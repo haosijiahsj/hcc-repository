@@ -19,6 +19,8 @@ public @interface Id {
 
     String value() default "";
 
-    IdType type() default IdType.AUTO;
+    IdType idType() default IdType.IDENTITY;
+
+    Class<? extends IdGenerator> generator() default DefaultIdGenerator.class;
 
 }

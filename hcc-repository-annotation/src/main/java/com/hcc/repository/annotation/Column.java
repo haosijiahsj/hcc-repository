@@ -23,6 +23,16 @@ public @interface Column {
      */
     String value() default "";
 
+    /**
+     * 转换器
+     * @return
+     */
     Class<? extends IConverter> converter() default DefaultConverter.class;
+
+    /**
+     * 是否忽略该字段
+     * @return
+     */
+    boolean ignore() default false;
 
 }

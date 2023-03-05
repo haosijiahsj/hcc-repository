@@ -17,6 +17,22 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Table {
 
+    /**
+     * 表名
+     * @return
+     */
     String value() default "";
+
+    /**
+     * 列名统一前缀
+     * @return
+     */
+    String columnPrefix() default "";
+
+    /**
+     * 忽略的属性名称，实体字段名称
+     * @return
+     */
+    String[] ignorePropertyNames() default {};
 
 }

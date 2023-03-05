@@ -7,5 +7,5 @@ package com.hcc.repository.annotation;
  * @date 2023/3/3
  */
 public enum IdType {
-    AUTO
+    IDENTITY, ASSIGNED, UUID, GENERATED
 }
