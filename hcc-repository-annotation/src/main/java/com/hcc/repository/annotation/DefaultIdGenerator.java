@@ -1,15 +1,17 @@
 package com.hcc.repository.annotation;
 
+import java.io.Serializable;
+
 /**
  * DefaultIdGenerator
  *
  * @author hushengjun
  * @date 2023/3/5
  */
-public class DefaultIdGenerator implements IdGenerator<Object> {
+public class DefaultIdGenerator implements IdGenerator<Serializable> {
 
     @Override
-    public Object nextId() {
+    public Serializable nextId() {
         throw new UnsupportedOperationException("请实现IdGenerator");
     }
 
