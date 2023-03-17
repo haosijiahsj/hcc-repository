@@ -18,16 +18,23 @@ import java.lang.reflect.Proxy;
 public class MyTest {
 
     public static void main(String[] args) {
-        Class<MyMapper> clazz = MyMapper.class;
-        System.out.println(MyTest.class.isAssignableFrom(clazz));
-//        MyMapper mapper = InjectMapperProxyFactory.create(MyMapper.class, new JdbcTemplate());
-//        mapper.insert(null);
+//        Class<MyMapper> clazz = MyMapper.class;
+//        System.out.println(MyTest.class.isAssignableFrom(clazz));
+////        MyMapper mapper = InjectMapperProxyFactory.create(MyMapper.class, new JdbcTemplate());
+////        mapper.insert(null);
+//
+//        MyMapper mapper1 = (MyMapper) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, (proxy, method, args1) -> {
+//            System.out.println("代理");
+//            return null;
+//        });
+//        mapper1.insert(null);
+        System.out.println(methodToField("getFile", "get"));
+    }
 
-        MyMapper mapper1 = (MyMapper) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, (proxy, method, args1) -> {
-            System.out.println("代理");
-            return null;
-        });
-        mapper1.insert(null);
+    public static String methodToField(String methodName, String prefix) {
+        int index = methodName.indexOf(prefix) + prefix.length();
+        char c = methodName.charAt(index);
+        return String.valueOf(c).toLowerCase() + methodName.substring(index + 1);
     }
 
     public interface MyMapper extends BaseMapper<Object, Long> {}

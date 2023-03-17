@@ -1,10 +1,10 @@
 package com.hcc.repository.core.condition;
 
 /**
- * Conditions
+ * ConditionBuilder
  *
  * @author hushengjun
- * @date 2023/3/3
+ * @date 2023/3/7
  */
-public interface Condition<T> {
+public class ConditionBuilder {
 }

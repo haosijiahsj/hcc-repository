@@ -1,6 +1,7 @@
 package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.interceptor.Interceptor;
+import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ import java.util.List;
  */
 public abstract class AbstractMethodHandler {
 
-    protected JdbcTemplate jdbcTemplate;
+    protected JdbcTemplateWrapper jdbcTemplateWrapper;
     protected String methodName;
     protected Object[] args;
     protected List<Interceptor> interceptors = new ArrayList<>();
@@ -26,10 +27,10 @@ public abstract class AbstractMethodHandler {
         return result;
     }
 
-    public abstract Object handleMethod() throws Exception;
+    protected abstract Object handleMethod() throws Exception;
 
-    public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public void setJdbcTemplateWrapper(JdbcTemplateWrapper jdbcTemplateWrapper) {
+        this.jdbcTemplateWrapper = jdbcTemplateWrapper;
     }
 
     public void setMethodName(String methodName) {

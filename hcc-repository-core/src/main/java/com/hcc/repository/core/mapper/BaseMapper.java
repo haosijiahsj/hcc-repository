@@ -1,6 +1,6 @@
 package com.hcc.repository.core.mapper;
 
-import com.hcc.repository.core.condition.Condition;
+import com.hcc.repository.core.condition.ICondition;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -48,7 +48,7 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param condition
      * @return
      */
-    int delete(Condition<T> condition);
+    int delete(ICondition<T> condition);
 
     /**
      * 根据实体更新
@@ -62,7 +62,7 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param condition
      * @return
      */
-    int update(Condition<T> condition);
+    int update(ICondition<T> condition);
 
     /**
      * 通过id查询
@@ -83,52 +83,34 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param condition
      * @return
      */
-    T selectOne(Condition<T> condition);
+    T selectOne(ICondition<T> condition);
 
     /**
      * 通过条件查询列表
      * @param condition
      * @return
      */
-    List<T> selectList(Condition<T> condition);
+    List<T> selectList(ICondition<T> condition);
+
+    /**
+     * 查询id列表
+     * @param condition
+     * @return
+     */
+    List<ID> selectIds(ICondition<T> condition);
+
+    /**
+     * 通过条件查询总数
+     * @param condition
+     * @return
+     */
+    Long selectCount(ICondition<T> condition);
 
     /**
      * 通过条件查询map列表
      * @param condition
      * @return
      */
-    List<Map<String, Object>> selectMaps(Condition<T> condition);
-
-    /**
-     * 通过sql更新
-     * @param sql
-     * @param args
-     * @return
-     */
-    int updateBySql(String sql, Object...args);
-
-    /**
-     * 通过sql查询一条
-     * @param sql
-     * @param args
-     * @return
-     */
-    T selectOneBySql(String sql, Object...args);
-
-    /**
-     * 通过sql查询列表
-     * @param sql
-     * @param args
-     * @return
-     */
-    List<T> selectListBySql(String sql, Object...args);
-
-    /**
-     * 通过sql查询map列表
-     * @param sql
-     * @param args
-     * @return
-     */
-    List<Map<String, Object>> selectMapsBySql(String sql, Object...args);
+    List<Map<String, Object>> selectMaps(ICondition<T> condition);
 
 }
