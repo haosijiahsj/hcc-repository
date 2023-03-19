@@ -24,8 +24,9 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
         selectColumns = new ArrayList<>(32);
     }
 
+    @SafeVarargs
     @Override
-    public LambdaQueryCondition<T> select(SFunction<T, ?>... columns) {
+    public final LambdaQueryCondition<T> select(SFunction<T, ?>... columns) {
         selectColumns.addAll(
                 Arrays.stream(columns)
                         .map(this::getColumnName)

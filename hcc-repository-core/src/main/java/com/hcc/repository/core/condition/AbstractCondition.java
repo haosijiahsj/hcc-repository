@@ -5,10 +5,15 @@ import com.hcc.repository.core.condition.interfaces.GroupByClause;
 import com.hcc.repository.core.condition.interfaces.OrderByClause;
 import com.hcc.repository.core.condition.interfaces.WhereClause;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.utils.CollUtils;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * AbstractCondition
@@ -19,6 +24,7 @@ import java.util.Map;
 public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, C>> extends ICondition<T>
         implements WhereClause<C, R>, GroupByClause<C, R>, OrderByClause<C, R>, ExtWhereClause<C, R> {
 
+    private AtomicInteger pos;
     protected C typeThis = (C) this;
 
     private T entity;
@@ -31,6 +37,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     protected void init() {
         columnValuePairs = new LinkedHashMap<>(16);
         segmentContainer = new SegmentContainer();
+        pos = new AtomicInteger(0);
     }
 
     @Override
@@ -54,6 +61,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return (String) column;
     }
 
+    private String getNamedColumnName(String originalColumnName) {
+        return originalColumnName + "#POS_" + pos.incrementAndGet();
+    }
+
     /**
      * 添加条件
      * @param condition
@@ -65,9 +76,11 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     private C addCondition(boolean condition, SqlKeywordEnum sqkKeyWord, R column, Object val) {
         if (condition) {
             String columnName = this.getColumnName(column);
-            this.putColumnValue(columnName, val);
-            String sqlSegment = String.format("%s %s %s", columnName, sqkKeyWord.getKeyword(), ":" + columnName);
-            segmentContainer.add(sqkKeyWord, sqlSegment);
+            String namedColumnName = this.getNamedColumnName(columnName);
+
+            this.putColumnValue(namedColumnName, val);
+            String sqlSegment = String.format("%s %s %s", columnName, sqkKeyWord.getKeyword(), ":" + namedColumnName);
+            segmentContainer.addAndSegment(sqlSegment);
         }
 
         return typeThis;
@@ -114,7 +127,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String sqlSegment = String.format("%s %s %s %s %s",
                     columnName, SqlKeywordEnum.BETWEEN.getKeyword(), ":" + leftColumnName,
                     SqlKeywordEnum.AND.getKeyword(), ":" + rightColumnName);
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -125,7 +138,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             this.putColumnValue(columnName, val);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.LIKE.getKeyword(), "%:" + columnName + "%");
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -136,7 +149,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             this.putColumnValue(columnName, val);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.NOT_LIKE.getKeyword(), "%:" + columnName + "%");
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -147,7 +160,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             this.putColumnValue(columnName, val);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.LIKE.getKeyword(), ":" + columnName + "%");
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -158,7 +171,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             this.putColumnValue(columnName, val);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.LIKE.getKeyword(), ":%" + columnName);
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -168,7 +181,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         if (condition) {
             String columnName = this.getColumnName(column);
             String sqlSegment = String.format("%s %s", columnName, SqlKeywordEnum.IS_NULL.getKeyword());
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
@@ -178,38 +191,47 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         if (condition) {
             String columnName = this.getColumnName(column);
             String sqlSegment = String.format("%s %s", columnName, SqlKeywordEnum.IS_NOT_NULL.getKeyword());
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
 
     @Override
     public C in(boolean condition, R column, Collection<?> coll) {
-        if (condition) {
+        if (condition && CollUtils.isNotEmpty(coll)) {
             String columnName = this.getColumnName(column);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.IN.getKeyword(), "(:" + columnName + ")");
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
     }
 
     @Override
     public C notIn(boolean condition, R column, Collection<?> coll) {
-        if (condition) {
+        if (condition && CollUtils.isNotEmpty(coll)) {
             String columnName = this.getColumnName(column);
             String sqlSegment = String.format("%s %s %s", columnName, SqlKeywordEnum.NOT_IN.getKeyword(), "(:" + columnName + ")");
-            segmentContainer.add(SqlKeywordEnum.AND, sqlSegment);
+            segmentContainer.addAndSegment(sqlSegment);
+        }
+        return typeThis;
+    }
+
+    @SafeVarargs
+    @Override
+    public final C groupBy(boolean condition, R... columns) {
+        if (condition) {
+            for (R column : columns) {
+                segmentContainer.addGroupBySegment(this.getColumnName(column));
+            }
         }
         return typeThis;
     }
 
     @Override
-    public C groupBy(boolean condition, R... columns) {
-        return typeThis;
-    }
-
-    @Override
     public C having(boolean condition, String havingSql, String... params) {
+        if (condition) {
+            segmentContainer.addHavingSegment(String.format(havingSql, params));
+        }
         return typeThis;
     }
 
@@ -219,26 +241,43 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return typeThis;
     }
 
+    @SafeVarargs
     @Override
-    public C orderBy(boolean condition, boolean isAsc, R... columns) {
+    public final C orderBy(boolean condition, boolean isAsc, R... columns) {
+        if (condition) {
+            for (R column : columns) {
+                String columnName = this.getColumnName(column);
+                if (isAsc) {
+                    segmentContainer.addOrderBySegment(columnName + " " + SqlKeywordEnum.ASC.getKeyword());
+                } else {
+                    segmentContainer.addOrderBySegment(columnName + " " + SqlKeywordEnum.DESC.getKeyword());
+                }
+            }
+        }
         return typeThis;
     }
 
     @Override
     public C apply(boolean condition, String sql) {
         if (condition) {
-            segmentContainer.add(SqlKeywordEnum.AND, sql);
+            segmentContainer.addPlainSegment(sql);
         }
         return typeThis;
     }
 
     @Override
     public C exists(boolean condition, String sql) {
+        if (condition) {
+            segmentContainer.addPlainSegment(SqlKeywordEnum.EXISTS.getKeyword() + "( " + sql +" )");
+        }
         return typeThis;
     }
 
     @Override
     public C notExists(boolean condition, String sql) {
+        if (condition) {
+            segmentContainer.addPlainSegment(SqlKeywordEnum.NOT_EXISTS.getKeyword() + "( " + sql +" )");
+        }
         return typeThis;
     }
 

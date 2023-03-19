@@ -1,6 +1,6 @@
 package com.hcc.repository.core.condition;
 
-import com.hcc.repository.core.constants.SqlKeywordEnum;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +11,7 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/3/10
  */
+@Getter
 public class SegmentContainer {
 
     private final List<String> whereSqlSegments;
@@ -25,8 +26,24 @@ public class SegmentContainer {
         havingSegments = new ArrayList<>(8);
     }
 
-    public void add(SqlKeywordEnum sqlKeyword, String sqlSegment) {
+    public void addAndSegment(String sqlSegment) {
+        whereSqlSegments.add("AND " + sqlSegment);
+    }
 
+    public void addPlainSegment(String sqlSegment) {
+        whereSqlSegments.add(sqlSegment);
+    }
+
+    public void addOrderBySegment(String sqlSegment) {
+        orderBySegments.add(sqlSegment);
+    }
+
+    public void addGroupBySegment(String sqlSegment) {
+        groupBySegments.add(sqlSegment);
+    }
+
+    public void addHavingSegment(String sqlSegment) {
+        havingSegments.add(sqlSegment);
     }
 
 }

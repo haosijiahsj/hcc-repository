@@ -2,6 +2,7 @@ package com.hcc.repository.core.metadata;
 
 import lombok.Data;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,8 +15,8 @@ import java.util.List;
 public class TableInfo {
 
     private String tableName;
-    private String columnPrefix;
-    private List<String> ignorePropertyNames;
+    private String columnPrefix = "";
+    private List<String> ignorePropertyNames = Collections.emptyList();
     private Class<?> clazz;
     private TableColumnInfo idColumnInfo;
     private List<TableColumnInfo> columnInfos;

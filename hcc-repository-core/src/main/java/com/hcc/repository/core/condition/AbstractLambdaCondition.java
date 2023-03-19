@@ -1,6 +1,8 @@
 package com.hcc.repository.core.condition;
 
 import com.hcc.repository.core.condition.interfaces.SFunction;
+import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfoCache;
 
 /**
  * AbstractLambdaCondition
@@ -16,10 +18,10 @@ public abstract class AbstractLambdaCondition<T, C extends AbstractCondition<T, 
             throw new NullPointerException();
         }
 
-        // TODO 这里要添加缓存逻辑
         String methodName = column.getImplMethodName();
+        String fieldName = this.resolveMethodName(methodName);
 
-        return this.resolveMethodName(methodName);
+        return fieldName;
     }
 
     private String resolveMethodName(String methodName) {
