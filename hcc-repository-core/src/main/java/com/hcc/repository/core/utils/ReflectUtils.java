@@ -9,6 +9,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,13 +47,32 @@ public class ReflectUtils {
      * @param value
      * @throws IllegalAccessException
      */
-    public static void setValue(Object obj, Field field, Object value) throws IllegalAccessException {
+    public static void setValue(Object obj, Field field, Object value) {
         boolean accessible = field.isAccessible();
         if (!accessible) {
             field.setAccessible(true);
         }
-        field.set(obj, value);
-        field.setAccessible(accessible);
+        try {
+            field.set(obj, value);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } finally {
+            field.setAccessible(accessible);
+        }
+    }
+
+    public static Object getValue(Object obj, Field field) {
+        boolean accessible = field.isAccessible();
+        if (!accessible) {
+            field.setAccessible(true);
+        }
+        try {
+            return field.get(obj);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        } finally {
+            field.setAccessible(accessible);
+        }
     }
 
     /**
@@ -131,17 +152,48 @@ public class ReflectUtils {
      * @param field
      * @return
      */
-    public static Class[] getGenericClasses(Field field) {
+    public static Class<?>[] getGenericClasses(Field field) {
         Type genericType = field.getGenericType();
         List<Class<?>> classes = new ArrayList<>();
         if (genericType instanceof ParameterizedType) {
             Type[] actualTypeArguments = ((ParameterizedType) genericType).getActualTypeArguments();
             for (Type type : actualTypeArguments) {
-                classes.add((Class) type);
+                classes.add((Class<?>) type);
             }
         }
 
         return classes.toArray(new Class[0]);
+    }
+
+    public static Type[] getGenericClassesForInterface(Class<?> clazz) {
+        Type[] types = clazz.getGenericInterfaces();
+        ParameterizedType target = null;
+        for (Type type : types) {
+            if (type instanceof ParameterizedType) {
+                Type[] typeArray = ((ParameterizedType) type).getActualTypeArguments();
+                if (ArrayUtils.isNotEmpty(typeArray)) {
+                    for (Type t : typeArray) {
+                        if (t instanceof TypeVariable || t instanceof WildcardType) {
+                            break;
+                        } else {
+                            target = (ParameterizedType) type;
+                            break;
+                        }
+                    }
+                }
+                break;
+            }
+        }
+
+        return target == null ? null : target.getActualTypeArguments();
+    }
+
+    public static <T> T newInstance(Class<T> clazz) {
+        try {
+            return clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

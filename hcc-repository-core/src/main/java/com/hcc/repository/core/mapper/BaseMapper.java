@@ -1,6 +1,6 @@
 package com.hcc.repository.core.mapper;
 
-import com.hcc.repository.core.condition.ICondition;
+import com.hcc.repository.core.conditions.ICondition;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -27,7 +27,7 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param entities
      * @return
      */
-    int batchInsert(Collection<T> entities);
+    int[] batchInsert(Collection<T> entities);
 
     /**
      * 根据id删除
@@ -55,7 +55,7 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param entity
      * @return
      */
-    int update(T entity);
+    int updateById(T entity);
 
     /**
      * 根据条件更新

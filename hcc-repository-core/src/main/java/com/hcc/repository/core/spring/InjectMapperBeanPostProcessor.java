@@ -2,7 +2,6 @@ package com.hcc.repository.core.spring;
 
 import com.hcc.repository.core.InjectMapper;
 import com.hcc.repository.core.mapper.BaseMapper;
-import com.hcc.repository.core.proxy.InjectMapperInvocationHandler;
 import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -47,11 +46,7 @@ public class InjectMapperBeanPostProcessor implements BeanPostProcessor {
 
             // 添加mapper的动态代理
             Object proxy = InjectMapperProxyFactory.create(mapperClass, jdbcTemplate);
-            try {
-                ReflectUtils.setValue(bean, field, proxy);
-            } catch (IllegalAccessException e) {
-                log.error("添加代理失败！", e);
-            }
+            ReflectUtils.setValue(bean, field, proxy);
         }
 
         return bean;

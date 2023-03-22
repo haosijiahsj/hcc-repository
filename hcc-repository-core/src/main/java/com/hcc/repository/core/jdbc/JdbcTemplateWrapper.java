@@ -1,16 +1,14 @@
 package com.hcc.repository.core.jdbc;
 
-import org.springframework.jdbc.core.JdbcOperations;
+import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.Pair;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
-import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterUtils;
-import org.springframework.jdbc.core.namedparam.ParsedSql;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,32 +28,54 @@ public class JdbcTemplateWrapper {
         this.namedParameterJdbcTemplateDelegate = new NamedParameterJdbcTemplateDelegate(jdbcTemplate);
     }
 
+    public JdbcTemplateWrapper(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.namedParameterJdbcTemplateDelegate = new NamedParameterJdbcTemplateDelegate(dataSource);
+    }
+
     public List<Map<String, Object>> namedQueryForList(String sql, Map<String, ?> paramMap) {
         return namedParameterJdbcTemplateDelegate.queryForList(sql, paramMap);
     }
 
-    private static class NamedParameterJdbcTemplateDelegate extends NamedParameterJdbcTemplate {
+    public int namedUpdate(String sql, Map<String, ?> paramMap) {
+        return namedParameterJdbcTemplateDelegate.update(sql, paramMap);
+    }
 
-        public NamedParameterJdbcTemplateDelegate(DataSource dataSource) {
-            super(dataSource);
+    public int[] namedBatchUpdate(String sql, List<Map<String, Object>> paramMaps) {
+        return namedParameterJdbcTemplateDelegate.batchUpdate(sql, paramMaps.toArray(new HashMap[0]));
+    }
+
+    /**
+     * 自增主键这样使用
+     * @param sql
+     * @param paramMap
+     * @return
+     */
+    public Pair<Number, Integer> namedUpdateForKey(String sql, Map<String, ?> paramMap) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        int rows = namedParameterJdbcTemplateDelegate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
+
+        return Pair.of(keyHolder.getKey(), rows);
+    }
+
+    public <T> List<T> namedQueryForList(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
+        return namedParameterJdbcTemplateDelegate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
+    }
+
+    public <T> T namedQueryForObject(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
+        List<T> results = namedParameterJdbcTemplateDelegate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
+        if (CollUtils.isEmpty(results)) {
+            return null;
+        }
+        if (results.size() > 1) {
+            throw new RuntimeException("结果不唯一");
         }
 
-        public NamedParameterJdbcTemplateDelegate(JdbcOperations classicJdbcTemplate) {
-            super(classicJdbcTemplate);
-        }
+        return results.get(0);
+    }
 
-        @Override
-        protected PreparedStatementCreator getPreparedStatementCreator(String sql, SqlParameterSource paramSource) {
-            ParsedSql parsedSql = this.getParsedSql(sql);
-
-            // TODO 这里拿到了最终的sql和参数
-            String sqlToUse = NamedParameterUtils.substituteNamedParameters(parsedSql, paramSource);
-            Object[] params = NamedParameterUtils.buildValueArray(parsedSql, paramSource, null);
-
-            List<SqlParameter> declaredParameters = NamedParameterUtils.buildSqlParameterList(parsedSql, paramSource);
-            PreparedStatementCreatorFactory pscf = new PreparedStatementCreatorFactory(sqlToUse, declaredParameters);
-            return pscf.newPreparedStatementCreator(params);
-        }
+    public <T> List<T> querForList(String sql, Object[] args, Class<T> targetClass) {
+        return jdbcTemplate.query(sql, args, new GeneralRowMapper<>(targetClass));
     }
 
 }

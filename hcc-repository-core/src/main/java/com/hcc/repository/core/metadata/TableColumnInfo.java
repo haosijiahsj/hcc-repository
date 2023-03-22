@@ -1,5 +1,6 @@
 package com.hcc.repository.core.metadata;
 
+import com.hcc.repository.annotation.DefaultConverter;
 import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
@@ -22,6 +23,10 @@ public class TableColumnInfo {
     private boolean primaryKey = false;
     private IdType idType;
     private Class<? extends IdGenerator> generator;
-    private Class<? extends IConverter> converter;
+    private Class<? extends IConverter> converter = DefaultConverter.class;
+
+    public boolean needConvert() {
+        return !DefaultConverter.class.equals(converter) && !IConverter.class.equals(converter);
+    }
 
 }

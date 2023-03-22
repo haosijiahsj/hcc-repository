@@ -16,7 +16,9 @@ import java.util.List;
 public abstract class AbstractMethodHandler {
 
     protected JdbcTemplateWrapper jdbcTemplateWrapper;
-    protected String methodName;
+    private String methodName;
+    protected Class<?> idClass;
+    protected Class<?> entityClass;
     protected Object[] args;
     protected List<Interceptor> interceptors = new ArrayList<>();
 
@@ -37,6 +39,10 @@ public abstract class AbstractMethodHandler {
         this.methodName = methodName;
     }
 
+    public String getMethodName() {
+        return methodName;
+    }
+
     public void setArgs(Object[] args) {
         this.args = args;
     }
@@ -47,6 +53,26 @@ public abstract class AbstractMethodHandler {
 
     public void addInterceptor(Interceptor interceptor) {
         this.interceptors.add(interceptor);
+    }
+
+    public void setIdClass(Class<?> idClass) {
+        this.idClass = idClass;
+    }
+
+    public void setEntityClass(Class<?> entityClass) {
+        this.entityClass = entityClass;
+    }
+
+    public Object getFirstArg() {
+        return args[0];
+    }
+
+    public <T> T getFirstArg(Class<T> clazz) {
+        return clazz.cast(args[0]);
+    }
+
+    public boolean firstArgIsNull() {
+        return args == null || args[0] == null;
     }
 
 }
