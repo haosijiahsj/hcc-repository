@@ -4,7 +4,6 @@ import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.TypeReference;
 import org.junit.Test;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
 /**
@@ -17,8 +16,11 @@ public class InsertTest extends BaseTest {
 
     @Test
     public void insert1() {
-        TableTestPo mock = JMockData.mock(TableTestPo.class);
-        mapper.insert(mock);
+        for (int i = 0; i < 100; i++) {
+            TableTestPo mock = JMockData.mock(TableTestPo.class);
+            mock.setSex(i % 2);
+            mapper.insert(mock);
+        }
     }
 
     @Test

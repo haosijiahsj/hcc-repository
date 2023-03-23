@@ -37,11 +37,10 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
         }
 
         Map<String, TableColumnInfo> columnNameColumnInfoMap = TableInfoHelper.getColumnNameColumnInfoMap(entityClass);
-
         ResultSetMetaData rsmd = rs.getMetaData();
         int columnCount = rsmd.getColumnCount();
         for (int index = 1; index <= columnCount; index++) {
-            Object columnValue = JdbcUtils.getResultSetValue(rs, index);
+
             String columnName = this.getColumnName(rsmd, index);
             // 可找到对应实体的字段了
             TableColumnInfo tableColumnInfo = columnNameColumnInfoMap.get(columnName);
@@ -52,10 +51,12 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
             Field field = tableColumnInfo.getField();
             Object targetValue;
             if (tableColumnInfo.needConvert()) {
+                Object columnValue = JdbcUtils.getResultSetValue(rs, index);
                 targetValue = this.convertValueByCustomerConverter(columnValue, tableColumnInfo.getConverter());
             } else {
                 // 是默认的，需要走内部的转换器
-                targetValue = JdbcUtils.getResultSetValue(rs, i, field.getType());
+                targetValue = JdbcUtils.getResultSetValue(rs, index, field.getType());
+                // TODO 还是得自己转哦
             }
 
             ReflectUtils.setValue(instance, field, targetValue);

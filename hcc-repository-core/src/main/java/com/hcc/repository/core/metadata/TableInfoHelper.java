@@ -161,7 +161,7 @@ public class TableInfoHelper {
     }
 
     public static boolean hasIdColumn(Class<?> clazz) {
-        return getIdColumnInfo(clazz) == null;
+        return getIdColumnInfo(clazz) != null;
     }
 
 }

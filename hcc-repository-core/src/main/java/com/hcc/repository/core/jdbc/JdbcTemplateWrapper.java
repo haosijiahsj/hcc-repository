@@ -74,8 +74,35 @@ public class JdbcTemplateWrapper {
         return results.get(0);
     }
 
-    public <T> List<T> querForList(String sql, Object[] args, Class<T> targetClass) {
+    public List<Map<String, Object>> queryForList(String sql, Object[] args) {
+        return jdbcTemplate.queryForList(sql, args);
+    }
+
+    public <T> List<T> queryForList(String sql, Object[] args, Class<T> targetClass) {
         return jdbcTemplate.query(sql, args, new GeneralRowMapper<>(targetClass));
+    }
+
+    public <T> T queryForObject(String sql, Object[] args, Class<T> targetClass) {
+        List<T> results = this.queryForList(sql, args, targetClass);
+        if (CollUtils.isEmpty(results)) {
+            return null;
+        }
+        if (results.size() > 1) {
+            throw new RuntimeException("结果不唯一");
+        }
+
+        return results.get(0);
+    }
+
+    public int update(String sql, Object[] args) {
+        return jdbcTemplate.update(sql, args);
+    }
+
+    public Pair<Number, Integer> updateForKey(String sql, Object[] args) {
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        int affectRow = jdbcTemplate.update(sql, args, keyHolder);
+
+        return Pair.of(keyHolder.getKey(), affectRow);
     }
 
 }

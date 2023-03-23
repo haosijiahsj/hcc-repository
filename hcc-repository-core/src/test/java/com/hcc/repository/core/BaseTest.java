@@ -1,6 +1,7 @@
 package com.hcc.repository.core;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.core.mapper.BaseMapper;
@@ -18,7 +19,7 @@ import java.time.LocalDateTime;
  */
 public class BaseTest {
 
-    private static final String DRIVER_CLASS_NAME = "com.mysql.jdbc.Driver";
+    private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
     protected TestMapper mapper;
 
@@ -26,10 +27,9 @@ public class BaseTest {
     public void init() {
         DruidDataSource druidDataSource = new DruidDataSource();
         druidDataSource.setDriverClassName(DRIVER_CLASS_NAME);
-//        String dbName = "oa_workflow";
-//        druidDataSource.setUrl("jdbc:mysql://cd-cdb-83zxqgz2.sql.tencentcdb.com:62363/"+ dbName +"?characterEncoding=utf-8");
-//        druidDataSource.setUsername("duxq_read");
-//        druidDataSource.setPassword("IKOjVXJ4");
+        druidDataSource.setUrl("jdbc:mysql://localhost:3306/hcc_repository?characterEncoding=utf-8&serverTimezone=Asia/Shanghai");
+        druidDataSource.setUsername("root");
+        druidDataSource.setPassword("123456");
 
         mapper = InjectMapperProxyFactory.create(TestMapper.class, druidDataSource);
     }
@@ -41,6 +41,7 @@ public class BaseTest {
     public static class TableTestPo {
         @Id
         private Long id;
+        @Column("name_")
         private String name;
         private Integer sex;
         private Integer age;

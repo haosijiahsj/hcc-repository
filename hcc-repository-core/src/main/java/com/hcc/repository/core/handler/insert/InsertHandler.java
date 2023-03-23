@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.insert;
 
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
+import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.insert.DefaultInsertCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
@@ -22,31 +23,15 @@ import java.util.UUID;
 public class InsertHandler extends AbstractMethodHandler {
 
     @Override
-    protected Object handleMethod() throws Exception {
-        Object firstArg = getFirstArg();
-        if (firstArg == null) {
-            throw new IllegalArgumentException("插入参数不能为空！");
-        }
-
-        DefaultInsertCondition<?> condition = this.buildInsertCondition(firstArg);
-        TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null && !IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
-            Pair<Number, Integer> pair = jdbcTemplateWrapper.namedUpdateForKey(condition.getSqlInsert(), condition.getColumnValuePairs());
-            Object value = NumberUtils.convertNumberToTargetClass(pair.getLeft(), (Class<? extends Number>) idClass);
-            // 回填id到实体中
-            ReflectUtils.setValue(firstArg, idColumnInfo.getField(), value);
-
-            return pair.getRight();
-        }
-
-        return jdbcTemplateWrapper.namedUpdate(condition.getSqlInsert(), condition.getColumnValuePairs());
+    protected ICondition<?> assembleCondition() {
+        return assembleCondition(getFirstArg());
     }
 
-    protected DefaultInsertCondition<?> buildInsertCondition(Object firstArg) {
-        DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(firstArg);
+    protected ICondition<?> assembleCondition(Object entity) {
+        DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(entity);
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
         columnInfos.forEach(c -> {
-            Object value = ReflectUtils.getValue(firstArg, c.getField());
+            Object value = ReflectUtils.getValue(entity, c.getField());
             // 转换
             Object targetValue = value;
             if (c.needConvert()) {
@@ -58,11 +43,27 @@ public class InsertHandler extends AbstractMethodHandler {
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         if (idColumnInfo != null) {
             if (!IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
-                condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, firstArg));
+                condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, entity));
             }
         }
 
         return condition;
+    }
+
+    @Override
+    protected Object executeSql(String sql, Object[] args) {
+        Object firstArg = getFirstArg();
+        TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
+        if (idColumnInfo != null && !IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
+            Pair<Number, Integer> pair = jdbcTemplateWrapper.updateForKey(sql, args);
+            Object value = NumberUtils.convertNumberToTargetClass(pair.getLeft(), (Class<? extends Number>) idClass);
+            // 回填id到实体中
+            ReflectUtils.setValue(firstArg, idColumnInfo.getField(), value);
+
+            return pair.getRight();
+        }
+
+        return jdbcTemplateWrapper.update(sql, args);
     }
 
     protected Object getIdValue(TableColumnInfo idColumnInfo, Object entity) {

@@ -16,8 +16,9 @@ import java.util.List;
  * @date 2023/3/21
  */
 public class UpdateByIdHandler extends AbstractMethodHandler {
+
     @Override
-    protected Object handleMethod() throws Exception {
+    protected ICondition<?> assembleCondition() {
         if (!TableInfoHelper.hasIdColumn(entityClass)) {
             throw new RuntimeException("没有id列");
         }
@@ -39,7 +40,12 @@ public class UpdateByIdHandler extends AbstractMethodHandler {
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         condition.eq(idColumnInfo.getColumnName(), ReflectUtils.getValue(firstArg, idColumnInfo.getField()));
 
-        return jdbcTemplateWrapper.namedUpdate(condition.getSqlUpdate(), condition.getColumnValuePairs());
+        return condition;
+    }
+
+    @Override
+    protected Object executeSql(String sql, Object[] args) {
+        return jdbcTemplateWrapper.update(sql, args);
     }
 
 }

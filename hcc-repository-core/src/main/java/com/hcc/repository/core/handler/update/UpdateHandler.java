@@ -10,10 +10,17 @@ import com.hcc.repository.core.handler.AbstractMethodHandler;
  * @date 2023/3/21
  */
 public class UpdateHandler extends AbstractMethodHandler {
+
     @Override
-    protected Object handleMethod() throws Exception {
-        ICondition<?> condition = getFirstArg(ICondition.class);
-        return jdbcTemplateWrapper.namedUpdate(condition.getSqlUpdate(), condition.getColumnValuePairs());
+    protected ICondition<?> assembleCondition() {
+        return getFirstArg(ICondition.class);
+    }
+
+    @Override
+    protected Object executeSql(String sql, Object[] args) {
+        return jdbcTemplateWrapper.update(sql, args);
+//        ICondition<?> condition = assembleCondition();
+//        return jdbcTemplateWrapper.namedUpdate(condition.getSqlUpdate(), condition.getColumnValuePairs());
     }
 
 }

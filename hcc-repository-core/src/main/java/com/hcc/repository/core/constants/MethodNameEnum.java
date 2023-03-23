@@ -16,6 +16,9 @@ import com.hcc.repository.core.handler.select.SelectOneHandler;
 import com.hcc.repository.core.handler.update.UpdateByIdHandler;
 import com.hcc.repository.core.handler.update.UpdateHandler;
 
+import java.util.Arrays;
+import java.util.List;
+
 /**
  * MethodNameConstants
  *
@@ -47,6 +50,18 @@ public enum MethodNameEnum {
     SELECT_ONE("selectOne", "查询查询", SelectOneHandler.class),
 
     ;
+
+    private static final List<MethodNameEnum> INSERT_METHODS;
+    private static final List<MethodNameEnum> DELETE_METHODS;
+    private static final List<MethodNameEnum> UPDATE_METHODS;
+    private static final List<MethodNameEnum> SELECT_METHODS;
+
+    static {
+        INSERT_METHODS = Arrays.asList(INSERT, BATCH_INSERT);
+        DELETE_METHODS = Arrays.asList(DELETE, DELETE_BY_ID, DELETE_BY_IDS);
+        UPDATE_METHODS = Arrays.asList(UPDATE, UPDATE_BY_ID);
+        SELECT_METHODS = Arrays.asList(SELECT_BY_ID, SELECT_BY_IDS, SELECT_COUNT, SELECT_IDS, SELECT_LIST, SELECT_MAPS, SELECT_ONE);
+    }
     private String methodName;
     private String desc;
     private Class<? extends AbstractMethodHandler> handlerClass;
@@ -63,6 +78,30 @@ public enum MethodNameEnum {
 
     public Class<? extends AbstractMethodHandler> getHandlerClass() {
         return handlerClass;
+    }
+
+    public static MethodNameEnum get(String methodName) {
+        MethodNameEnum[] values = MethodNameEnum.values();
+        for (MethodNameEnum methodNameEnum : values) {
+            if (methodNameEnum.getMethodName().equals(methodName)) {
+                return methodNameEnum;
+            }
+        }
+
+        return null;
+    }
+
+    public static boolean isC(MethodNameEnum methodNameEnum) {
+        return INSERT_METHODS.contains(methodNameEnum);
+    }
+    public static boolean isR(MethodNameEnum methodNameEnum) {
+        return SELECT_METHODS.contains(methodNameEnum);
+    }
+    public static boolean isU(MethodNameEnum methodNameEnum) {
+        return UPDATE_METHODS.contains(methodNameEnum);
+    }
+    public static boolean isD(MethodNameEnum methodNameEnum) {
+        return DELETE_METHODS.contains(methodNameEnum);
     }
 
 }

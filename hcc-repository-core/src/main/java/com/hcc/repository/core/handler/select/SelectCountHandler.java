@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.select;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
+import com.hcc.repository.core.handler.AbstractSelectMethodHandler;
 import com.hcc.repository.core.utils.CollUtils;
 
 import java.util.List;
@@ -14,13 +15,16 @@ import java.util.Optional;
  * @author hushengjun
  * @date 2023/3/21
  */
-public class SelectCountHandler extends AbstractMethodHandler {
-    @Override
-    protected Object handleMethod() throws Exception {
-        ICondition<?> condition = getFirstArg(ICondition.class);
-        condition.setEntityClass(entityClass);
+public class SelectCountHandler extends AbstractSelectMethodHandler {
 
-        List<Map<String, Object>> results = jdbcTemplateWrapper.namedQueryForList(condition.getSqlQuery(), condition.getColumnValuePairs());
+    @Override
+    protected ICondition<?> assembleCondition() {
+        return getFirstArg(ICondition.class);
+    }
+
+    @Override
+    protected Object executeSql(String sql, Object[] args) {
+        List<Map<String, Object>> results = jdbcTemplateWrapper.queryForList(sql, args);
         if (CollUtils.isEmpty(results)) {
             return null;
         }
@@ -40,4 +44,10 @@ public class SelectCountHandler extends AbstractMethodHandler {
 
         return null;
     }
+
+    @Override
+    protected Object defaultValueForQuery() {
+        return null;
+    }
+
 }

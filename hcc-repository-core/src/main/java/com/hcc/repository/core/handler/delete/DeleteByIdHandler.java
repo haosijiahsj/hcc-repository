@@ -12,13 +12,19 @@ import com.hcc.repository.core.metadata.TableInfoHelper;
  * @date 2023/3/21
  */
 public class DeleteByIdHandler extends AbstractMethodHandler {
+
     @Override
-    protected Object handleMethod() throws Exception {
+    protected ICondition<?> assembleCondition() {
         Object firstArg = getFirstArg();
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
-        ICondition<?> condition = new DefaultQueryCondition<>(entityClass)
-                .eq(idColumnName, firstArg);
 
-        return jdbcTemplateWrapper.namedUpdate(condition.getSqlDelete(), condition.getColumnValuePairs());
+        return new DefaultQueryCondition<>(entityClass)
+                .eq(idColumnName, firstArg);
     }
+
+    @Override
+    protected Object executeSql(String sql, Object[] args) {
+        return jdbcTemplateWrapper.update(sql, args);
+    }
+
 }

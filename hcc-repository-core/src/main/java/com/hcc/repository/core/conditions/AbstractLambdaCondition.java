@@ -21,6 +21,10 @@ public abstract class AbstractLambdaCondition<T, C extends AbstractCondition<T, 
         String methodName = column.getImplMethodName();
         String fieldName = this.resolveMethodName(methodName);
         Class<T> entityClass = getEntityClass();
+        if (entityClass == null) {
+            // 获取lambda中的class
+            entityClass = (Class<T>) column.getImplClassType();
+        }
         TableColumnInfo tableColumnInfo = TableInfoHelper.getColumnInfoByClassAndFieldName(entityClass, fieldName);
         if (tableColumnInfo == null) {
             throw new IllegalArgumentException("该字段未映射");

@@ -23,9 +23,18 @@ public interface SFunction<T, R> extends Function<T, R>, Serializable {
 
     default String getImplClass() {
         try {
-            return getSerializedLambda().getImplClass();
+            String implClass = getSerializedLambda().getImplClass();
+            return implClass.replace('/', '.');
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    default Class<?> getImplClassType() {
+        try {
+            return Class.forName(getImplClass());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
