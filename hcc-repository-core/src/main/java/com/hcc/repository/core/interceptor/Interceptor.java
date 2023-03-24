@@ -26,4 +26,18 @@ public interface Interceptor {
         return true;
     }
 
+    /**
+     * 更新之前调用
+     * @param jdbcTemplateWrapper
+     * @param context
+     */
+    default void beforeUpdate(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {}
+
+    /**
+     * 查询之前调用
+     * @param jdbcTemplateWrapper
+     * @param context
+     */
+    default void beforeQuery(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {}
+
 }

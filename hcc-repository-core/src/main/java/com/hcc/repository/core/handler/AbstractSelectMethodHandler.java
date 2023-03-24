@@ -2,7 +2,6 @@ package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
-import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
  * AbstractCrudMethodHandler

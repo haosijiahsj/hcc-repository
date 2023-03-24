@@ -1,5 +1,9 @@
 package com.hcc.repository.core.conditions.interfaces;
 
+import com.hcc.repository.core.metadata.TableColumnInfo;
+
+import java.util.function.Predicate;
+
 /**
  * Select
  *
@@ -9,5 +13,11 @@ package com.hcc.repository.core.conditions.interfaces;
 public interface SelectClause<C, T, R> {
 
     C select(R...columns);
+
+    C select(Class<T> entityClass, Predicate<TableColumnInfo> predicate);
+
+    default C select(Predicate<TableColumnInfo> predicate) {
+        return select(null, predicate);
+    }
 
 }

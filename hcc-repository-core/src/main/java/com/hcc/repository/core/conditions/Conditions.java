@@ -11,9 +11,9 @@ import com.hcc.repository.core.conditions.update.LambdaUpdateCondition;
  * @author hushengjun
  * @date 2023/3/7
  */
-public final class ConditionBuilder {
+public final class Conditions {
 
-    private ConditionBuilder() {}
+    private Conditions() {}
 
     public static <T> DefaultQueryCondition<T> query() {
         return new DefaultQueryCondition<>();

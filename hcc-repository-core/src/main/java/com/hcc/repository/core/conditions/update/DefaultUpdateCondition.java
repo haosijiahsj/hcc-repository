@@ -61,4 +61,19 @@ public class DefaultUpdateCondition<T> extends AbstractCondition<T, String, Defa
                 + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
     }
 
+    @Override
+    public String getSqlCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlDelete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlQuery() {
+        throw new UnsupportedOperationException();
+    }
+
 }

@@ -4,6 +4,8 @@ import com.alibaba.druid.pool.DruidDataSource;
 import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.Table;
+import com.hcc.repository.core.converter.CustomerConverter;
+import com.hcc.repository.core.enums.SexEnum;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
 import lombok.Data;
@@ -43,7 +45,8 @@ public class BaseTest {
         private Long id;
         @Column("name_")
         private String name;
-        private Integer sex;
+        @Column(converter = CustomerConverter.class)
+        private SexEnum sex;
         private Integer age;
         private LocalDateTime createTime;
         private LocalDateTime updateTime;

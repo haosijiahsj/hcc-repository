@@ -5,6 +5,8 @@ import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 
+import java.util.Collection;
+
 /**
  * DeleteByIdsHandler
  *
@@ -18,7 +20,7 @@ public class DeleteByIdsHandler extends AbstractMethodHandler {
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
 
         return new DefaultQueryCondition<>(entityClass)
-                .in(idColumnName, firstArg);
+                .in(idColumnName, (Collection<?>) firstArg);
     }
 
     @Override

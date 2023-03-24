@@ -14,6 +14,7 @@ import java.util.Map;
  * @date 2023/3/21
  */
 public class BatchInsertHandler extends InsertHandler {
+
     @Override
     public Object handle() throws Exception {
         Object firstArg = args[0];
@@ -32,4 +33,10 @@ public class BatchInsertHandler extends InsertHandler {
 
         return jdbcTemplateWrapper.namedBatchUpdate(sql, paramMaps);
     }
+
+    @Override
+    protected Object defaultValueForUpdate() {
+        return new int[] {};
+    }
+
 }

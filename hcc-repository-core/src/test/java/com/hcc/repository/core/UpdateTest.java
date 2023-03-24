@@ -17,7 +17,6 @@ public class UpdateTest extends BaseTest {
     @Test
     public void updateById() {
         TableTestPo mock = JMockData.mock(TableTestPo.class);
-        mock.setSex(1);
         mock.setId(1L);
 
         mapper.updateById(mock);

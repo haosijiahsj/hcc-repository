@@ -14,4 +14,5 @@ public class DeleteHandler extends AbstractSelectMethodHandler {
     protected Object executeSql(String sql, Object[] args) {
         return jdbcTemplateWrapper.update(sql, args);
     }
+
 }

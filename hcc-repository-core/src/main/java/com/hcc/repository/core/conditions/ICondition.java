@@ -1,6 +1,7 @@
 package com.hcc.repository.core.conditions;
 
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.Map;
 
@@ -20,16 +21,47 @@ public abstract class ICondition<T> {
 
     public abstract Map<String, Object> getColumnValuePairs();
 
-    public String getSqlSet() {
-        return null;
+    /**
+     * update语句set片段
+     * @return
+     */
+    protected String getSqlSet() {
+        throw new UnsupportedOperationException();
     }
 
-    public String getSqlSelect() {
-        return null;
+    /**
+     * select语句select片段
+     * @return
+     */
+    protected String getSqlSelect() {
+        throw new UnsupportedOperationException();
     }
 
+    /**
+     * where条件后的sql片段
+     * @return
+     */
     public String getSqlWhere() {
         return null;
+    }
+
+    /**
+     * 获取插入sql
+     * @return
+     */
+    public String getSqlInsert() {
+        throw new UnsupportedOperationException();
+    }
+
+    /**
+     * 获取删除sql
+     * @return
+     */
+    public String getSqlDelete() {
+        return "DELETE FROM "
+                + TableInfoHelper.getTableName(this.getEntityClass())
+                + " "
+                + getSqlWhere();
     }
 
     /**
@@ -38,7 +70,20 @@ public abstract class ICondition<T> {
      */
     public String getSqlQuery() {
         return getSqlSelect()
-                + " FROM " + TableInfoHelper.getTableName(this.getEntityClass()) + " "
+                + " FROM "
+                + TableInfoHelper.getTableName(this.getEntityClass())
+                + " "
+                + getSqlWhere();
+    }
+
+    /**
+     * 获取统计sql
+     * @return
+     */
+    public String getSqlCount() {
+        return "SELECT COUNT(*) FROM "
+                + TableInfoHelper.getTableName(this.getEntityClass())
+                + " "
                 + getSqlWhere();
     }
 
@@ -47,22 +92,16 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlUpdate() {
-        return "UPDATE " + TableInfoHelper.getTableName(this.getEntityClass())
-                + " " + getSqlSet() + " "
+        String sqlSet = getSqlSet();
+        if (StrUtils.isEmpty(sqlSet)) {
+            throw new IllegalArgumentException("没有set的sql片段");
+        }
+        return "UPDATE "
+                + TableInfoHelper.getTableName(this.getEntityClass())
+                + " "
+                + sqlSet
+                + " "
                 + getSqlWhere();
-    }
-
-    /**
-     * 获取删除sql
-     * @return
-     */
-    public String getSqlDelete() {
-        return "DELETE FROM " + TableInfoHelper.getTableName(this.getEntityClass())
-                + " " + getSqlWhere();
-    }
-
-    public String getSqlInsert() {
-        throw new UnsupportedOperationException();
     }
 
 }

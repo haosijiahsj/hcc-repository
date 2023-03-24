@@ -4,6 +4,7 @@ import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
@@ -21,28 +22,28 @@ import java.util.Map;
 public class JdbcTemplateWrapper {
 
     private JdbcTemplate jdbcTemplate;
-    private NamedParameterJdbcTemplateDelegate namedParameterJdbcTemplateDelegate;
+    private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public JdbcTemplateWrapper(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplateDelegate = new NamedParameterJdbcTemplateDelegate(jdbcTemplate);
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
     }
 
     public JdbcTemplateWrapper(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
-        this.namedParameterJdbcTemplateDelegate = new NamedParameterJdbcTemplateDelegate(dataSource);
+        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
     public List<Map<String, Object>> namedQueryForList(String sql, Map<String, ?> paramMap) {
-        return namedParameterJdbcTemplateDelegate.queryForList(sql, paramMap);
+        return namedParameterJdbcTemplate.queryForList(sql, paramMap);
     }
 
     public int namedUpdate(String sql, Map<String, ?> paramMap) {
-        return namedParameterJdbcTemplateDelegate.update(sql, paramMap);
+        return namedParameterJdbcTemplate.update(sql, paramMap);
     }
 
     public int[] namedBatchUpdate(String sql, List<Map<String, Object>> paramMaps) {
-        return namedParameterJdbcTemplateDelegate.batchUpdate(sql, paramMaps.toArray(new HashMap[0]));
+        return namedParameterJdbcTemplate.batchUpdate(sql, paramMaps.toArray(new HashMap[0]));
     }
 
     /**
@@ -53,17 +54,17 @@ public class JdbcTemplateWrapper {
      */
     public Pair<Number, Integer> namedUpdateForKey(String sql, Map<String, ?> paramMap) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        int rows = namedParameterJdbcTemplateDelegate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
+        int rows = namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
 
         return Pair.of(keyHolder.getKey(), rows);
     }
 
     public <T> List<T> namedQueryForList(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
-        return namedParameterJdbcTemplateDelegate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
+        return namedParameterJdbcTemplate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
     }
 
     public <T> T namedQueryForObject(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
-        List<T> results = namedParameterJdbcTemplateDelegate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
+        List<T> results = namedParameterJdbcTemplate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
         if (CollUtils.isEmpty(results)) {
             return null;
         }

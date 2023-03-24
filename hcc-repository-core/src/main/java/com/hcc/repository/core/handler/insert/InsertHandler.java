@@ -20,6 +20,7 @@ import java.util.UUID;
  * @author hushengjun
  * @date 2023/3/21
  */
+@SuppressWarnings("unchecked")
 public class InsertHandler extends AbstractMethodHandler {
 
     @Override
@@ -66,6 +67,12 @@ public class InsertHandler extends AbstractMethodHandler {
         return jdbcTemplateWrapper.update(sql, args);
     }
 
+    /**
+     * 获取id值
+     * @param idColumnInfo
+     * @param entity
+     * @return
+     */
     protected Object getIdValue(TableColumnInfo idColumnInfo, Object entity) {
         Object idValue = null;
         IdType idType = idColumnInfo.getIdType();

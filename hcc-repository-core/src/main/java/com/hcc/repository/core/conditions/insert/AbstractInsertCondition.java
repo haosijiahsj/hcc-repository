@@ -77,4 +77,24 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
         return sb.toString();
     }
 
+    @Override
+    public String getSqlCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlDelete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlUpdate() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlQuery() {
+        throw new UnsupportedOperationException();
+    }
+
 }

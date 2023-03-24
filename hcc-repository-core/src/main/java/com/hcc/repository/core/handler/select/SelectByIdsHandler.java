@@ -7,6 +7,8 @@ import com.hcc.repository.core.handler.AbstractSelectMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 
+import java.util.Collection;
+
 /**
  * SelectByIdHandler
  *
@@ -24,7 +26,8 @@ public class SelectByIdsHandler extends AbstractSelectMethodHandler {
         }
 
         return new DefaultQueryCondition<>(entityClass)
-                .in(idColumnInfo.getColumnName(), firstArg);
+                // 如果不强转，会调用可变参数的in方法，导致解析sql后in中只有一个参数
+                .in(idColumnInfo.getColumnName(), (Collection<?>) firstArg);
     }
 
     @Override

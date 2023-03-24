@@ -3,13 +3,14 @@ package com.hcc.repository.core.conditions.query;
 import com.hcc.repository.core.conditions.AbstractLambdaCondition;
 import com.hcc.repository.core.conditions.interfaces.SFunction;
 import com.hcc.repository.core.conditions.interfaces.SelectClause;
-import com.hcc.repository.core.metadata.TableInfo;
+import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -24,11 +25,6 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
 
     public LambdaQueryCondition() {
         this((T) null);
-//        Type genericSuperclass = this.getClass().getGenericSuperclass();
-//        ParameterizedType parameterizedType = (ParameterizedType) genericSuperclass;
-//        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
-//        Type actualTypeArgument = actualTypeArguments[0];
-//        setEntityClass((Class<T>) actualTypeArgument);
     }
 
     public LambdaQueryCondition(T entity) {
@@ -43,6 +39,10 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
         setEntityClass(entityClass);
     }
 
+    public List<String> getSelectColumns() {
+        return selectColumns;
+    }
+
     @SafeVarargs
     @Override
     public final LambdaQueryCondition<T> select(SFunction<T, ?>... columns) {
@@ -51,6 +51,18 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
                         .map(this::getColumnName)
                         .collect(Collectors.toList())
         );
+        return typeThis;
+    }
+
+    @Override
+    public LambdaQueryCondition<T> select(Class<T> entityClass, Predicate<TableColumnInfo> predicate) {
+        super.setEntityClass(entityClass);
+        List<String> columnNames = TableInfoHelper.getColumnInfos(getEntityClass())
+                .stream()
+                .filter(predicate)
+                .map(TableColumnInfo::getColumnName)
+                .collect(Collectors.toList());
+        selectColumns.addAll(columnNames);
         return typeThis;
     }
 
@@ -65,6 +77,11 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
 
         return getSegmentContainer().getSqlSegment()
                 + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
+    }
+
+    @Override
+    public String getSqlUpdate() {
+        throw new UnsupportedOperationException();
     }
 
 }

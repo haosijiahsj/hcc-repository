@@ -104,4 +104,18 @@ public enum MethodNameEnum {
         return DELETE_METHODS.contains(methodNameEnum);
     }
 
+    public SqlTypeEnum getSqlType() {
+        if (MethodNameEnum.isC(this)) {
+            return SqlTypeEnum.INSERT;
+        } else if (MethodNameEnum.isR(this)) {
+            return SqlTypeEnum.SELECT;
+        } else if (MethodNameEnum.isU(this)) {
+            return SqlTypeEnum.UPDATE;
+        } else if (MethodNameEnum.isD(this)) {
+            return SqlTypeEnum.DELETE;
+        }
+
+        throw new IllegalArgumentException("无法判断sql类型");
+    }
+
 }

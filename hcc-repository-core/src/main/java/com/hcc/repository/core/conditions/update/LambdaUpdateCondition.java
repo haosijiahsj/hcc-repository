@@ -60,4 +60,19 @@ public class LambdaUpdateCondition<T> extends AbstractLambdaCondition<T, LambdaU
                 + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
     }
 
+    @Override
+    public String getSqlCount() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlDelete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public String getSqlQuery() {
+        throw new UnsupportedOperationException();
+    }
+
 }

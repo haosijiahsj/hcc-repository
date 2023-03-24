@@ -28,6 +28,11 @@ public class TableInfoHelper {
 
     private TableInfoHelper() {}
 
+    /**
+     * 获取表元数据
+     * @param clazz
+     * @return
+     */
     public static TableInfo getTableInfo(Class<?> clazz) {
         if (clazz == null) {
             throw new NullPointerException();
@@ -111,14 +116,29 @@ public class TableInfoHelper {
         return StrUtils.isEmpty(tableAnno.value()) ? clazz.getSimpleName() : tableAnno.value();
     }
 
+    /**
+     * 获取id列
+     * @param clazz
+     * @return
+     */
     public static TableColumnInfo getIdColumnInfo(Class<?> clazz) {
         return getTableInfo(clazz).getIdColumnInfo();
     }
 
+    /**
+     * 获取表名
+     * @param clazz
+     * @return
+     */
     public static String getTableName(Class<?> clazz) {
         return getTableInfo(clazz).getTableName();
     }
 
+    /**
+     * 获取id列名
+     * @param clazz
+     * @return
+     */
     public static String getIdColumnName(Class<?> clazz) {
         TableColumnInfo idColumnInfo = getIdColumnInfo(clazz);
         if (idColumnInfo == null) {
@@ -127,10 +147,20 @@ public class TableInfoHelper {
         return idColumnInfo.getColumnName();
     }
 
+    /**
+     * 获取列元数据
+     * @param clazz
+     * @return
+     */
     public static List<TableColumnInfo> getColumnInfos(Class<?> clazz) {
         return getTableInfo(clazz).getColumnInfos();
     }
 
+    /**
+     * 获取列元数据，排除主键列
+     * @param clazz
+     * @return
+     */
     public static List<TableColumnInfo> getColumnInfosWithOutIdColumn(Class<?> clazz) {
         return getTableInfo(clazz).getColumnInfos().stream().filter(c -> !c.isPrimaryKey()).collect(Collectors.toList());
     }

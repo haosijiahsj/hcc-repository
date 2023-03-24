@@ -18,9 +18,7 @@ import java.util.Optional;
 public class SelectCountHandler extends AbstractSelectMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
-        return getFirstArg(ICondition.class);
-    }
+    protected void prepare() {}
 
     @Override
     protected Object executeSql(String sql, Object[] args) {

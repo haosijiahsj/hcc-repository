@@ -16,9 +16,8 @@ public class InsertTest extends BaseTest {
 
     @Test
     public void insert1() {
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             TableTestPo mock = JMockData.mock(TableTestPo.class);
-            mock.setSex(i % 2);
             mapper.insert(mock);
         }
     }

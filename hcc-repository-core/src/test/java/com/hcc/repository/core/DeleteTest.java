@@ -1,6 +1,6 @@
 package com.hcc.repository.core;
 
-import com.hcc.repository.core.conditions.ConditionBuilder;
+import com.hcc.repository.core.conditions.Conditions;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class DeleteTest extends BaseTest {
 
     @Test
     public void delete() {
-        LambdaQueryCondition<TableTestPo> condition = ConditionBuilder.<TableTestPo>lambdaQuery()
+        LambdaQueryCondition<TableTestPo> condition = Conditions.<TableTestPo>lambdaQuery()
                 .in(TableTestPo::getId, 2L);
         mapper.delete(condition);
     }
