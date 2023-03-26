@@ -19,29 +19,22 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/3/17
  */
-public class JdbcTemplateWrapper {
+public class JdbcTemplateWrapper implements JdbcTemplateProxy {
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
-
-    public JdbcTemplateWrapper(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(jdbcTemplate);
-    }
 
     public JdbcTemplateWrapper(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
 
-    public List<Map<String, Object>> namedQueryForList(String sql, Map<String, ?> paramMap) {
-        return namedParameterJdbcTemplate.queryForList(sql, paramMap);
-    }
-
+    @Override
     public int namedUpdate(String sql, Map<String, ?> paramMap) {
         return namedParameterJdbcTemplate.update(sql, paramMap);
     }
 
+    @Override
     public int[] namedBatchUpdate(String sql, List<Map<String, Object>> paramMaps) {
         return namedParameterJdbcTemplate.batchUpdate(sql, paramMaps.toArray(new HashMap[0]));
     }
@@ -52,6 +45,7 @@ public class JdbcTemplateWrapper {
      * @param paramMap
      * @return
      */
+    @Override
     public Pair<Number, Integer> namedUpdateForKey(String sql, Map<String, ?> paramMap) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int rows = namedParameterJdbcTemplate.update(sql, new MapSqlParameterSource(paramMap), keyHolder);
@@ -59,46 +53,37 @@ public class JdbcTemplateWrapper {
         return Pair.of(keyHolder.getKey(), rows);
     }
 
-    public <T> List<T> namedQueryForList(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
+    @Override
+    public List<Map<String, Object>> namedQueryForList(String sql, Map<String, ?> paramMap) {
+        return namedParameterJdbcTemplate.queryForList(sql, paramMap);
+    }
+
+    @Override
+    public <T> List<T> namedQueryForEntityList(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
         return namedParameterJdbcTemplate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
     }
 
+    @Override
     public <T> T namedQueryForObject(String sql, Map<String, ?> paramMap, Class<T> targetClass) {
-        List<T> results = namedParameterJdbcTemplate.query(sql, paramMap, new GeneralRowMapper<>(targetClass));
-        if (CollUtils.isEmpty(results)) {
-            return null;
-        }
-        if (results.size() > 1) {
-            throw new RuntimeException("结果不唯一");
-        }
-
-        return results.get(0);
+        return namedParameterJdbcTemplate.queryForObject(sql, paramMap, targetClass);
     }
 
+    @Override
     public List<Map<String, Object>> queryForList(String sql, Object[] args) {
         return jdbcTemplate.queryForList(sql, args);
     }
 
-    public <T> List<T> queryForList(String sql, Object[] args, Class<T> targetClass) {
+    @Override
+    public <T> List<T> queryForEntityList(String sql, Object[] args, Class<T> targetClass) {
         return jdbcTemplate.query(sql, args, new GeneralRowMapper<>(targetClass));
     }
 
-    public <T> T queryForObject(String sql, Object[] args, Class<T> targetClass) {
-        List<T> results = this.queryForList(sql, args, targetClass);
-        if (CollUtils.isEmpty(results)) {
-            return null;
-        }
-        if (results.size() > 1) {
-            throw new RuntimeException("结果不唯一");
-        }
-
-        return results.get(0);
-    }
-
+    @Override
     public int update(String sql, Object[] args) {
         return jdbcTemplate.update(sql, args);
     }
 
+    @Override
     public Pair<Number, Integer> updateForKey(String sql, Object[] args) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
         int affectRow = jdbcTemplate.update(sql, args, keyHolder);

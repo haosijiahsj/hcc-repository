@@ -56,7 +56,7 @@ public class InsertHandler extends AbstractMethodHandler {
         Object firstArg = getFirstArg();
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         if (idColumnInfo != null && !IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
-            Pair<Number, Integer> pair = jdbcTemplateWrapper.updateForKey(sql, args);
+            Pair<Number, Integer> pair = jdbcTemplateProxy.updateForKey(sql, args);
             Object value = NumberUtils.convertNumberToTargetClass(pair.getLeft(), (Class<? extends Number>) idClass);
             // 回填id到实体中
             ReflectUtils.setValue(firstArg, idColumnInfo.getField(), value);
@@ -64,7 +64,7 @@ public class InsertHandler extends AbstractMethodHandler {
             return pair.getRight();
         }
 
-        return jdbcTemplateWrapper.update(sql, args);
+        return jdbcTemplateProxy.update(sql, args);
     }
 
     /**

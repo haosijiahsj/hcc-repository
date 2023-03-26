@@ -2,6 +2,7 @@ package com.hcc.repository.core;
 
 import com.hcc.repository.core.conditions.Conditions;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
+import com.hcc.repository.core.page.IPage;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -58,7 +59,6 @@ public class SelectTest extends BaseTest {
     @Test
     public void selectOne() {
         LambdaQueryCondition<TableTestPo> condition = Conditions.<TableTestPo>lambdaQuery()
-                .select(TableTestPo::getId, TableTestPo::getName, TableTestPo::getAge)
                 .eq(TableTestPo::getSex, 1)
                 .last("LIMIT 1")
                 .orderByDesc(TableTestPo::getId);
@@ -73,6 +73,31 @@ public class SelectTest extends BaseTest {
                 .orderByDesc(TableTestPo::getId);
         List<Map<String, Object>> maps = mapper.selectMaps(condition);
         System.out.println(maps);
+    }
+
+    @Test
+    public void selectPage() {
+        LambdaQueryCondition<TableTestPo> condition = Conditions.<TableTestPo>lambdaQuery()
+                .eq(TableTestPo::getSex, 1)
+                .orderByDesc(TableTestPo::getId);
+        IPage<TableTestPo> page = mapper.selectPage(condition, null);
+        System.out.println(page);
+    }
+
+    @Test
+    public void selectList1() {
+        LambdaQueryCondition<TableTestPo> condition = Conditions.<TableTestPo>lambdaQuery()
+                .select(TableTestPo::getId, TableTestPo::getName, TableTestPo::getAge)
+                .eq(TableTestPo::getSex, 1)
+                .eq(TableTestPo::getAge, 10)
+                .or(c -> c.eq(TableTestPo::getName, "a"))
+                .or(c -> c.eq(TableTestPo::getName, "b"))
+                .or(c -> c.eq(TableTestPo::getName, "c"))
+                .eq(TableTestPo::getName, "10")
+                .last("limit 1")
+                .orderByDesc(TableTestPo::getId);
+        List<TableTestPo> tableTestPos = mapper.selectList(condition);
+        System.out.println(tableTestPos);
     }
 
 }

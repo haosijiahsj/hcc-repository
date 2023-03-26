@@ -1,12 +1,12 @@
 package com.hcc.repository.core.conditions.update;
 
-import com.hcc.repository.core.conditions.AbstractLambdaCondition;
+import com.hcc.repository.core.conditions.SegmentContainer;
 import com.hcc.repository.core.conditions.interfaces.SFunction;
-import com.hcc.repository.core.conditions.interfaces.SetClause;
-import com.hcc.repository.core.utils.StrUtils;
+import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfoHelper;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * LambdaUpdateConditions
@@ -14,13 +14,10 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/3/3
  */
-public class LambdaUpdateCondition<T> extends AbstractLambdaCondition<T, LambdaUpdateCondition<T>> implements SetClause<LambdaUpdateCondition<T>, SFunction<T, ?>> {
-
-    private final List<String> sqlSets;
+public class LambdaUpdateCondition<T> extends AbstractUpdateCondition<T, SFunction<T, ?>, LambdaUpdateCondition<T>> {
 
     public LambdaUpdateCondition() {
         super.init();
-        sqlSets = new ArrayList<>();
     }
 
     public LambdaUpdateCondition(Class<T> entityClass) {
@@ -28,51 +25,37 @@ public class LambdaUpdateCondition<T> extends AbstractLambdaCondition<T, LambdaU
         super.setEntityClass(entityClass);
     }
 
+    public LambdaUpdateCondition(Class<T> entityClass, SegmentContainer segmentContainer, Map<String, Object> columnValuePairs, AtomicInteger pos) {
+        super.entityClass = entityClass;
+        super.segmentContainer = segmentContainer;
+        super.columnValuePairs = columnValuePairs;
+        super.pos = pos;
+    }
+
     @Override
-    public LambdaUpdateCondition<T> set(boolean condition, SFunction<T, ?> column, Object val) {
-        if (condition) {
-            String columnName = this.getColumnName(column);
-            String namedColumnName = this.getNamedColumnName(columnName);
-            sqlSets.add(String.format("%s = %s", columnName, ":" + namedColumnName));
-            super.putColumnValue(namedColumnName, val);
+    protected LambdaUpdateCondition<T> newInstance() {
+        return new LambdaUpdateCondition<>(entityClass, new SegmentContainer(), columnValuePairs, pos);
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    protected String getColumnName(SFunction<T, ?> column) {
+        if (column == null) {
+            throw new NullPointerException();
         }
-        return typeThis;
-    }
 
-    @Override
-    public LambdaUpdateCondition<T> setSql(boolean condition, String setSql) {
-        if (condition) {
-            sqlSets.add(setSql);
+        String fieldName = column.getFieldName();
+        Class<T> entityClass = getEntityClass();
+        if (entityClass == null) {
+            // 获取lambda中的class
+            entityClass = (Class<T>) column.getImplClassType();
         }
-        return typeThis;
-    }
+        TableColumnInfo tableColumnInfo = TableInfoHelper.getColumnInfoByClassAndFieldName(entityClass, fieldName);
+        if (tableColumnInfo == null) {
+            throw new IllegalArgumentException("该字段未映射");
+        }
 
-    @Override
-    public String getSqlSet() {
-        return sqlSets.isEmpty() ? "" : ("SET " + String.join(", ", sqlSets));
-    }
-
-    @Override
-    public String getSqlWhere() {
-        String lastSql = getLastSql();
-
-        return getSegmentContainer().getSqlSegment()
-                + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
-    }
-
-    @Override
-    public String getSqlCount() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlDelete() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlQuery() {
-        throw new UnsupportedOperationException();
+        return tableColumnInfo.getColumnName();
     }
 
 }

@@ -4,6 +4,7 @@ import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.TypeReference;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,7 +25,10 @@ public class InsertTest extends BaseTest {
 
     @Test
     public void batchInsert() {
-        List<TableTestPo> list = JMockData.mock(new TypeReference<List<TableTestPo>>() {});
+        List<TableTestPo> list = new ArrayList<>();
+        for (int i = 0; i < 100; i++) {
+            list.add(JMockData.mock(TableTestPo.class));
+        }
 
         mapper.batchInsert(list);
     }

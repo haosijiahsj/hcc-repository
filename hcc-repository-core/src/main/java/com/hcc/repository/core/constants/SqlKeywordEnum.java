@@ -31,7 +31,18 @@ public enum SqlKeywordEnum {
     BETWEEN("BETWEEN"),
     NOT_BETWEEN("NOT BETWEEN"),
     ASC("ASC"),
-    DESC("DESC");
+    DESC("DESC"),
+
+    INSERT_INTO("INSERT INTO"),
+    VALUES("VALUES"),
+    DELETE_FROM("DELETE FROM"),
+    UPDATE("UPDATE"),
+    SELECT("SELECT"),
+    WHERE("WHERE"),
+    FROM("FROM"),
+    SET("SET"),
+    COUNT("COUNT(*)"),
+    ;
 
     private final String keyword;
 

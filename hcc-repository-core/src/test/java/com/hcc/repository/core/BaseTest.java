@@ -6,12 +6,20 @@ import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.core.converter.CustomerConverter;
 import com.hcc.repository.core.enums.SexEnum;
+import com.hcc.repository.core.interceptor.Interceptor;
+import com.hcc.repository.core.interceptor.Interceptor1;
+import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
+import com.hcc.repository.core.proxy.JdbcTemplateProxyInvocationHandler;
+import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.Data;
 import org.junit.Before;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * BaseTest
@@ -24,6 +32,8 @@ public class BaseTest {
     private static final String DRIVER_CLASS_NAME = "com.mysql.cj.jdbc.Driver";
 
     protected TestMapper mapper;
+    protected JdbcTemplateProxy jdbcTemplateProxy;
+    protected List<Interceptor> interceptors = new ArrayList<>();
 
     @Before
     public void init() {
@@ -33,7 +43,12 @@ public class BaseTest {
         druidDataSource.setUsername("root");
         druidDataSource.setPassword("123456");
 
-        mapper = InjectMapperProxyFactory.create(TestMapper.class, druidDataSource);
+        interceptors.add(new Interceptor1());
+
+        mapper = InjectMapperProxyFactory.create(TestMapper.class, druidDataSource, interceptors);
+        JdbcTemplateProxyInvocationHandler jdbcTemplateProxyInvocationHandler
+                = new JdbcTemplateProxyInvocationHandler(new JdbcTemplateWrapper(druidDataSource), interceptors);
+        jdbcTemplateProxy = ReflectUtils.newProxy(JdbcTemplateProxy.class, jdbcTemplateProxyInvocationHandler);
     }
 
     public interface TestMapper extends BaseMapper<TableTestPo, Long> {}

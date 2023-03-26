@@ -3,14 +3,12 @@ package com.hcc.repository.core.handler.select;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
-import com.hcc.repository.core.handler.AbstractMethodHandler;
-import com.hcc.repository.core.handler.AbstractSelectMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -21,16 +19,16 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/3/21
  */
-public class SelectIdsHandler extends AbstractSelectMethodHandler {
+public class SelectIdsHandler extends AbstractSelectHandler {
 
     @Override
     protected void prepare() {
-        if (!TableInfoHelper.hasIdColumn(entityClass)) {
-            throw new IllegalArgumentException(String.format("实体：%s，没有id列", entityClass.getName()));
-        }
+        Assert.isTrue(TableInfoHelper.hasIdColumn(entityClass),
+                String.format("表：%s，没有定义id字段", TableInfoHelper.getTableName(entityClass)));
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected ICondition<?> assembleCondition() {
         ICondition<?> condition = super.assembleCondition();
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
@@ -53,7 +51,7 @@ public class SelectIdsHandler extends AbstractSelectMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        List<?> results = jdbcTemplateWrapper.queryForList(sql, args, entityClass);
+        List<?> results = jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
         if (CollUtils.isEmpty(results)) {
             return Collections.emptyList();
         }

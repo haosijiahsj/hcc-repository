@@ -1,17 +1,12 @@
 package com.hcc.repository.core.conditions.query;
 
-import com.hcc.repository.core.conditions.AbstractLambdaCondition;
+import com.hcc.repository.core.conditions.SegmentContainer;
 import com.hcc.repository.core.conditions.interfaces.SFunction;
-import com.hcc.repository.core.conditions.interfaces.SelectClause;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
-import com.hcc.repository.core.utils.StrUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.Collectors;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * LambdaQueryConditions
@@ -19,9 +14,7 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/3/3
  */
-public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQueryCondition<T>> implements SelectClause<LambdaQueryCondition<T>, T, SFunction<T, ?>> {
-
-    private final List<String> selectColumns;
+public class LambdaQueryCondition<T> extends AbstractQueryCondition<T, SFunction<T, ?>, LambdaQueryCondition<T>> {
 
     public LambdaQueryCondition() {
         this((T) null);
@@ -29,59 +22,44 @@ public class LambdaQueryCondition<T> extends AbstractLambdaCondition<T, LambdaQu
 
     public LambdaQueryCondition(T entity) {
         super.init();
-        selectColumns = new ArrayList<>(32);
         setEntity(entity);
     }
 
     public LambdaQueryCondition(Class<T> entityClass) {
         super.init();
-        selectColumns = new ArrayList<>(32);
         setEntityClass(entityClass);
     }
 
-    public List<String> getSelectColumns() {
-        return selectColumns;
-    }
-
-    @SafeVarargs
-    @Override
-    public final LambdaQueryCondition<T> select(SFunction<T, ?>... columns) {
-        selectColumns.addAll(
-                Arrays.stream(columns)
-                        .map(this::getColumnName)
-                        .collect(Collectors.toList())
-        );
-        return typeThis;
+    public LambdaQueryCondition(Class<T> entityClass, SegmentContainer segmentContainer, Map<String, Object> columnValuePairs, AtomicInteger pos) {
+        super.entityClass = entityClass;
+        super.segmentContainer = segmentContainer;
+        super.columnValuePairs = columnValuePairs;
+        super.pos = pos;
     }
 
     @Override
-    public LambdaQueryCondition<T> select(Class<T> entityClass, Predicate<TableColumnInfo> predicate) {
-        super.setEntityClass(entityClass);
-        List<String> columnNames = TableInfoHelper.getColumnInfos(getEntityClass())
-                .stream()
-                .filter(predicate)
-                .map(TableColumnInfo::getColumnName)
-                .collect(Collectors.toList());
-        selectColumns.addAll(columnNames);
-        return typeThis;
+    protected LambdaQueryCondition<T> newInstance() {
+        return new LambdaQueryCondition<>(entityClass, new SegmentContainer(), columnValuePairs, pos);
     }
 
-    @Override
-    public String getSqlSelect() {
-        return "SELECT " + (selectColumns.isEmpty() ? "*" : String.join(", ", selectColumns));
-    }
+    @SuppressWarnings("unchecked")
+    protected String getColumnName(SFunction<T, ?> column) {
+        if (column == null) {
+            throw new NullPointerException();
+        }
 
-    @Override
-    public String getSqlWhere() {
-        String lastSql = getLastSql();
+        String fieldName = column.getFieldName();
+        Class<T> entityClass = getEntityClass();
+        if (entityClass == null) {
+            // 获取lambda中的class
+            entityClass = (Class<T>) column.getImplClassType();
+        }
+        TableColumnInfo tableColumnInfo = TableInfoHelper.getColumnInfoByClassAndFieldName(entityClass, fieldName);
+        if (tableColumnInfo == null) {
+            throw new IllegalArgumentException("该字段未映射");
+        }
 
-        return getSegmentContainer().getSqlSegment()
-                + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
-    }
-
-    @Override
-    public String getSqlUpdate() {
-        throw new UnsupportedOperationException();
+        return tableColumnInfo.getColumnName();
     }
 
 }

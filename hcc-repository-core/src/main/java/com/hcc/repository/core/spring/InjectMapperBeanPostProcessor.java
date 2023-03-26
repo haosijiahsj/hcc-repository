@@ -7,8 +7,8 @@ import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
-import org.springframework.jdbc.core.JdbcTemplate;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Field;
 
 /**
@@ -20,10 +20,10 @@ import java.lang.reflect.Field;
 @Slf4j
 public class InjectMapperBeanPostProcessor implements BeanPostProcessor {
 
-    private JdbcTemplate jdbcTemplate;
+    private DataSource dataSource;
 
-    public InjectMapperBeanPostProcessor(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    public InjectMapperBeanPostProcessor(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class InjectMapperBeanPostProcessor implements BeanPostProcessor {
             }
 
             // 添加mapper的动态代理
-            Object proxy = InjectMapperProxyFactory.create(mapperClass, jdbcTemplate);
+            Object proxy = InjectMapperProxyFactory.create(mapperClass, dataSource, null);
             ReflectUtils.setValue(bean, field, proxy);
         }
 

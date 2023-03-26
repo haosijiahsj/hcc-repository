@@ -1,5 +1,8 @@
 package com.hcc.repository.core.conditions.interfaces;
 
+import com.hcc.repository.core.utils.LambdaUtils;
+import com.hcc.repository.core.utils.StrUtils;
+
 import java.io.Serializable;
 import java.lang.invoke.SerializedLambda;
 import java.lang.reflect.Method;
@@ -44,6 +47,10 @@ public interface SFunction<T, R> extends Function<T, R>, Serializable {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    default String getFieldName() {
+        return LambdaUtils.getFieldNameFromSetterGetterMethodName(getImplMethodName());
     }
 
 }

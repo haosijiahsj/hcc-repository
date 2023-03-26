@@ -1,13 +1,9 @@
 package com.hcc.repository.core.conditions.update;
 
-import com.hcc.repository.core.conditions.AbstractCondition;
-import com.hcc.repository.core.conditions.interfaces.SetClause;
-import com.hcc.repository.core.metadata.TableInfo;
-import com.hcc.repository.core.metadata.TableInfoHelper;
-import com.hcc.repository.core.utils.StrUtils;
+import com.hcc.repository.core.conditions.SegmentContainer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * UpdateConditions
@@ -15,13 +11,10 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/3/3
  */
-public class DefaultUpdateCondition<T> extends AbstractCondition<T, String, DefaultUpdateCondition<T>> implements SetClause<DefaultUpdateCondition<T>, String> {
-
-    private final List<String> sqlSets;
+public class DefaultUpdateCondition<T> extends AbstractUpdateCondition<T, String, DefaultUpdateCondition<T>> {
 
     public DefaultUpdateCondition() {
         super.init();
-        sqlSets = new ArrayList<>();
     }
 
     public DefaultUpdateCondition(Class<T> entityClass) {
@@ -29,51 +22,16 @@ public class DefaultUpdateCondition<T> extends AbstractCondition<T, String, Defa
         super.setEntityClass(entityClass);
     }
 
-    @Override
-    public DefaultUpdateCondition<T> set(boolean condition, String column, Object val) {
-        if (condition) {
-            String namedColumnName = this.getNamedColumnName(column);
-            sqlSets.add(String.format("%s = %s", column, ":" + namedColumnName));
-            super.putColumnValue(namedColumnName, val);
-        }
-
-        return typeThis;
+    public DefaultUpdateCondition(Class<T> entityClass, SegmentContainer segmentContainer, Map<String, Object> columnValuePairs, AtomicInteger pos) {
+        super.entityClass = entityClass;
+        super.segmentContainer = segmentContainer;
+        super.columnValuePairs = columnValuePairs;
+        super.pos = pos;
     }
 
     @Override
-    public DefaultUpdateCondition<T> setSql(boolean condition, String setSql) {
-        if (condition) {
-            sqlSets.add(setSql);
-        }
-        return typeThis;
-    }
-
-    @Override
-    public String getSqlSet() {
-        return sqlSets.isEmpty() ? " " : ("SET " + String.join(", ", sqlSets));
-    }
-
-    @Override
-    public String getSqlWhere() {
-        String lastSql = getLastSql();
-
-        return getSegmentContainer().getSqlSegment()
-                + (StrUtils.isEmpty(lastSql) ? "" : " " + lastSql);
-    }
-
-    @Override
-    public String getSqlCount() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlDelete() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlQuery() {
-        throw new UnsupportedOperationException();
+    protected DefaultUpdateCondition<T> newInstance() {
+        return new DefaultUpdateCondition<>(entityClass, new SegmentContainer(), columnValuePairs, pos);
     }
 
 }

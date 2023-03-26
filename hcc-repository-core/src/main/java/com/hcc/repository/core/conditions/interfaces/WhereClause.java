@@ -55,6 +55,12 @@ public interface WhereClause<C, R> {
         return between(true, column, leftVal, rightVal);
     }
 
+    C notBetween(boolean condition, R column, Object leftVal, Object rightVal);
+
+    default C notBetween(R column, Object leftVal, Object rightVal) {
+        return notBetween(true, column, leftVal, rightVal);
+    }
+
     C like(boolean condition, R column, Object val);
 
     default C like(R column, Object val) {

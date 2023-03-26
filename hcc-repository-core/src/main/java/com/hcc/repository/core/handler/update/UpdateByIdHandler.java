@@ -5,6 +5,7 @@ import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.ReflectUtils;
 
 import java.util.List;
@@ -18,11 +19,14 @@ import java.util.List;
 public class UpdateByIdHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
-        if (!TableInfoHelper.hasIdColumn(entityClass)) {
-            throw new RuntimeException("没有id列");
-        }
+    protected void prepare() {
+        Assert.isTrue(TableInfoHelper.hasIdColumn(entityClass),
+                String.format("表：%s，没有定义id字段", TableInfoHelper.getTableName(entityClass)));
+    }
 
+    @Override
+    @SuppressWarnings("unchecked")
+    protected ICondition<?> assembleCondition() {
         Object firstArg = getFirstArg();
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
         // 使用对象拼接update sql
@@ -45,7 +49,7 @@ public class UpdateByIdHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateWrapper.update(sql, args);
+        return jdbcTemplateProxy.update(sql, args);
     }
 
 }

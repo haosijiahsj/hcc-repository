@@ -24,7 +24,7 @@ public class DeleteByIdHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateWrapper.update(sql, args);
+        return jdbcTemplateProxy.update(sql, args);
     }
 
 }

@@ -18,9 +18,7 @@ public class UpdateHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateWrapper.update(sql, args);
-//        ICondition<?> condition = assembleCondition();
-//        return jdbcTemplateWrapper.namedUpdate(condition.getSqlUpdate(), condition.getColumnValuePairs());
+        return jdbcTemplateProxy.update(sql, args);
     }
 
 }

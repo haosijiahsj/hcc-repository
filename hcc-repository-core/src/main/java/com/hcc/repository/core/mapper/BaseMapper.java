@@ -1,6 +1,7 @@
 package com.hcc.repository.core.mapper;
 
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.page.IPage;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -112,5 +113,20 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @return
      */
     List<Map<String, Object>> selectMaps(ICondition<T> condition);
+
+    /**
+     * 通过map条件查询列表
+     * @param paramMap
+     * @return
+     */
+    List<T> selectListByMap(Map<String, Object> paramMap);
+
+    /**
+     * 分页查询
+     * @param condition
+     * @param pageParam
+     * @return
+     */
+    IPage<T> selectPage(ICondition<T> condition, IPage<T> pageParam);
 
 }

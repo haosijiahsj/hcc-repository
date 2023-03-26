@@ -1,6 +1,6 @@
 package com.hcc.repository.core.interceptor;
 
-import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
+import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 
 /**
  * Interceptor
@@ -14,7 +14,7 @@ public interface Interceptor {
      * 能否更新
      * @return
      */
-    default boolean canUpdate(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {
+    default boolean canUpdate(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {
         return true;
     }
 
@@ -22,7 +22,7 @@ public interface Interceptor {
      * 能否查询
      * @return
      */
-    default boolean canQuery(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {
+    default boolean canQuery(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {
         return true;
     }
 
@@ -31,13 +31,13 @@ public interface Interceptor {
      * @param jdbcTemplateWrapper
      * @param context
      */
-    default void beforeUpdate(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {}
+    default void beforeUpdate(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {}
 
     /**
      * 查询之前调用
-     * @param jdbcTemplateWrapper
+     * @param jdbcTemplateProxy
      * @param context
      */
-    default void beforeQuery(JdbcTemplateWrapper jdbcTemplateWrapper, ExecuteContext context) {}
+    default void beforeQuery(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
 
 }

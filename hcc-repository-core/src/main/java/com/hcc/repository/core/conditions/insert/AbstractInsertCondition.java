@@ -1,6 +1,8 @@
 package com.hcc.repository.core.conditions.insert;
 
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 
 import java.util.ArrayList;
@@ -63,18 +65,18 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
 
     @Override
     public String getSqlInsert() {
-        String columnField = "(" + String.join(", ", sqlColumns) + ")";
-        String namedField = "(" + sqlValues.stream().map(c -> ":" + c).collect(Collectors.joining(", ")) + ")";
+        String columnField = StrPool.L_BRACKET + String.join(StrPool.COMMA_SPACE, sqlColumns) + StrPool.R_BRACKET;
+        String namedField = StrPool.L_BRACKET
+                + sqlValues.stream().map(c -> StrPool.COLON + c).collect(Collectors.joining(StrPool.COMMA_SPACE))
+                + StrPool.R_BRACKET;
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("INSERT INTO ")
-                .append(TableInfoHelper.getTableName(getEntityClass()))
-                .append(" ")
-                .append(columnField)
-                .append(" VALUES ")
-                .append(namedField);
-
-        return sb.toString();
+        return String.join(StrPool.SPACE,
+                SqlKeywordEnum.INSERT_INTO.getKeyword(),
+                TableInfoHelper.getTableName(getEntityClass()),
+                columnField,
+                SqlKeywordEnum.VALUES.getKeyword(),
+                namedField
+        );
     }
 
     @Override

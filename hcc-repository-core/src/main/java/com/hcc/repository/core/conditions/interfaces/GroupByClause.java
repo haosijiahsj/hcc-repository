@@ -14,10 +14,14 @@ public interface GroupByClause<C, R> {
         return groupBy(true, columns);
     }
 
-    C having(boolean condition, String havingSql, String...params);
+    default C groupBy(R column) {
+        return groupBy(true, column);
+    }
 
-    default C having(String havingSql, String...params) {
-        return having(true, havingSql, params);
+    C having(boolean condition, String havingSql);
+
+    default C having(String havingSql) {
+        return having(true, havingSql);
     }
 
 }

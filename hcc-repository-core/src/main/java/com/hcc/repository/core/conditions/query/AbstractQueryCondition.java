@@ -1,0 +1,83 @@
+package com.hcc.repository.core.conditions.query;
+
+import com.hcc.repository.core.conditions.AbstractCondition;
+import com.hcc.repository.core.conditions.interfaces.SelectClause;
+import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.constants.StrPool;
+import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.StrUtils;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+/**
+ * AbstractQueryCondition
+ *
+ * @author hushengjun
+ * @date 2023/3/25
+ */
+public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
+
+    private List<String> selectColumns;
+
+    @Override
+    protected void init() {
+        super.init();
+        selectColumns = new ArrayList<>(32);
+    }
+
+    public List<String> getSelectColumns() {
+        return selectColumns;
+    }
+
+    @Override
+    @SafeVarargs
+    public final C select(R...columns) {
+        selectColumns.addAll(Arrays.stream(columns).map(this::getColumnName).collect(Collectors.toList()));
+        return typeThis;
+    }
+
+    @Override
+    public C select(Class<T> entityClass, Predicate<TableColumnInfo> predicate) {
+        super.setEntityClass(entityClass);
+        List<String> columnNames = TableInfoHelper.getColumnInfos(getEntityClass())
+                .stream()
+                .filter(predicate)
+                .map(TableColumnInfo::getColumnName)
+                .collect(Collectors.toList());
+        selectColumns.addAll(columnNames);
+        return typeThis;
+    }
+
+    @Override
+    public String getSqlSelect() {
+        String sqlSelect;
+        if (selectColumns.isEmpty()) {
+            sqlSelect = TableInfoHelper.getColumnInfos(entityClass).stream()
+                    .map(TableColumnInfo::getColumnName)
+                    .collect(Collectors.joining(StrPool.COMMA_SPACE));
+        } else {
+            sqlSelect = String.join(StrPool.COMMA_SPACE, selectColumns);
+        }
+
+        return SqlKeywordEnum.SELECT.getKeyword() + StrPool.SPACE + sqlSelect;
+    }
+
+    @Override
+    public String getSqlWhere() {
+        String lastSql = getLastSql();
+
+        return getSegmentContainer().getSqlSegment()
+                + (StrUtils.isEmpty(lastSql) ? StrPool.EMPTY : StrPool.SPACE + lastSql);
+    }
+
+    @Override
+    public String getSqlUpdate() {
+        throw new UnsupportedOperationException();
+    }
+
+}

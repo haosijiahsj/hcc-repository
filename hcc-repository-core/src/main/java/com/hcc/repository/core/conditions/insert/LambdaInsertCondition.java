@@ -32,8 +32,7 @@ public class LambdaInsertCondition<T> extends AbstractInsertCondition<T, SFuncti
             throw new NullPointerException();
         }
 
-        String methodName = column.getImplMethodName();
-        String fieldName = this.resolveMethodName(methodName);
+        String fieldName = column.getFieldName();
         TableColumnInfo tableColumnInfo = TableInfoHelper.getColumnInfoByClassAndFieldName(getEntityClass(), fieldName);
         if (tableColumnInfo == null) {
             throw new IllegalArgumentException("该字段未映射");
@@ -42,29 +41,5 @@ public class LambdaInsertCondition<T> extends AbstractInsertCondition<T, SFuncti
         return tableColumnInfo.getColumnName();
     }
 
-    private String resolveMethodName(String methodName) {
-        if (methodName == null) {
-            return null;
-        }
-
-        String columnName;
-        if (methodName.startsWith("is")) {
-            columnName = this.methodToField(methodName, "is");
-        } else if (methodName.startsWith("get")) {
-            columnName = this.methodToField(methodName, "get");
-        } else if (methodName.startsWith("set")) {
-            columnName = this.methodToField(methodName, "set");
-        } else {
-            columnName = methodName;
-        }
-
-        return columnName;
-    }
-
-    private String methodToField(String methodName, String prefix) {
-        int index = methodName.indexOf(prefix) + prefix.length();
-        char c = methodName.charAt(index);
-        return String.valueOf(c).toLowerCase() + methodName.substring(index + 1);
-    }
 
 }

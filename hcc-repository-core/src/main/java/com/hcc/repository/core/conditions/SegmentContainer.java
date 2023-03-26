@@ -1,5 +1,7 @@
 package com.hcc.repository.core.conditions;
 
+import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import lombok.Getter;
@@ -48,49 +50,74 @@ public class SegmentContainer {
         havingSegments.add(sqlSegment);
     }
 
+    /**
+     * where子句
+     * @return
+     */
     public String getSqlWhere() {
         List<String> whereSqlSegments = getWhereSqlSegments();
         if (CollUtils.isEmpty(whereSqlSegments)) {
-            return "";
+            return StrPool.EMPTY;
         }
+
+        // 去掉第一个AND OR
         String firstWhere = whereSqlSegments.get(0);
-        if (firstWhere.startsWith("AND") || firstWhere.startsWith("OR")) {
-            if (firstWhere.startsWith("AND")) {
+        if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword()) || firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+            if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword())) {
                 firstWhere = firstWhere.substring(4);
-            } else if (firstWhere.startsWith("OR")) {
+            } else if (firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
                 firstWhere = firstWhere.substring(3);
             }
             whereSqlSegments.remove(0);
             whereSqlSegments.add(0, firstWhere);
         }
 
-        return "WHERE " + String.join(" ", whereSqlSegments);
+        return SqlKeywordEnum.WHERE.getKeyword() + StrPool.SPACE + String.join(StrPool.SPACE, whereSqlSegments);
     }
 
+    /**
+     * order by子句
+     * @return
+     */
     public String getSqlOrderBy() {
         List<String> orderBySegments = getOrderBySegments();
         if (CollUtils.isEmpty(orderBySegments)) {
-            return "";
+            return StrPool.EMPTY;
         }
-        return "ORDER BY " + String.join(", ", orderBySegments);
+
+        return SqlKeywordEnum.ORDER_BY.getKeyword() + StrPool.SPACE + String.join(StrPool.COMMA_SPACE, orderBySegments);
     }
 
+    /**
+     * group by子句
+     * @return
+     */
     public String getSqlGroupBy() {
         List<String> groupBySegments = getGroupBySegments();
         if (CollUtils.isEmpty(groupBySegments)) {
-            return "";
+            return StrPool.EMPTY;
         }
-        return "GROUP BY " + String.join(", ", groupBySegments);
+
+        return SqlKeywordEnum.GROUP_BY.getKeyword() + StrPool.SPACE + String.join(StrPool.COMMA_SPACE, groupBySegments);
     }
 
+    /**
+     * having子句
+     * @return
+     */
     public String getSqlHaving() {
         List<String> havingSegments = getHavingSegments();
         if (CollUtils.isEmpty(havingSegments)) {
-            return "";
+            return StrPool.EMPTY;
         }
-        return "HAVING " + String.join(" ", havingSegments);
+
+        return SqlKeywordEnum.HAVING.getKeyword() + StrPool.SPACE + String.join(StrPool.SPACE, havingSegments);
     }
 
+    /**
+     * where后的整个子句
+     * @return
+     */
     public String getSqlSegment() {
         StringBuilder sb = new StringBuilder();
         String sqlWhere = getSqlWhere();
@@ -99,15 +126,24 @@ public class SegmentContainer {
         }
         String sqlGroupBy = getSqlGroupBy();
         if (StrUtils.isNotEmpty(sqlGroupBy)) {
-            sb.append(" ").append(sqlGroupBy);
+            if (sb.length() > 0) {
+                sb.append(StrPool.SPACE);
+            }
+            sb.append(sqlGroupBy);
         }
         String sqlHaving = getSqlHaving();
         if (StrUtils.isNotEmpty(sqlHaving)) {
-            sb.append(" ").append(sqlHaving);
+            if (sb.length() > 0) {
+                sb.append(StrPool.SPACE);
+            }
+            sb.append(sqlHaving);
         }
         String sqlOrderBy = getSqlOrderBy();
         if (StrUtils.isNotEmpty(sqlOrderBy)) {
-            sb.append(" ").append(sqlOrderBy);
+            if (sb.length() > 0) {
+                sb.append(StrPool.SPACE);
+            }
+            sb.append(sqlOrderBy);
         }
 
         return sb.toString();

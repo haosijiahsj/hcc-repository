@@ -27,16 +27,12 @@ public class BatchInsertHandler extends InsertHandler {
         String sql = "";
         for (Object entity : entities) {
             DefaultInsertCondition<?> condition = (DefaultInsertCondition<?>) super.assembleCondition(entity);
+            condition.setEntityClass(entityClass);
             paramMaps.add(condition.getColumnValuePairs());
             sql = condition.getSqlInsert();
         }
 
-        return jdbcTemplateWrapper.namedBatchUpdate(sql, paramMaps);
-    }
-
-    @Override
-    protected Object defaultValueForUpdate() {
-        return new int[] {};
+        return jdbcTemplateProxy.namedBatchUpdate(sql, paramMaps);
     }
 
 }

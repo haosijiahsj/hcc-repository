@@ -1,5 +1,7 @@
 package com.hcc.repository.core.conditions;
 
+import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.StrUtils;
 
@@ -42,7 +44,15 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlWhere() {
-        return null;
+        return StrPool.EMPTY;
+    }
+
+    private String tableName() {
+        return TableInfoHelper.getTableName(this.getEntityClass());
+    }
+
+    private String joinSpace(String...strs) {
+        return String.join(StrPool.SPACE, strs);
     }
 
     /**
@@ -58,10 +68,11 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlDelete() {
-        return "DELETE FROM "
-                + TableInfoHelper.getTableName(this.getEntityClass())
-                + " "
-                + getSqlWhere();
+        return joinSpace(
+                SqlKeywordEnum.DELETE_FROM.getKeyword(),
+                tableName(),
+                getSqlWhere()
+        );
     }
 
     /**
@@ -69,11 +80,12 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlQuery() {
-        return getSqlSelect()
-                + " FROM "
-                + TableInfoHelper.getTableName(this.getEntityClass())
-                + " "
-                + getSqlWhere();
+        return joinSpace(
+                getSqlSelect(),
+                SqlKeywordEnum.FROM.getKeyword(),
+                tableName(),
+                getSqlWhere()
+        );
     }
 
     /**
@@ -81,10 +93,13 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlCount() {
-        return "SELECT COUNT(*) FROM "
-                + TableInfoHelper.getTableName(this.getEntityClass())
-                + " "
-                + getSqlWhere();
+        return joinSpace(
+                SqlKeywordEnum.SELECT.getKeyword(),
+                SqlKeywordEnum.COUNT.getKeyword(),
+                SqlKeywordEnum.FROM.getKeyword(),
+                tableName(),
+                getSqlWhere()
+        );
     }
 
     /**
@@ -96,12 +111,13 @@ public abstract class ICondition<T> {
         if (StrUtils.isEmpty(sqlSet)) {
             throw new IllegalArgumentException("没有set的sql片段");
         }
-        return "UPDATE "
-                + TableInfoHelper.getTableName(this.getEntityClass())
-                + " "
-                + sqlSet
-                + " "
-                + getSqlWhere();
+
+        return joinSpace(
+                SqlKeywordEnum.UPDATE.getKeyword(),
+                tableName(),
+                sqlSet,
+                getSqlWhere()
+        );
     }
 
 }

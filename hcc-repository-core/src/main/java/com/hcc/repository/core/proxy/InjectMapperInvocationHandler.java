@@ -2,20 +2,16 @@ package com.hcc.repository.core.proxy;
 
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.MethodHandlerFactory;
+import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import com.hcc.repository.core.mapper.BaseMapper;
-import com.hcc.repository.core.utils.ArrayUtils;
-import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.lang.reflect.WildcardType;
 
 /**
  * InjectMapperInvocationHandler
@@ -26,15 +22,11 @@ import java.lang.reflect.WildcardType;
 @Slf4j
 public class InjectMapperInvocationHandler implements InvocationHandler {
 
-    private JdbcTemplateWrapper jdbcTemplateWrapper;
+    private JdbcTemplateProxy jdbcTemplateProxy;
     private Class<?> baseMapperClass;
 
-    public InjectMapperInvocationHandler(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplateWrapper = new JdbcTemplateWrapper(jdbcTemplate);
-    }
-
-    public InjectMapperInvocationHandler(JdbcTemplateWrapper jdbcTemplateWrapper, Class<?> baseMapperClass) {
-        this.jdbcTemplateWrapper = jdbcTemplateWrapper;
+    public InjectMapperInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, Class<?> baseMapperClass) {
+        this.jdbcTemplateProxy = jdbcTemplateProxy;
         this.baseMapperClass = baseMapperClass;
     }
 
@@ -51,7 +43,7 @@ public class InjectMapperInvocationHandler implements InvocationHandler {
 
         AbstractMethodHandler handler = MethodHandlerFactory.create(methodName);
         handler.setMethodName(methodName);
-        handler.setJdbcTemplateWrapper(jdbcTemplateWrapper);
+        handler.setJdbcTemplateProxy(jdbcTemplateProxy);
         handler.setArgs(args);
 
         // 解析出BaseMapper上的泛型
@@ -61,7 +53,13 @@ public class InjectMapperInvocationHandler implements InvocationHandler {
             handler.setIdClass((Class<?>) classes[1]);
         }
 
+        long start = System.currentTimeMillis();
         Object returnVal = handler.handle();
+        long end = System.currentTimeMillis();
+
+        if (log.isDebugEnabled()) {
+            log.debug("方法：{}执行耗时：{}ms", methodName, end - start);
+        }
 
         return returnVal;
     }
