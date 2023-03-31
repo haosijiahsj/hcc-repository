@@ -16,11 +16,15 @@ public interface NestedClause<P, C> {
         return and(true, consumer);
     }
 
+    C and();
+
     C or(boolean condition, Consumer<P> consumer);
 
     default C or(Consumer<P> consumer) {
         return or(true, consumer);
     }
+
+    C or();
 
     C nested(boolean condition, Consumer<P> consumer);
 

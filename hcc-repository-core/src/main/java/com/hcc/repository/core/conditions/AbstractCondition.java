@@ -338,8 +338,18 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     @Override
+    public C and() {
+        return typeThis;
+    }
+
+    @Override
     public C or(boolean condition, Consumer<C> consumer) {
         return addNestedCondition(condition, consumer, SqlKeywordEnum.OR);
+    }
+
+    @Override
+    public C or() {
+        return typeThis;
     }
 
     @Override
