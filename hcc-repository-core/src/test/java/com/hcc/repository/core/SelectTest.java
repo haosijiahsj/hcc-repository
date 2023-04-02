@@ -51,6 +51,8 @@ public class SelectTest extends BaseTest {
         LambdaQueryCondition<TableTestPo> condition = Conditions.<TableTestPo>lambdaQuery()
                 .select(TableTestPo::getId, TableTestPo::getName, TableTestPo::getAge)
                 .eq(TableTestPo::getSex, 1)
+                .or()
+                .eq(TableTestPo::getSex, 0)
                 .orderByDesc(TableTestPo::getId);
         List<TableTestPo> tableTestPos = mapper.selectList(condition);
         System.out.println(tableTestPos);

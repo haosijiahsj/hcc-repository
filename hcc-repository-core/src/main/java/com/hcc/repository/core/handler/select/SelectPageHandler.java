@@ -1,8 +1,10 @@
 package com.hcc.repository.core.handler.select;
 
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.query.AbstractQueryCondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
@@ -35,10 +37,12 @@ public class SelectPageHandler extends AbstractMethodHandler {
         }
         condition.setEntityClass(entityClass);
 
+        ((AbstractQueryCondition) condition).setExecuteSqlType(ExecuteSqlTypeEnum.SELECT_COUNT);
+
         // 查询总数
         Long count;
         try {
-           count = jdbcTemplateProxy.namedQueryForObject(condition.getSqlCount(), condition.getColumnValuePairs(), Long.class);
+           count = jdbcTemplateProxy.namedQueryForObject(condition.getExecuteSql(), condition.getColumnValuePairs(), Long.class);
         } catch (Exception e) {
             count = 0L;
         }
@@ -66,8 +70,10 @@ public class SelectPageHandler extends AbstractMethodHandler {
                     .putColumnValue("size_for_selectPage", pageParam.getPageSize());
         }
 
+        ((AbstractQueryCondition) condition).setExecuteSqlType(ExecuteSqlTypeEnum.SELECT);
+
         // 查询数据
-        List results = jdbcTemplateProxy.namedQueryForEntityList(condition.getSqlQuery(), condition.getColumnValuePairs(), entityClass);
+        List results = jdbcTemplateProxy.namedQueryForEntityList(condition.getExecuteSql(), condition.getColumnValuePairs(), entityClass);
         pageResult.setRecords(results);
 
         return pageResult;

@@ -40,7 +40,7 @@ public abstract class AbstractMethodHandler {
         condition.setEntityClass(entityClass);
 
         // 真实带有占位符的sql和参数数组
-        Pair<String, Object[]> pair = SqlParseUtils.parseNamedSql(this.getTargetNamedSql(condition),
+        Pair<String, Object[]> pair = SqlParseUtils.parseNamedSql(condition.getExecuteSql(),
                 condition.getColumnValuePairs());
 
         String sqlToUse = pair.getLeft();
@@ -54,32 +54,6 @@ public abstract class AbstractMethodHandler {
         if (firstArgIsNull()) {
             throw new IllegalArgumentException("参数不能为空！");
         }
-    }
-
-    /**
-     * 获取目标sql
-     * @param condition
-     * @return
-     */
-    private String getTargetNamedSql(ICondition<?> condition) {
-        String namedSql;
-        if (MethodNameEnum.isC(methodNameEnum)) {
-            namedSql = condition.getSqlInsert();
-        } else if (MethodNameEnum.isR(methodNameEnum)) {
-            if (MethodNameEnum.SELECT_COUNT.equals(methodNameEnum)) {
-                namedSql = condition.getSqlCount();
-            } else {
-                namedSql = condition.getSqlQuery();
-            }
-        } else if (MethodNameEnum.isU(methodNameEnum)) {
-            namedSql = condition.getSqlUpdate();
-        } else if (MethodNameEnum.isD(methodNameEnum)) {
-            namedSql = condition.getSqlDelete();
-        } else {
-            throw new UnsupportedOperationException();
-        }
-
-        return namedSql.trim();
     }
 
     /**

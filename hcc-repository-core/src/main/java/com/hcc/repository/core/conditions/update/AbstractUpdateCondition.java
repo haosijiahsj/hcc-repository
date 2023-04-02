@@ -4,6 +4,7 @@ import com.hcc.repository.core.conditions.AbstractCondition;
 import com.hcc.repository.core.conditions.interfaces.SetClause;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.StrPool;
+import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.ArrayList;
@@ -45,27 +46,31 @@ public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>>
         return typeThis;
     }
 
-    @Override
-    public String getSqlSet() {
+    private String getSqlSet() {
         return SqlKeywordEnum.SET + StrPool.SPACE + String.join(StrPool.COMMA_SPACE, sqlSets);
     }
 
-    @Override
     public String getSqlWhere() {
-        String lastSql = getLastSql();
+        return getSegmentContainer().getSqlSegmentAfterWhere();
+    }
 
-        return getSegmentContainer().getSqlSegment()
-                + (StrUtils.isEmpty(lastSql) ? StrPool.EMPTY : StrPool.SPACE + lastSql);
+    private String tableName() {
+        return TableInfoHelper.getTableName(this.getEntityClass());
     }
 
     @Override
-    public String getSqlCount() {
-        throw new UnsupportedOperationException();
-    }
+    public String getExecuteSql() {
+        String sqlSet = getSqlSet();
+        if (StrUtils.isEmpty(sqlSet)) {
+            throw new IllegalArgumentException("没有set的sql片段");
+        }
 
-    @Override
-    public String getSqlQuery() {
-        throw new UnsupportedOperationException();
+        return StrUtils.joinSpace(
+                SqlKeywordEnum.UPDATE.getKeyword(),
+                tableName(),
+                sqlSet,
+                getSqlWhere()
+        );
     }
 
 }

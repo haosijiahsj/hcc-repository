@@ -13,6 +13,7 @@
         <module>hcc-repository-core</module>
         <module>hcc-repository-extension</module>
         <module>hcc-repository-spring-boot-starter</module>
+        <module>hcc-repository-test</module>
     </modules>
 
     <properties>

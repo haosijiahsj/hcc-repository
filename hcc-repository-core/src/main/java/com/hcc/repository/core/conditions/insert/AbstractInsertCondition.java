@@ -64,7 +64,7 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
     }
 
     @Override
-    public String getSqlInsert() {
+    public String getExecuteSql() {
         String columnField = StrPool.L_BRACKET + String.join(StrPool.COMMA_SPACE, sqlColumns) + StrPool.R_BRACKET;
         String namedField = StrPool.L_BRACKET
                 + sqlValues.stream().map(c -> StrPool.COLON + c).collect(Collectors.joining(StrPool.COMMA_SPACE))
@@ -78,25 +78,4 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
                 namedField
         );
     }
-
-    @Override
-    public String getSqlCount() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlDelete() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlUpdate() {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public String getSqlQuery() {
-        throw new UnsupportedOperationException();
-    }
-
 }

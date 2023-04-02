@@ -33,7 +33,6 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     private T entity;
     protected Class<T> entityClass;
-    private String lastSql;
     protected Map<String, Object> columnValuePairs;
     protected SegmentContainer segmentContainer;
 
@@ -83,10 +82,6 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             return (String) column;
         }
         throw new IllegalArgumentException("需要实现获取列名方法");
-    }
-
-    public String getLastSql() {
-        return StrUtils.isEmpty(lastSql) ? StrPool.EMPTY : lastSql;
     }
 
     protected String getNamedColumnName(String originalColumnName) {
@@ -267,7 +262,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     @Override
     public C last(boolean condition, String lastSql) {
-        this.lastSql = lastSql;
+//        this.lastSql = lastSql;
+        if (condition) {
+            segmentContainer.setLastSql(lastSql);
+        }
         return typeThis;
     }
 
@@ -315,12 +313,9 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             C newC = this.newInstance();
             consumer.accept(newC);
             String sqlKeywordStr = sqlKeyword == null ? StrPool.EMPTY : sqlKeyword.getKeyword();
-            String sqlSegment = newC.getSegmentContainer().getSqlSegment();
+            String sqlSegment = newC.getSegmentContainer().getSqlSegmentAfterWhere();
             if (StrUtils.isNotEmpty(sqlSegment)) {
                 sqlSegment = sqlSegment.replaceAll(SqlKeywordEnum.WHERE.getKeyword(), StrPool.EMPTY).trim();
-                if (StrUtils.isNotEmpty(newC.getLastSql())) {
-                    sqlSegment += StrPool.SPACE + newC.getLastSql();
-                }
                 String sqlNested = sqlKeywordStr + StrPool.SPACE + StrPool.L_BRACKET + sqlSegment + StrPool.R_BRACKET;
                 segmentContainer.addPlainSegment(sqlNested);
             }
@@ -339,6 +334,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     @Override
     public C and() {
+        segmentContainer.addPlainSegment(SqlKeywordEnum.AND.getKeyword());
         return typeThis;
     }
 
@@ -349,6 +345,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     @Override
     public C or() {
+        segmentContainer.addPlainSegment(SqlKeywordEnum.OR.getKeyword());
         return typeThis;
     }
 

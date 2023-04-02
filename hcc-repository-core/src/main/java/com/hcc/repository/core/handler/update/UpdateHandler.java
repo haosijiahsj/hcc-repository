@@ -1,6 +1,7 @@
 package com.hcc.repository.core.handler.update;
 
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.update.AbstractUpdateCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
@@ -13,7 +14,11 @@ public class UpdateHandler extends AbstractMethodHandler {
 
     @Override
     protected ICondition<?> assembleCondition() {
-        return getFirstArg(ICondition.class);
+        ICondition<?> condition = getFirstArg(ICondition.class);
+        if (!(condition instanceof AbstractUpdateCondition)) {
+            throw new UnsupportedOperationException("update仅支持使用Update的Condition");
+        }
+        return condition;
     }
 
     @Override

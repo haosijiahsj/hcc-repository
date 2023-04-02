@@ -1,5 +1,7 @@
 package com.hcc.repository.core.utils;
 
+import com.hcc.repository.core.constants.StrPool;
+
 /**
  * 字符串工具类
  *
@@ -46,6 +48,10 @@ public class StrUtils {
         }
 
         return sb.toString();
+    }
+
+    public static String joinSpace(String...strs) {
+        return String.join(StrPool.SPACE, strs);
     }
 
 }

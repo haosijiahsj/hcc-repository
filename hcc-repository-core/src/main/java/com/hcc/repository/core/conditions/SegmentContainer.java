@@ -22,6 +22,7 @@ public class SegmentContainer {
     private final List<String> orderBySegments;
     private final List<String> groupBySegments;
     private final List<String> havingSegments;
+    private String lastSql;
 
     public SegmentContainer() {
         whereSqlSegments = new ArrayList<>(16);
@@ -31,7 +32,19 @@ public class SegmentContainer {
     }
 
     public void addAndSegment(String sqlSegment) {
-        whereSqlSegments.add("AND " + sqlSegment);
+        if (CollUtils.isEmpty(whereSqlSegments)) {
+            // 第一个不拼AND
+            whereSqlSegments.add(sqlSegment);
+        } else {
+            String curLast = whereSqlSegments.get(whereSqlSegments.size() - 1);
+            String sqlSegmentStr = SqlKeywordEnum.AND.getKeyword();
+            if (curLast.equals(SqlKeywordEnum.OR.getKeyword())) {
+                // 加入前的最后一个为OR则移除，同时本次拼接OR
+                sqlSegmentStr = SqlKeywordEnum.OR.getKeyword();
+                whereSqlSegments.remove(whereSqlSegments.size() - 1);
+            }
+            whereSqlSegments.add(sqlSegmentStr + StrPool.SPACE + sqlSegment);
+        }
     }
 
     public void addPlainSegment(String sqlSegment) {
@@ -50,6 +63,10 @@ public class SegmentContainer {
         havingSegments.add(sqlSegment);
     }
 
+    public void setLastSql(String lastSql) {
+        this.lastSql = lastSql;
+    }
+
     /**
      * where子句
      * @return
@@ -59,14 +76,28 @@ public class SegmentContainer {
         if (CollUtils.isEmpty(whereSqlSegments)) {
             return StrPool.EMPTY;
         }
+        String lastSqlSegment = whereSqlSegments.get(whereSqlSegments.size() - 1);
+        if (SqlKeywordEnum.AND.getKeyword().equals(lastSqlSegment)
+                || SqlKeywordEnum.OR.getKeyword().equals(lastSqlSegment)) {
+            // 最后一个where sql片段为AND 或 OR，则去掉
+            whereSqlSegments.remove(whereSqlSegments.size() - 1);
+        }
 
         // 去掉第一个AND OR
         String firstWhere = whereSqlSegments.get(0);
         if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword()) || firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
             if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword())) {
-                firstWhere = firstWhere.substring(4);
+                if (firstWhere.endsWith(StrPool.SPACE)) {
+                    firstWhere = firstWhere.substring(4);
+                } else {
+                    firstWhere = firstWhere.substring(3);
+                }
             } else if (firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
-                firstWhere = firstWhere.substring(3);
+                if (firstWhere.endsWith(StrPool.SPACE)) {
+                    firstWhere = firstWhere.substring(3);
+                } else {
+                    firstWhere = firstWhere.substring(2);
+                }
             }
             whereSqlSegments.remove(0);
             whereSqlSegments.add(0, firstWhere);
@@ -118,7 +149,7 @@ public class SegmentContainer {
      * where后的整个子句
      * @return
      */
-    public String getSqlSegment() {
+    public String getSqlSegmentAfterWhere() {
         StringBuilder sb = new StringBuilder();
         String sqlWhere = getSqlWhere();
         if (StrUtils.isNotEmpty(sqlWhere)) {
@@ -144,6 +175,12 @@ public class SegmentContainer {
                 sb.append(StrPool.SPACE);
             }
             sb.append(sqlOrderBy);
+        }
+        if (StrUtils.isNotEmpty(lastSql)) {
+            if (sb.length() > 0) {
+                sb.append(StrPool.SPACE);
+            }
+            sb.append(lastSql);
         }
 
         return sb.toString();

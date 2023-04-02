@@ -19,7 +19,7 @@ public class SqlExecuteContext {
      */
     private SqlTypeEnum sqlType;
     /**
-     * 是否具名map
+     * 是否具名sql
      */
     private boolean isNamedSql;
     /**
