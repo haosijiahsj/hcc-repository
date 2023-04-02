@@ -6,6 +6,7 @@ package com.hcc.repository.core.handler.select;
  * @author hushengjun
  * @date 2023/3/21
  */
+@Deprecated
 public class SelectOneHandler extends AbstractSelectHandler {
 
     @Override

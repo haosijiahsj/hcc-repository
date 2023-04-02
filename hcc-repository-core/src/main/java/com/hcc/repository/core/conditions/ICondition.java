@@ -1,5 +1,7 @@
 package com.hcc.repository.core.conditions;
 
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
+
 import java.util.Map;
 
 /**
@@ -15,6 +17,8 @@ public abstract class ICondition<T> {
     public abstract Class<?> getEntityClass();
 
     public void setEntityClass(Class entityClass) {}
+
+    public void setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {}
 
     /**
      * 获取执行的sql

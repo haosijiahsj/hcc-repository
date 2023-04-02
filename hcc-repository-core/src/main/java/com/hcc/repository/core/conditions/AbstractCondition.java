@@ -5,6 +5,7 @@ import com.hcc.repository.core.conditions.interfaces.GroupByClause;
 import com.hcc.repository.core.conditions.interfaces.NestedClause;
 import com.hcc.repository.core.conditions.interfaces.OrderByClause;
 import com.hcc.repository.core.conditions.interfaces.WhereClause;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.SqlLikeEnum;
 import com.hcc.repository.core.constants.StrPool;
@@ -33,6 +34,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     private T entity;
     protected Class<T> entityClass;
+    protected ExecuteSqlTypeEnum executeSqlType;
     protected Map<String, Object> columnValuePairs;
     protected SegmentContainer segmentContainer;
 

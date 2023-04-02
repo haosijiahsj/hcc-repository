@@ -5,10 +5,12 @@ import com.hcc.repository.core.handler.MethodHandlerFactory;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import com.hcc.repository.core.mapper.BaseMapper;
+import com.hcc.repository.core.utils.MethodHandlesUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.jdbc.core.JdbcTemplate;
 
+import java.lang.invoke.MethodHandle;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -36,6 +38,11 @@ public class InjectMapperInvocationHandler implements InvocationHandler {
                 || !BaseMapper.class.equals(method.getDeclaringClass())) {
             // Object自带的方法，或者不是BaseMapper中定义的方法，不走代理调用
             return method.invoke(this, args);
+        }
+
+        if (method.isDefault()) {
+            MethodHandle methodHandle = MethodHandlesUtils.getSpecialMethodHandle(method).bindTo(proxy);
+            return methodHandle.invokeWithArguments(args);
         }
 
         String methodName = method.getName();

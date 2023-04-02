@@ -2,6 +2,7 @@ package com.hcc.repository.core.conditions.update;
 
 import com.hcc.repository.core.conditions.AbstractCondition;
 import com.hcc.repository.core.conditions.interfaces.SetClause;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -24,6 +25,7 @@ public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>>
     protected void init() {
         super.init();
         sqlSets = new ArrayList<>(32);
+        super.executeSqlType = ExecuteSqlTypeEnum.UPDATE;
     }
 
     @Override

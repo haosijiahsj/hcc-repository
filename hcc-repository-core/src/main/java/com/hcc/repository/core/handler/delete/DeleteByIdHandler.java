@@ -11,6 +11,7 @@ import com.hcc.repository.core.metadata.TableInfoHelper;
  * @author hushengjun
  * @date 2023/3/21
  */
+@Deprecated
 public class DeleteByIdHandler extends AbstractMethodHandler {
 
     @Override

@@ -17,6 +17,7 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/3/26
  */
+@Deprecated
 public class SelectPageHandler extends AbstractMethodHandler {
 
     @Override

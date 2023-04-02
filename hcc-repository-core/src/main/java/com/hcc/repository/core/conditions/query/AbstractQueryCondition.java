@@ -24,7 +24,6 @@ import java.util.stream.Collectors;
 public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
 
     private List<String> selectColumns;
-    protected ExecuteSqlTypeEnum executeSqlType;
 
     @Override
     protected void init() {
@@ -32,11 +31,6 @@ public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> 
         selectColumns = new ArrayList<>(32);
         // 默认是select语句
         this.executeSqlType = ExecuteSqlTypeEnum.SELECT;
-    }
-
-    public C setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {
-        this.executeSqlType = selectSqlType;
-        return typeThis;
     }
 
     public List<String> getSelectColumns() {

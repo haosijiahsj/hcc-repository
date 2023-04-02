@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.update;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.update.AbstractUpdateCondition;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
@@ -18,6 +19,8 @@ public class UpdateHandler extends AbstractMethodHandler {
         if (!(condition instanceof AbstractUpdateCondition)) {
             throw new UnsupportedOperationException("update仅支持使用Update的Condition");
         }
+        condition.setExecuteSqlType(ExecuteSqlTypeEnum.UPDATE);
+
         return condition;
     }
 

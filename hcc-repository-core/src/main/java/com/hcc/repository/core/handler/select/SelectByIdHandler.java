@@ -12,6 +12,7 @@ import com.hcc.repository.core.utils.Assert;
  * @author hushengjun
  * @date 2023/3/21
  */
+@Deprecated
 public class SelectByIdHandler extends AbstractSelectHandler {
 
     @Override
