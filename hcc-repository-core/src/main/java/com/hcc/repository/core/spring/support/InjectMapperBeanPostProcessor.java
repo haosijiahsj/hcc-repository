@@ -1,8 +1,8 @@
-package com.hcc.repository.core.spring;
+package com.hcc.repository.core.spring.support;
 
-import com.hcc.repository.core.InjectMapper;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
+import com.hcc.repository.core.spring.InjectMapper;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -20,7 +20,7 @@ import java.lang.reflect.Field;
 @Slf4j
 public class InjectMapperBeanPostProcessor implements BeanPostProcessor {
 
-    private DataSource dataSource;
+    private final DataSource dataSource;
 
     public InjectMapperBeanPostProcessor(DataSource dataSource) {
         this.dataSource = dataSource;

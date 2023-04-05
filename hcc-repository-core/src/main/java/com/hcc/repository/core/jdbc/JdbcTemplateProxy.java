@@ -1,5 +1,6 @@
 package com.hcc.repository.core.jdbc;
 
+import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
 
@@ -30,7 +31,7 @@ public interface JdbcTemplateProxy {
             return null;
         }
         if (results.size() > 1) {
-            throw new RuntimeException("结果不唯一");
+            throw new RepositoryException("结果不唯一");
         }
 
         return results.get(0);
@@ -48,7 +49,7 @@ public interface JdbcTemplateProxy {
             return null;
         }
         if (results.size() > 1) {
-            throw new RuntimeException("结果不唯一");
+            throw new RepositoryException("结果不唯一");
         }
 
         return results.get(0);

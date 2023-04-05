@@ -1,4 +1,4 @@
-package com.hcc.repository.core;
+package com.hcc.repository.core.spring;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

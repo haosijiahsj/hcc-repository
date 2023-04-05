@@ -1,6 +1,7 @@
 package com.hcc.repository.core.conditions.insert;
 
 import com.hcc.repository.core.conditions.interfaces.SFunction;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 
@@ -21,7 +22,7 @@ public class LambdaInsertCondition<T> extends AbstractInsertCondition<T, SFuncti
         if (condition) {
             String columnName = this.getColumnName(column);
             sqlColumns.add(columnName);
-            sqlValues.add(":" + columnName);
+            sqlValues.add(StrPool.COLON + columnName);
             columnValuePairs.put(columnName, val);
         }
         return this;

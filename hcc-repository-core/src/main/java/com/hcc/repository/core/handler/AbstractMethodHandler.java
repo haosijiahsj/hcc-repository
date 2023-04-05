@@ -1,6 +1,7 @@
 package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.OriginalSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.utils.Pair;
@@ -39,9 +40,15 @@ public abstract class AbstractMethodHandler {
         }
         condition.setEntityClass(entityClass);
 
-        // 真实带有占位符的sql和参数数组
-        Pair<String, Object[]> pair = SqlParseUtils.parseNamedSql(condition.getExecuteSql(),
-                condition.getColumnValuePairs());
+        Pair<String, Object[]> pair;
+        if (condition instanceof OriginalSqlCondition && !((OriginalSqlCondition<?>) condition).maybeNamedSql()) {
+            // 如果是原生sql的方式传参
+            pair = Pair.of(condition.getExecuteSql(), ((OriginalSqlCondition<?>) condition).getArgs());
+        } else {
+            // 真实带有占位符的sql和参数数组
+            pair = SqlParseUtils.parseNamedSql(condition.getExecuteSql(),
+                    condition.getColumnValuePairs());
+        }
 
         String sqlToUse = pair.getLeft();
         Object[] params = pair.getRight();

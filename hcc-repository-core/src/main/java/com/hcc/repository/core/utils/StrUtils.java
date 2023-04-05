@@ -54,4 +54,12 @@ public class StrUtils {
         return String.join(StrPool.SPACE, strs);
     }
 
+    public static String join(CharSequence delimiter, CharSequence... elements) {
+        return String.join(delimiter, elements);
+    }
+
+    public static String join(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
+        return String.join(delimiter, elements);
+    }
+
 }

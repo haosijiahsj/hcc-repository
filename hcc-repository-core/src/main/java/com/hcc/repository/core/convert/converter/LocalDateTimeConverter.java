@@ -1,6 +1,7 @@
 package com.hcc.repository.core.convert.converter;
 
 import com.hcc.repository.core.convert.ValueConverter;
+import com.hcc.repository.core.exceptions.RepositoryException;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ public class LocalDateTimeConverter implements ValueConverter<LocalDateTime> {
             return ((Timestamp)value).toLocalDateTime();
         }
 
-        throw new RuntimeException(String.format("无法转换值：%s，到目标class: %s", value, targetClass.getName()));
+        throw new RepositoryException(String.format("无法转换值：%s，到目标class: %s", value, targetClass.getName()));
     }
 
 }

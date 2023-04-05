@@ -35,7 +35,7 @@ import java.util.stream.Collectors;
 public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
 
     private List<Interceptor> interceptors = new ArrayList<>();
-    private JdbcTemplateProxy jdbcTemplateProxy;
+    private final JdbcTemplateProxy jdbcTemplateProxy;
 
     public JdbcTemplateProxyInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, List<Interceptor> interceptors) {
         this.jdbcTemplateProxy = jdbcTemplateProxy;

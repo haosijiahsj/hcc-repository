@@ -13,6 +13,7 @@ import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
 import com.hcc.repository.core.proxy.JdbcTemplateProxyInvocationHandler;
+import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.Data;
 import org.junit.Before;
@@ -45,7 +46,7 @@ public class BaseTest {
 
         interceptors.add(new Interceptor1());
 
-        mapper = InjectMapperProxyFactory.create(TestMapper.class, druidDataSource, interceptors);
+        mapper = InjectMapperProxyFactory.create(TestMapper.class, druidDataSource, new RepositoryConfiguration());
         JdbcTemplateProxyInvocationHandler jdbcTemplateProxyInvocationHandler
                 = new JdbcTemplateProxyInvocationHandler(new JdbcTemplateWrapper(druidDataSource), interceptors);
         jdbcTemplateProxy = ReflectUtils.newProxy(JdbcTemplateProxy.class, jdbcTemplateProxyInvocationHandler);
