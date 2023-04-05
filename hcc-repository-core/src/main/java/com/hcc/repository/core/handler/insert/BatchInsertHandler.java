@@ -13,6 +13,7 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/3/21
  */
+@Deprecated
 public class BatchInsertHandler extends InsertHandler {
 
     @Override

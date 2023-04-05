@@ -1,5 +1,6 @@
 package com.hcc.repository.core.handler.update;
 
+import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
@@ -38,6 +39,8 @@ public class UpdateByIdHandler extends AbstractMethodHandler {
             Object targetValue = value;
             if (c.needConvert()) {
                 targetValue = ReflectUtils.newInstance(c.getConverter()).convertToColumn(value);
+            } else if (c.isAssignableFromIEnum()) {
+                targetValue = ((IEnum)value).getValue();
             }
             condition.set(c.getColumnName(), targetValue);
         });

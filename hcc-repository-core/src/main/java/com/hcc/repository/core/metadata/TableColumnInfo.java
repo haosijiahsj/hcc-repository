@@ -2,6 +2,7 @@ package com.hcc.repository.core.metadata;
 
 import com.hcc.repository.annotation.DefaultConverter;
 import com.hcc.repository.annotation.IConverter;
+import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
 import lombok.Data;
@@ -27,6 +28,14 @@ public class TableColumnInfo {
 
     public boolean needConvert() {
         return !DefaultConverter.class.equals(converter) && !IConverter.class.equals(converter);
+    }
+
+    public boolean isEnum() {
+        return field.getType().isEnum();
+    }
+
+    public boolean isAssignableFromIEnum() {
+        return isEnum() && IEnum.class.isAssignableFrom(field.getType());
     }
 
 }

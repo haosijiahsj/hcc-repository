@@ -1,6 +1,6 @@
 package com.hcc.repository.core.jdbc;
 
-import com.hcc.repository.annotation.IConverter;
+import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
 import com.hcc.repository.core.metadata.TableColumnInfo;
@@ -9,12 +9,14 @@ import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * 通用的rowMapper转换器
@@ -57,6 +59,9 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
                 // 用户自定义转换器
                 targetValue = ReflectUtils.newInstance(tableColumnInfo.getConverter())
                         .convertToAttribute(columnValue);
+            } else if (tableColumnInfo.isAssignableFromIEnum()) {
+                // 枚举处理
+                targetValue = this.convertToEnum(columnValue, field.getType());
             } else {
                 ValueConverter<?> converter = ConverterFactory.getConverter(field.getType());
                 if (converter != null) {
@@ -73,6 +78,28 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
         }
 
         return instance;
+    }
+
+    /**
+     * 转换到枚举
+     * @param val
+     * @param enumClass
+     * @param <E>
+     * @return
+     */
+    private <E> E convertToEnum(Object val, Class<E> enumClass) {
+        E[] enumConstants = enumClass.getEnumConstants();
+        return Arrays.stream(enumConstants)
+                .filter(e -> {
+                    Serializable value = ((IEnum) e).getValue();
+                    if (value == null) {
+                        return false;
+                    }
+
+                    return Objects.equals(val.toString(), value.toString());
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**

@@ -1,5 +1,6 @@
 package com.hcc.repository.core.handler.insert;
 
+import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
 import com.hcc.repository.core.conditions.ICondition;
@@ -37,6 +38,8 @@ public class InsertHandler extends AbstractMethodHandler {
             Object targetValue = value;
             if (c.needConvert()) {
                 targetValue = ReflectUtils.newInstance(c.getConverter()).convertToColumn(value);
+            } else if (c.isAssignableFromIEnum()) {
+                targetValue = ((IEnum)value).getValue();
             }
             condition.value(c.getColumnName(), targetValue);
         });
