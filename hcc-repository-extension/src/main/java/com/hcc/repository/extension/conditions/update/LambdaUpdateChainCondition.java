@@ -14,24 +14,24 @@ import java.io.Serializable;
  * @author hushengjun
  * @date 2023/4/3
  */
-public class LambdaChainUpdateCondition<T, ID extends Serializable>
-        extends AbstractChainCondition<T, SFunction<T, ?>, LambdaChainUpdateCondition<T, ID>, LambdaUpdateCondition<T>>
-        implements ChainUpdate<T, ID>, SetClause<LambdaChainUpdateCondition<T, ID>, SFunction<T, ?>> {
+public class LambdaUpdateChainCondition<T, ID extends Serializable>
+        extends AbstractChainCondition<T, SFunction<T, ?>, LambdaUpdateChainCondition<T, ID>, LambdaUpdateCondition<T>>
+        implements ChainUpdate<T, ID>, SetClause<LambdaUpdateChainCondition<T, ID>, SFunction<T, ?>> {
 
     private final BaseMapper<T, ID> baseMapper;
 
-    public LambdaChainUpdateCondition(BaseMapper<T, ID> baseMapper) {
+    public LambdaUpdateChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
     }
 
     @Override
-    public LambdaChainUpdateCondition<T, ID> set(boolean condition, SFunction<T, ?> column, Object val) {
+    public LambdaUpdateChainCondition<T, ID> set(boolean condition, SFunction<T, ?> column, Object val) {
         ch.set(condition, column, val);
         return typeThis;
     }
 
     @Override
-    public LambdaChainUpdateCondition<T, ID> setSql(boolean condition, String setSql) {
+    public LambdaUpdateChainCondition<T, ID> setSql(boolean condition, String setSql) {
         ch.setSql(condition, setSql);
         return typeThis;
     }

@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.hcc.repository.starter.autoconfigure.RepositoryAutoConfiguration
+org.springframework.context.ApplicationListener=\
+com.hcc.repository.starter.autoconfigure.RepositoryApplicationListener

@@ -13,13 +13,13 @@ import java.io.Serializable;
  * @author hushengjun
  * @date 2023/4/3
  */
-public class DefaultChainUpdateCondition<T, ID extends Serializable>
-        extends AbstractChainCondition<T, String, DefaultChainUpdateCondition<T, ID>, DefaultUpdateCondition<T>>
-        implements ChainUpdate<T, ID>, SetClause<DefaultChainUpdateCondition<T, ID>, String> {
+public class DefaultUpdateChainCondition<T, ID extends Serializable>
+        extends AbstractChainCondition<T, String, DefaultUpdateChainCondition<T, ID>, DefaultUpdateCondition<T>>
+        implements ChainUpdate<T, ID>, SetClause<DefaultUpdateChainCondition<T, ID>, String> {
 
     private final BaseMapper<T, ID> baseMapper;
 
-    public DefaultChainUpdateCondition(BaseMapper<T, ID> baseMapper) {
+    public DefaultUpdateChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
     }
 
@@ -29,13 +29,13 @@ public class DefaultChainUpdateCondition<T, ID extends Serializable>
     }
 
     @Override
-    public DefaultChainUpdateCondition<T, ID> set(boolean condition, String column, Object val) {
+    public DefaultUpdateChainCondition<T, ID> set(boolean condition, String column, Object val) {
         ch.set(condition, column, val);
         return typeThis;
     }
 
     @Override
-    public DefaultChainUpdateCondition<T, ID> setSql(boolean condition, String setSql) {
+    public DefaultUpdateChainCondition<T, ID> setSql(boolean condition, String setSql) {
         ch.setSql(condition, setSql);
         return typeThis;
     }

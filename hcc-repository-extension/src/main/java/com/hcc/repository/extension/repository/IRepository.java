@@ -2,20 +2,23 @@ package com.hcc.repository.extension.repository;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.mapper.BaseMapper;
+import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.conditions.ChainConditions;
-import com.hcc.repository.extension.conditions.query.DefaultChainQueryCondition;
-import com.hcc.repository.extension.conditions.query.LambdaChainQueryCondition;
-import com.hcc.repository.extension.conditions.update.DefaultChainUpdateCondition;
-import com.hcc.repository.extension.conditions.update.LambdaChainUpdateCondition;
+import com.hcc.repository.extension.conditions.OriginalSqlChainCondition;
+import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
+import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
+import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
+import com.hcc.repository.extension.conditions.update.LambdaUpdateChainCondition;
 
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,20 +36,44 @@ public interface IRepository<T, ID extends Serializable> {
      */
     BaseMapper<T, ID> getBaseMapper();
 
-    default DefaultChainQueryCondition<T, ID> defaultQuery() {
+    /**
+     * 默认的链式查询
+     * @return
+     */
+    default DefaultQueryChainCondition<T, ID> defaultQuery() {
         return ChainConditions.defaultQuery(getBaseMapper());
     }
 
-    default LambdaChainQueryCondition<T, ID> lambdaQuery() {
+    /**
+     * lambda的链式查询
+     * @return
+     */
+    default LambdaQueryChainCondition<T, ID> lambdaQuery() {
         return ChainConditions.lambdaQuery(getBaseMapper());
     }
 
-    default DefaultChainUpdateCondition<T, ID> defaultUpdate() {
+    /**
+     * 默认的链式更新
+     * @return
+     */
+    default DefaultUpdateChainCondition<T, ID> defaultUpdate() {
         return ChainConditions.defaultUpdate(getBaseMapper());
     }
 
-    default LambdaChainUpdateCondition<T, ID> lambdaUpdate() {
+    /**
+     * lambda的链式更新
+     * @return
+     */
+    default LambdaUpdateChainCondition<T, ID> lambdaUpdate() {
         return ChainConditions.lambdaUpdate(getBaseMapper());
+    }
+
+    /**
+     * 原生的sql操作
+     * @return
+     */
+    default OriginalSqlChainCondition<T, ID> originalSql() {
+        return ChainConditions.originalSql(getBaseMapper());
     }
 
     /**
@@ -88,7 +115,28 @@ public interface IRepository<T, ID extends Serializable> {
      * @param entity
      * @return
      */
-    boolean saveOrUpdate(T entity);
+    default boolean saveOrUpdate(T entity) {
+        TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entity.getClass());
+        if (idColumnInfo == null) {
+            return false;
+        }
+
+        Object idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
+        if (idValue == null) {
+            return save(entity);
+        }
+
+        // 通过构建condition查询，避免强转
+        T existEntity = defaultQuery()
+                .select(idColumnInfo.getColumnName())
+                .eq(idColumnInfo.getColumnName(), idValue)
+                .one();
+        if (existEntity == null) {
+            return save(entity);
+        }
+
+        return updateById(entity);
+    }
 
     /**
      * 通过id删除数据

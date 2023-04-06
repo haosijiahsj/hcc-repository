@@ -13,7 +13,7 @@ import com.hcc.repository.test.enums.SexEnum;
 public class CustomerConverter extends AbstractEnumConverter<SexEnum, Integer> {
 
     @Override
-    public Integer toColum(SexEnum attribute) {
+    public Integer toColumn(SexEnum attribute) {
         return attribute.getCode();
     }
 

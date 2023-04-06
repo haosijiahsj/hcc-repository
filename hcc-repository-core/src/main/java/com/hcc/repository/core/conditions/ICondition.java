@@ -22,9 +22,7 @@ public abstract class ICondition<T> {
 
     public void setEntityClass(Class entityClass) {}
 
-    public void setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {
-        throw new UnsupportedOperationException();
-    }
+    public void setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {}
 
     /**
      * 获取执行的sql

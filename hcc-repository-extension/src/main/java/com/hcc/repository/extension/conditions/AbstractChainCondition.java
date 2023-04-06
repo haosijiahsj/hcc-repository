@@ -7,6 +7,8 @@ import com.hcc.repository.core.conditions.interfaces.GroupByClause;
 import com.hcc.repository.core.conditions.interfaces.NestedClause;
 import com.hcc.repository.core.conditions.interfaces.OrderByClause;
 import com.hcc.repository.core.conditions.interfaces.WhereClause;
+import com.hcc.repository.core.constants.SqlKeywordEnum;
+import com.hcc.repository.core.constants.StrPool;
 
 import java.util.Collection;
 import java.util.Map;
@@ -216,6 +218,18 @@ public abstract class AbstractChainCondition<T, R, C extends AbstractChainCondit
     @Override
     public C notIn(boolean condition, R column, Collection<?> coll) {
         getCondition().notIn(condition, column, coll);
+        return typeThis;
+    }
+
+    @Override
+    public C inSql(boolean condition, R column, String value) {
+        getCondition().inSql(condition, column, value);
+        return typeThis;
+    }
+
+    @Override
+    public C notInSql(boolean condition, R column, String value) {
+        getCondition().notInSql(condition, column, value);
         return typeThis;
     }
 

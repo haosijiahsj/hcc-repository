@@ -2,11 +2,12 @@ package com.hcc.repository.core.spring.support;
 
 import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.mapper.BaseMapper;
+import com.hcc.repository.core.spring.DS;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
-import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.support.GenericBeanDefinition;
 import org.springframework.context.annotation.ClassPathBeanDefinitionScanner;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -69,6 +69,13 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
             definition.getConstructorArgumentValues().addGenericArgumentValue(beanClassName);
             // 通过该FactoryBean.getObject获取代理对象
             definition.setBeanClass(MapperFactoryBean.class);
+
+            // 加入动态数据源功能 扫描DS注解获取dataSource依赖名称
+            Class<?> mapperBeanClass = definition.getBeanClass();
+            DS ds = ReflectUtils.getAnnotation(mapperBeanClass, DS.class);
+            if (ds != null && StrUtils.isNotEmpty(ds.value())) {
+                dataSourceRef = ds.value();
+            }
 
             boolean autoWiredDataSource = true;
             if (StrUtils.isNotEmpty(dataSourceRef)) {

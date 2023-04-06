@@ -125,4 +125,16 @@ public interface WhereClause<C, R> {
         return notIn(true, column, args);
     }
 
+    default C inSql(R column, String value) {
+        return inSql(true, column, value);
+    }
+
+    C inSql(boolean condition, R column, String value);
+
+    default C notInSql(R column, String value) {
+        return notInSql(true, column, value);
+    }
+
+    C notInSql(boolean condition, R column, String value);
+
 }

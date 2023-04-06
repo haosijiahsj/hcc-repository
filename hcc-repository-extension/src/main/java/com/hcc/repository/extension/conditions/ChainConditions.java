@@ -1,10 +1,10 @@
 package com.hcc.repository.extension.conditions;
 
 import com.hcc.repository.core.mapper.BaseMapper;
-import com.hcc.repository.extension.conditions.query.DefaultChainQueryCondition;
-import com.hcc.repository.extension.conditions.query.LambdaChainQueryCondition;
-import com.hcc.repository.extension.conditions.update.DefaultChainUpdateCondition;
-import com.hcc.repository.extension.conditions.update.LambdaChainUpdateCondition;
+import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
+import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
+import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
+import com.hcc.repository.extension.conditions.update.LambdaUpdateChainCondition;
 
 import java.io.Serializable;
 
@@ -18,20 +18,24 @@ public final class ChainConditions {
 
     private ChainConditions() {}
 
-    public static <T, ID extends Serializable> DefaultChainQueryCondition<T, ID> defaultQuery(BaseMapper<T, ID> baseMapper) {
-        return new DefaultChainQueryCondition<>(baseMapper);
+    public static <T, ID extends Serializable> DefaultQueryChainCondition<T, ID> defaultQuery(BaseMapper<T, ID> baseMapper) {
+        return new DefaultQueryChainCondition<>(baseMapper);
     }
 
-    public static <T, ID extends Serializable> LambdaChainQueryCondition<T, ID> lambdaQuery(BaseMapper<T, ID> baseMapper) {
-        return new LambdaChainQueryCondition<>(baseMapper);
+    public static <T, ID extends Serializable> LambdaQueryChainCondition<T, ID> lambdaQuery(BaseMapper<T, ID> baseMapper) {
+        return new LambdaQueryChainCondition<>(baseMapper);
     }
 
-    public static <T, ID extends Serializable> DefaultChainUpdateCondition<T, ID> defaultUpdate(BaseMapper<T, ID> baseMapper) {
-        return new DefaultChainUpdateCondition<>(baseMapper);
+    public static <T, ID extends Serializable> DefaultUpdateChainCondition<T, ID> defaultUpdate(BaseMapper<T, ID> baseMapper) {
+        return new DefaultUpdateChainCondition<>(baseMapper);
     }
 
-    public static <T, ID extends Serializable> LambdaChainUpdateCondition<T, ID> lambdaUpdate(BaseMapper<T, ID> baseMapper) {
-        return new LambdaChainUpdateCondition<>(baseMapper);
+    public static <T, ID extends Serializable> LambdaUpdateChainCondition<T, ID> lambdaUpdate(BaseMapper<T, ID> baseMapper) {
+        return new LambdaUpdateChainCondition<>(baseMapper);
+    }
+
+    public static <T, ID extends Serializable> OriginalSqlChainCondition<T, ID> originalSql(BaseMapper<T, ID> baseMapper) {
+        return new OriginalSqlChainCondition<>(baseMapper);
     }
 
 }

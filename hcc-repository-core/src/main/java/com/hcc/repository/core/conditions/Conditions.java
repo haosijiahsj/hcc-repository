@@ -47,4 +47,8 @@ public final class Conditions {
         return new LambdaUpdateCondition<>(clazz);
     }
 
+    public static <T> OriginalSqlCondition<T> originalSql() {
+        return new OriginalSqlCondition<>();
+    }
+
 }

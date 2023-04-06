@@ -36,30 +36,6 @@ public class IRepositoryImpl<M extends BaseMapper<T, ID>, T, ID extends Serializ
     }
 
     @Override
-    public boolean saveOrUpdate(T entity) {
-        TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entity.getClass());
-        if (idColumnInfo == null) {
-            return false;
-        }
-
-        Object idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
-        if (idValue == null) {
-            return save(entity);
-        }
-
-        // 通过构建condition查询，避免强转
-        T existEntity = defaultQuery()
-                .select(idColumnInfo.getColumnName())
-                .eq(idColumnInfo.getColumnName(), idValue)
-                .one();
-        if (existEntity == null) {
-            return save(entity);
-        }
-
-        return updateById(entity);
-    }
-
-    @Override
     public IPage<T> page(ICondition<T> condition, IPage<T> pageParam) {
         return null;
     }

@@ -249,6 +249,28 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return addInCondition(condition, column, coll, false);
     }
 
+    @Override
+    public C inSql(boolean condition, R column, String value) {
+        if (condition) {
+            String columnName = this.getColumnName(column);
+            String sqlSegment = String.format("%s %s %s", columnName,
+                    SqlKeywordEnum.IN.getKeyword(), StrPool.L_BRACKET + value + StrPool.R_BRACKET);
+            segmentContainer.addAndSegment(sqlSegment);
+        }
+        return typeThis;
+    }
+
+    @Override
+    public C notInSql(boolean condition, R column, String value) {
+        if (condition) {
+            String columnName = this.getColumnName(column);
+            String sqlSegment = String.format("%s %s %s", columnName,
+                    SqlKeywordEnum.NOT_IN.getKeyword(), StrPool.L_BRACKET + value + StrPool.R_BRACKET);
+            segmentContainer.addAndSegment(sqlSegment);
+        }
+        return typeThis;
+    }
+
     @SafeVarargs
     @Override
     public final C groupBy(boolean condition, R... columns) {

@@ -147,6 +147,13 @@ public class ReflectUtils {
         return method.getAnnotation(annotationClass);
     }
 
+    public static <T extends Annotation> T getAnnotation(Class<?> clazz, Class<T> annotationClass) {
+        if (clazz == null || annotationClass == null) {
+            return null;
+        }
+        return clazz.getAnnotation(annotationClass);
+    }
+
     /**
      * 获取字段的真实泛型
      * @param field

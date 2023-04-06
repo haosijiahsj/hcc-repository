@@ -16,7 +16,7 @@ public abstract class AbstractEnumConverter<E extends Enum<E>, COL> implements I
             return null;
         }
 
-        return toColum(attribute);
+        return toColumn(attribute);
     }
 
     @Override
@@ -28,9 +28,8 @@ public abstract class AbstractEnumConverter<E extends Enum<E>, COL> implements I
         return toEnum(column);
     }
 
-    public abstract COL toColum(E attribute);
+    public abstract COL toColumn(E attribute);
 
     public abstract E toEnum(COL column);
-
 
 }

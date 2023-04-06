@@ -52,6 +52,8 @@ public class RepositorySelectTest extends BaseTest {
                 .eq(TableTestPo::getSex, 1)
                 .count();
         System.out.println(count);
+        List<Long> longs = testRepository.originalSql().sql("select * from table_test").listIds();
+        System.out.println(longs);
     }
 
 }

@@ -9,6 +9,7 @@ import com.hcc.repository.core.utils.StrUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,26 +25,31 @@ import java.util.stream.Collectors;
  */
 public class TableInfoHelper {
 
+    /**
+     * 实体元数据缓存
+     */
     private static final Map<Class<?>, TableInfo> CACHE = new ConcurrentHashMap<>(128);
 
     private TableInfoHelper() {}
 
     /**
-     * 获取表元数据
-     * @param clazz
-     * @return
+     * 批量载入缓存
+     * @param classes
      */
-    public static TableInfo getTableInfo(Class<?> clazz) {
+    public static synchronized void loadAll(Collection<Class<?>> classes) {
+        classes.forEach(TableInfoHelper::load);
+    }
+
+    /**
+     * 载入缓存
+     * @param clazz
+     */
+    public static synchronized TableInfo load(Class<?> clazz) {
         if (clazz == null) {
-            throw new NullPointerException();
+            return null;
         }
 
-        TableInfo tableInfo = CACHE.get(clazz);
-        if (tableInfo != null) {
-            return tableInfo;
-        }
-
-        tableInfo = new TableInfo();
+        TableInfo tableInfo = new TableInfo();
         Table tableAnnotation = clazz.getAnnotation(Table.class);
         tableInfo.setClazz(clazz);
         tableInfo.setTableName(resolveTableName(clazz));
@@ -99,6 +105,19 @@ public class TableInfoHelper {
         CACHE.put(clazz, tableInfo);
 
         return tableInfo;
+    }
+
+    /**
+     * 获取表元数据
+     * @param clazz
+     * @return
+     */
+    public static TableInfo getTableInfo(Class<?> clazz) {
+        if (clazz == null) {
+            throw new NullPointerException();
+        }
+
+        return CACHE.getOrDefault(clazz, load(clazz));
     }
 
     /**
@@ -165,6 +184,11 @@ public class TableInfoHelper {
         return getTableInfo(clazz).getColumnInfos().stream().filter(c -> !c.isPrimaryKey()).collect(Collectors.toList());
     }
 
+    /**
+     * 获取字段和列映射关系
+     * @param clazz
+     * @return
+     */
     public static Map<String, TableColumnInfo> getFieldNameColumnInfoMap(Class<?> clazz) {
         List<TableColumnInfo> columnInfos = getTableInfo(clazz).getColumnInfos();
         return Optional.ofNullable(columnInfos)
@@ -173,6 +197,11 @@ public class TableInfoHelper {
                 .collect(Collectors.toMap(TableColumnInfo::getFieldName, Function.identity()));
     }
 
+    /**
+     * 获取列名和列映射关系
+     * @param clazz
+     * @return
+     */
     public static Map<String, TableColumnInfo> getColumnNameColumnInfoMap(Class<?> clazz) {
         List<TableColumnInfo> columnInfos = getTableInfo(clazz).getColumnInfos();
         return Optional.ofNullable(columnInfos)
@@ -181,6 +210,12 @@ public class TableInfoHelper {
                 .collect(Collectors.toMap(TableColumnInfo::getColumnName, Function.identity()));
     }
 
+    /**
+     * 通过字段获取列元数据信息
+     * @param clazz
+     * @param fieldName
+     * @return
+     */
     public static TableColumnInfo getColumnInfoByClassAndFieldName(Class<?> clazz, String fieldName) {
         Map<String, TableColumnInfo> fieldNameColumnInfoMap = getFieldNameColumnInfoMap(clazz);
         if (CollUtils.isEmpty(fieldNameColumnInfoMap)) {
@@ -190,6 +225,11 @@ public class TableInfoHelper {
         return fieldNameColumnInfoMap.get(fieldName);
     }
 
+    /**
+     * 判断是否有id列
+     * @param clazz
+     * @return
+     */
     public static boolean hasIdColumn(Class<?> clazz) {
         return getIdColumnInfo(clazz) != null;
     }
