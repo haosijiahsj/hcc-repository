@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * DS
+ * 动态数据源注解
  *
  * @author hushengjun
  * @date 2023/4/6

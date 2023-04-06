@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: hcc-repository
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://127.0.0.1:3306/hcc-config-center?characterEncoding=UTF-8&serverTimezone=Asia/Shanghai&connectTimeout=2000&socketTimeout=150000
+    username: root
+    password: 123456
+
+server:
+  port: 8080
+  servlet:
+    context-path: /hcc-repo
+
+config:
+  center:
+    webPort: 8088
+    serverPort: 8089
+    zkAddress: 127.0.0.1:2181
+    zkNamespace: hcc-config-center
+    zkSessionTimeOut: 5000
+# debug: true

@@ -7,6 +7,7 @@ import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.AnnotatedBeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.RuntimeBeanReference;
@@ -25,6 +26,7 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/4/5
  */
+@Slf4j
 public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
 
     @Setter
@@ -42,8 +44,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
         Set<BeanDefinitionHolder> filterHolders = holders.stream()
                 .filter(holder -> {
                     GenericBeanDefinition definition = (GenericBeanDefinition) holder.getBeanDefinition();
-                    Class<?> beanClass = definition.getBeanClass();
-
+                    Class<?> beanClass = ReflectUtils.forName(definition.getBeanClassName());
                     return BaseMapper.class.isAssignableFrom(beanClass);
                 })
                 .collect(Collectors.toSet());
@@ -71,7 +72,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
             definition.setBeanClass(MapperFactoryBean.class);
 
             // 加入动态数据源功能 扫描DS注解获取dataSource依赖名称
-            Class<?> mapperBeanClass = definition.getBeanClass();
+            Class<?> mapperBeanClass = ReflectUtils.forName(beanClassName);
             DS ds = ReflectUtils.getAnnotation(mapperBeanClass, DS.class);
             if (ds != null && StrUtils.isNotEmpty(ds.value())) {
                 dataSourceRef = ds.value();
