@@ -15,11 +15,11 @@ public final class Conditions {
 
     private Conditions() {}
 
-    public static <T> DefaultQueryCondition<T> query() {
+    public static <T> DefaultQueryCondition<T> defaultQuery() {
         return new DefaultQueryCondition<>();
     }
 
-    public static <T> DefaultQueryCondition<T> query(Class<T> clazz) {
+    public static <T> DefaultQueryCondition<T> defaultQuery(Class<T> clazz) {
         return new DefaultQueryCondition<>(clazz);
     }
 
@@ -31,11 +31,11 @@ public final class Conditions {
         return new LambdaQueryCondition<>(clazz);
     }
 
-    public static <T> DefaultUpdateCondition<T> update() {
+    public static <T> DefaultUpdateCondition<T> defaultUpdate() {
         return new DefaultUpdateCondition<>();
     }
 
-    public static <T> DefaultUpdateCondition<T> update(Class<T> clazz) {
+    public static <T> DefaultUpdateCondition<T> defaultUpdate(Class<T> clazz) {
         return new DefaultUpdateCondition<>(clazz);
     }
 

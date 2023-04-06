@@ -1,4 +1,4 @@
-package com.hcc.repository.core.enums;
+package com.hcc.repository.test.enums;
 
 /**
  * SexEnum

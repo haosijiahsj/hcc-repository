@@ -4,6 +4,11 @@ import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.extension.conditions.ChainConditions;
+import com.hcc.repository.extension.conditions.query.DefaultChainQueryCondition;
+import com.hcc.repository.extension.conditions.query.LambdaChainQueryCondition;
+import com.hcc.repository.extension.conditions.update.DefaultChainUpdateCondition;
+import com.hcc.repository.extension.conditions.update.LambdaChainUpdateCondition;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -28,13 +33,21 @@ public interface IRepository<T, ID extends Serializable> {
      */
     BaseMapper<T, ID> getBaseMapper();
 
-    default void defaultQuery() {}
+    default DefaultChainQueryCondition<T, ID> defaultQuery() {
+        return ChainConditions.defaultQuery(getBaseMapper());
+    }
 
-    default void lambdaQuery() {}
+    default LambdaChainQueryCondition<T, ID> lambdaQuery() {
+        return ChainConditions.lambdaQuery(getBaseMapper());
+    }
 
-    default void defaultUpdate() {}
+    default DefaultChainUpdateCondition<T, ID> defaultUpdate() {
+        return ChainConditions.defaultUpdate(getBaseMapper());
+    }
 
-    default void lambdaUpdate() {}
+    default LambdaChainUpdateCondition<T, ID> lambdaUpdate() {
+        return ChainConditions.lambdaUpdate(getBaseMapper());
+    }
 
     /**
      * 保存实体数据

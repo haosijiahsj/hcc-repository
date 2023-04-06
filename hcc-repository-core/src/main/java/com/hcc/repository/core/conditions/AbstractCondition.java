@@ -56,6 +56,11 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         }
     }
 
+    @Override
+    public void setExecuteSqlType(ExecuteSqlTypeEnum executeSqlType) {
+        this.executeSqlType = executeSqlType;
+    }
+
     public void setEntity(T entity) {
         this.entity = entity;
     }
@@ -83,7 +88,8 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         if (column instanceof String) {
             return (String) column;
         }
-        throw new IllegalArgumentException("需要实现获取列名方法");
+
+        throw new UnsupportedOperationException("需要实现获取列名方法");
     }
 
     protected String getNamedColumnName(String originalColumnName) {

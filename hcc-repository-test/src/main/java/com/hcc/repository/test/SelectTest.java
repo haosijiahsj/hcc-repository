@@ -1,11 +1,10 @@
-package com.hcc.repository.core;
+package com.hcc.repository.test;
 
 import com.hcc.repository.core.conditions.Conditions;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import com.hcc.repository.core.page.IPage;
 import org.junit.Test;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;

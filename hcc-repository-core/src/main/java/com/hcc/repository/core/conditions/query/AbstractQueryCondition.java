@@ -30,7 +30,7 @@ public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> 
         super.init();
         selectColumns = new ArrayList<>(32);
         // 默认是select语句
-        this.executeSqlType = ExecuteSqlTypeEnum.SELECT;
+        super.executeSqlType = ExecuteSqlTypeEnum.SELECT;
     }
 
     public List<String> getSelectColumns() {
@@ -118,14 +118,12 @@ public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> 
 
     @Override
     public String getExecuteSql() {
-        if (ExecuteSqlTypeEnum.SELECT.equals(executeSqlType)) {
-            return this.getSqlQuery();
-        } else if (ExecuteSqlTypeEnum.SELECT_COUNT.equals(executeSqlType)) {
+        if (ExecuteSqlTypeEnum.SELECT_COUNT.equals(executeSqlType)) {
             return this.getSqlCount();
         } else if (ExecuteSqlTypeEnum.DELETE.equals(executeSqlType)) {
             return this.getSqlDelete();
         }
 
-        throw new UnsupportedOperationException();
+        return this.getSqlQuery();
     }
 }

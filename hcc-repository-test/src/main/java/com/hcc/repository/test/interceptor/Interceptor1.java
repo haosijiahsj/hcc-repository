@@ -1,5 +1,7 @@
-package com.hcc.repository.core.interceptor;
+package com.hcc.repository.test.interceptor;
 
+import com.hcc.repository.core.interceptor.Interceptor;
+import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 
 /**

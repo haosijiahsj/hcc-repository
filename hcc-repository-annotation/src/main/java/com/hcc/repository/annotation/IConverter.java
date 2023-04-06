@@ -6,20 +6,20 @@ package com.hcc.repository.annotation;
  * @author hushengjun
  * @date 2023/3/3
  */
-public interface IConverter<X, Y> {
+public interface IConverter<ATTR, COL> {
 
     /**
      * 转换到数据库列
      * @param attribute
      * @return
      */
-    Y convertToColumn(X attribute);
+    COL convertToColumn(ATTR attribute);
 
     /**
      * 转换到实体属性
      * @param column
      * @return
      */
-    X convertToAttribute(Y column);
+    ATTR convertToAttribute(COL column);
 
 }

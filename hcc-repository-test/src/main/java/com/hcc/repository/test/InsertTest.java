@@ -1,4 +1,4 @@
-package com.hcc.repository.core;
+package com.hcc.repository.test;
 
 import com.github.jsonzou.jmockdata.JMockData;
 import com.github.jsonzou.jmockdata.TypeReference;

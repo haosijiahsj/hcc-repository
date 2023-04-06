@@ -1,4 +1,4 @@
-package com.hcc.repository.core;
+package com.hcc.repository.test;
 
 import org.junit.Test;
 

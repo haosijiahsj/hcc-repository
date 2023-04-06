@@ -1,5 +1,7 @@
 package com.hcc.repository.extension.conditions.query;
 
+import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.extension.conditions.ChainCondition;
 
 import java.io.Serializable;
@@ -41,6 +43,8 @@ public interface ChainQuery<T, ID extends Serializable> extends ChainCondition<T
     }
 
     default Long count() {
+        ICondition<T> condition = getCondition();
+        condition.setExecuteSqlType(ExecuteSqlTypeEnum.SELECT_COUNT);
         return getBaseMapper().selectCount(getCondition());
     }
 

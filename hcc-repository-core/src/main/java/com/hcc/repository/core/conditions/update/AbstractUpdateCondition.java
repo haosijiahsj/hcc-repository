@@ -60,8 +60,19 @@ public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>>
         return TableInfoHelper.getTableName(this.getEntityClass());
     }
 
-    @Override
-    public String getExecuteSql() {
+    /**
+     * 获取删除sql
+     * @return
+     */
+    public String getSqlDelete() {
+        return StrUtils.joinSpace(
+                SqlKeywordEnum.DELETE_FROM.getKeyword(),
+                tableName(),
+                getSqlWhere()
+        );
+    }
+
+    public String getSqlUpdate() {
         String sqlSet = getSqlSet();
         if (StrUtils.isEmpty(sqlSet)) {
             throw new IllegalArgumentException("没有set的sql片段");
@@ -73,6 +84,15 @@ public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>>
                 sqlSet,
                 getSqlWhere()
         );
+    }
+
+    @Override
+    public String getExecuteSql() {
+        if (ExecuteSqlTypeEnum.DELETE.equals(executeSqlType)) {
+            return getSqlDelete();
+        }
+
+        return getSqlUpdate();
     }
 
 }

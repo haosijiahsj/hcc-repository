@@ -13,7 +13,6 @@ import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.util.NumberUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * InsertHandler
@@ -82,15 +81,9 @@ public class InsertHandler extends AbstractMethodHandler {
         if (IdType.ASSIGNED.equals(idType)) {
             // 用户指定值
             idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
-        } else if (IdType.UUID.equals(idType)) {
-            idValue = UUID.randomUUID().toString().replaceAll("-", "");
         } else if (IdType.GENERATED.equals(idType)) {
             Class<? extends IdGenerator> generator = idColumnInfo.getGenerator();
-            try {
-                idValue = generator.newInstance().nextId();
-            } catch (InstantiationException | IllegalAccessException e) {
-                throw new RuntimeException(e);
-            }
+            idValue = ReflectUtils.newInstance(generator).nextId();
         }
         if (idValue != null) {
             // 回填id到实体中

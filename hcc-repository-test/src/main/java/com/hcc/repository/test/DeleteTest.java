@@ -1,4 +1,4 @@
-package com.hcc.repository.core;
+package com.hcc.repository.test;
 
 import com.hcc.repository.core.conditions.Conditions;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;

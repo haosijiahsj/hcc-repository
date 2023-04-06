@@ -20,6 +20,10 @@ public class IRepositoryImpl<M extends BaseMapper<T, ID>, T, ID extends Serializ
 
     private M mapper;
 
+    public IRepositoryImpl(M mapper) {
+        this.mapper = mapper;
+    }
+
     @Override
     public M getBaseMapper() {
         return mapper;
@@ -43,7 +47,11 @@ public class IRepositoryImpl<M extends BaseMapper<T, ID>, T, ID extends Serializ
             return save(entity);
         }
 
-        T existEntity = getById((ID) idValue);
+        // 通过构建condition查询，避免强转
+        T existEntity = defaultQuery()
+                .select(idColumnInfo.getColumnName())
+                .eq(idColumnInfo.getColumnName(), idValue)
+                .one();
         if (existEntity == null) {
             return save(entity);
         }

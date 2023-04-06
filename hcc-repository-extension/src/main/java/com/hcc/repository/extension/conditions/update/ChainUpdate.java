@@ -1,5 +1,7 @@
 package com.hcc.repository.extension.conditions.update;
 
+import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.extension.conditions.ChainCondition;
 
 import java.io.Serializable;
@@ -17,7 +19,9 @@ public interface ChainUpdate<T, ID extends Serializable> extends ChainCondition<
     }
 
     default boolean remove() {
-        return getBaseMapper().delete(getCondition()) >= 0;
+        ICondition<T> condition = getCondition();
+        condition.setExecuteSqlType(ExecuteSqlTypeEnum.DELETE);
+        return getBaseMapper().delete(condition) >= 0;
     }
 
 }

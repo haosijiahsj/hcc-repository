@@ -1,5 +1,6 @@
 package com.hcc.repository.core.jdbc;
 
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
