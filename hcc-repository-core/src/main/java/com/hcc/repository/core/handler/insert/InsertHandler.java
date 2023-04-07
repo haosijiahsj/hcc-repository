@@ -38,7 +38,7 @@ public class InsertHandler extends AbstractMethodHandler {
             if (c.needConvert()) {
                 targetValue = ReflectUtils.newInstance(c.getConverter()).convertToColumn(value);
             } else if (c.isAssignableFromIEnum()) {
-                targetValue = ((IEnum)value).getValue();
+                targetValue = ((IEnum<?>) value).getValue();
             }
             condition.value(c.getColumnName(), targetValue);
         });

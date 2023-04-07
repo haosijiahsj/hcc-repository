@@ -12,6 +12,7 @@ import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -214,6 +215,28 @@ public class ReflectUtils {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * 获取一个类所有字段，含父类
+     * @param clazz
+     * @return
+     */
+    public static List<Field> getAllDeclaredFields(Class<?> clazz) {
+        if (clazz == null) {
+            throw new NullPointerException();
+        }
+
+        List<Field> fields = new ArrayList<>();
+        while (clazz != null) {
+            Field[] declaredFields = clazz.getDeclaredFields();
+            if (declaredFields.length > 0) {
+                fields.addAll(Arrays.asList(declaredFields));
+            }
+            clazz = clazz.getSuperclass();
+        }
+
+        return fields;
     }
 
 }

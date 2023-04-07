@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 用于拼接原生sql<br/>
+ * 用于拼接原生sql，自行保证sql的正确性<br/>
  * 注意使用named方式和原生数组方式只能选其一
  *
  * @author hushengjun

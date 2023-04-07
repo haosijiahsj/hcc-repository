@@ -1,6 +1,5 @@
 package com.hcc.repository.core.jdbc;
 
-import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
@@ -92,7 +91,7 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
         E[] enumConstants = enumClass.getEnumConstants();
         return Arrays.stream(enumConstants)
                 .filter(e -> {
-                    Serializable value = ((IEnum) e).getValue();
+                    Serializable value = ((IEnum<?>) e).getValue();
                     if (value == null) {
                         return false;
                     }

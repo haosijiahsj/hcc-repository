@@ -3,7 +3,8 @@ package com.hcc.repository.test.service.impl;
 import com.hcc.repository.extension.repository.IRepository;
 import com.hcc.repository.extension.repository.IRepositoryImpl;
 import com.hcc.repository.test.domain.po.ProductPo;
-import com.hcc.repository.test.mapper.ProductMapper;
+import com.hcc.repository.test.dao.mapper.ProductMapper;
+import com.hcc.repository.test.service.ProductService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @Transactional(rollbackFor = Exception.class)
-public class ProductServiceImpl extends IRepositoryImpl<ProductMapper, ProductPo, Long> implements IRepository<ProductPo, Long> {
+public class ProductServiceImpl extends IRepositoryImpl<ProductMapper, ProductPo, Long> implements ProductService {
 
     public ProductServiceImpl(ProductMapper mapper) {
         super(mapper);

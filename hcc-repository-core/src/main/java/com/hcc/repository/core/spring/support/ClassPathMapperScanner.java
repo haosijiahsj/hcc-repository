@@ -41,21 +41,14 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
     @Override
     protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
         Set<BeanDefinitionHolder> holders = super.doScan(basePackages);
-        Set<BeanDefinitionHolder> filterHolders = holders.stream()
-                .filter(holder -> {
-                    GenericBeanDefinition definition = (GenericBeanDefinition) holder.getBeanDefinition();
-                    Class<?> beanClass = ReflectUtils.forName(definition.getBeanClassName());
-                    return BaseMapper.class.isAssignableFrom(beanClass);
-                })
-                .collect(Collectors.toSet());
-        if (CollUtils.isEmpty(filterHolders)) {
+        if (CollUtils.isEmpty(holders)) {
             throw new RepositoryException(String.format("Could not find mapper in '%s'", Arrays.toString(basePackages)));
         }
 
         // 往这个里面塞入MapperBeanFactory
-        this.processBeanDefinitions(filterHolders);
+        this.processBeanDefinitions(holders);
 
-        return filterHolders;
+        return holders;
     }
 
     /**
@@ -75,6 +68,7 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
             Class<?> mapperBeanClass = ReflectUtils.forName(beanClassName);
             DS ds = ReflectUtils.getAnnotation(mapperBeanClass, DS.class);
             if (ds != null && StrUtils.isNotEmpty(ds.value())) {
+                log.debug("mapper {} 使用了DS注解指定数据源bean为：{}", beanClassName, ds.value());
                 dataSourceRef = ds.value();
             }
 
@@ -103,10 +97,12 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
      */
     public void registerFilters() {
         addIncludeFilter((metadataReader, metadataReaderFactory) -> true);
-        // exclude package-info.java
+        // exclude package-info.java 以及不是继承自BaseMapper的bean
         addExcludeFilter((metadataReader, metadataReaderFactory) -> {
             String className = metadataReader.getClassMetadata().getClassName();
-            return className.endsWith("package-info");
+            Class<?> beanClass = ReflectUtils.forName(className);
+
+            return className.endsWith("package-info") || !BaseMapper.class.isAssignableFrom(beanClass);
         });
     }
 

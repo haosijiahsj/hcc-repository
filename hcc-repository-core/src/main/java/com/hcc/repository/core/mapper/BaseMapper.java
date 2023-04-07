@@ -32,7 +32,19 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param entities
      * @return
      */
-    int[] batchInsert(Collection<T> entities);
+    default int[] batchInsert(Collection<T> entities) {
+        Integer[] rs = Optional.ofNullable(entities)
+                .orElse(Collections.emptyList())
+                .stream()
+                .map(this::insert)
+                .toArray(Integer[]::new);
+        int[] r = new int[rs.length];
+        for (int i = 0; i < rs.length; i++) {
+            r[i] = rs[i] == null ? 0 : rs[i];
+        }
+
+        return r;
+    }
 
     /**
      * 根据id删除

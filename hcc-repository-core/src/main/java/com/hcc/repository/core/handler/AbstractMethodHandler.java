@@ -4,9 +4,12 @@ import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.OriginalSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.SqlParseUtils;
 import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Method;
 
 /**
  * 抽象的方法处理器
@@ -18,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public abstract class AbstractMethodHandler {
 
     protected JdbcTemplateProxy jdbcTemplateProxy;
+    protected Method method;
     private String methodName;
     private MethodNameEnum methodNameEnum;
     protected Class<?> idClass;
@@ -30,30 +34,20 @@ public abstract class AbstractMethodHandler {
      * @throws Exception
      */
     public Object handle() throws Exception {
-        // 1. prepare
+        // prepare
         this.prepare();
 
-        // 2. 构建条件
+        // 构建条件
         ICondition<?> condition = this.assembleCondition();
-        if (condition == null) {
-            throw new NullPointerException("condition不能为空");
-        }
+        Assert.isNotNull(condition, "condition不能为空");
         condition.setEntityClass(entityClass);
 
-        Pair<String, Object[]> pair;
-        if (condition instanceof OriginalSqlCondition && !((OriginalSqlCondition<?>) condition).maybeNamedSql()) {
-            // 如果是原生sql的方式传参
-            pair = Pair.of(condition.getExecuteSql(), ((OriginalSqlCondition<?>) condition).getArgs());
-        } else {
-            // 真实带有占位符的sql和参数数组
-            pair = SqlParseUtils.parseNamedSql(condition.getExecuteSql(),
-                    condition.getColumnValuePairs());
-        }
-
+        // 解析sql
+        Pair<String, Object[]> pair = this.parseSql(condition);
         String sqlToUse = pair.getLeft();
         Object[] params = pair.getRight();
 
-        // 3. 执行sql
+        // 执行sql
         return this.executeSql(sqlToUse, params);
     }
 
@@ -77,13 +71,32 @@ public abstract class AbstractMethodHandler {
      */
     protected abstract Object executeSql(String sql, Object[] args);
 
+    /**
+     * sql解析
+     * @param condition
+     * @return
+     */
+    private Pair<String, Object[]> parseSql(ICondition<?> condition) {
+        Pair<String, Object[]> pair;
+        if (condition instanceof OriginalSqlCondition && !((OriginalSqlCondition<?>) condition).maybeNamedSql()) {
+            // 如果是原生sql的方式传参
+            pair = Pair.of(condition.getExecuteSql(), ((OriginalSqlCondition<?>) condition).getArgs());
+        } else {
+            // 真实带有占位符的sql和参数数组
+            pair = SqlParseUtils.parseNamedSql(condition.getExecuteSql(),
+                    condition.getColumnValuePairs());
+        }
+
+        return pair;
+    }
+
     public void setJdbcTemplateProxy(JdbcTemplateProxy jdbcTemplateProxy) {
         this.jdbcTemplateProxy = jdbcTemplateProxy;
     }
 
-    public void setMethodName(String methodName) {
-        this.methodName = methodName;
-        this.methodNameEnum = MethodNameEnum.get(methodName);
+    public void setMethod(Method method) {
+        this.method = method;
+        this.methodName = method.getName();
     }
 
     public String getMethodName() {

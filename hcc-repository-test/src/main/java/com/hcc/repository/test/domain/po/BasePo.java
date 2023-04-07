@@ -1,5 +1,7 @@
 package com.hcc.repository.test.domain.po;
 
+import lombok.Data;
+
 import java.time.LocalDateTime;
 
 /**
@@ -8,6 +10,7 @@ import java.time.LocalDateTime;
  * @author hushengjun
  * @date 2023/4/6
  */
+@Data
 public class BasePo {
 
     private LocalDateTime createTime;

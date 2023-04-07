@@ -12,7 +12,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
  * @date 2022/10/6
  */
 @Slf4j
-@SpringBootApplication(scanBasePackages = "com.hcc.repository")
+@SpringBootApplication
 public class Application {
 
     public static void main(String[] args) {

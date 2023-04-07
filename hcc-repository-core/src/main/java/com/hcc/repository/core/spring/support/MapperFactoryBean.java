@@ -1,12 +1,13 @@
 package com.hcc.repository.core.spring.support;
 
-import com.hcc.repository.core.proxy.InjectMapperProxyFactory;
+import com.hcc.repository.core.proxy.MapperProxyFactory;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.FactoryBean;
 
 import javax.sql.DataSource;
-import java.util.Collections;
+import java.util.Optional;
 
 /**
  * MapperFactoryBean
@@ -14,6 +15,7 @@ import java.util.Collections;
  * @author hushengjun
  * @date 2023/4/5
  */
+@Slf4j
 public class MapperFactoryBean<T> implements FactoryBean<T> {
 
     private final Class<T> mapperClass;
@@ -29,11 +31,12 @@ public class MapperFactoryBean<T> implements FactoryBean<T> {
 
     @Override
     public T getObject() throws Exception {
-        if (configuration == null) {
-            configuration = new RepositoryConfiguration();
-            configuration.setInterceptors(Collections.emptyList());
-        }
-        return InjectMapperProxyFactory.create(mapperClass, dataSource, configuration);
+        configuration = Optional.ofNullable(configuration).orElse(new RepositoryConfiguration());
+        T mapperProxy = MapperProxyFactory.create(mapperClass, dataSource, configuration);
+
+        log.debug("mapper: {} 代理创建完成", mapperClass.getName());
+
+        return mapperProxy;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.hcc.repository.core.proxy;
 
-import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
@@ -8,17 +7,16 @@ import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.ReflectUtils;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 /**
- * InjectMapperProxyFactory
+ * mapper代理工厂
  *
  * @author hushengjun
  * @date 2023/3/6
  */
-public class InjectMapperProxyFactory {
+public class MapperProxyFactory {
 
-    private InjectMapperProxyFactory() {}
+    private MapperProxyFactory() {}
 
     /**
      * 创建代理
@@ -40,7 +38,7 @@ public class InjectMapperProxyFactory {
         JdbcTemplateProxy jdbcTemplateProxy = ReflectUtils.newProxy(JdbcTemplateProxy.class, jdbcTemplateProxyInvocationHandler);
 
         // Mapper代理创建
-        InjectMapperInvocationHandler invocationHandler = new InjectMapperInvocationHandler(jdbcTemplateProxy, interfaceType);
+        MapperMethodInvocationHandler invocationHandler = new MapperMethodInvocationHandler(jdbcTemplateProxy, interfaceType);
 
         return ReflectUtils.newProxy(interfaceType, invocationHandler);
     }

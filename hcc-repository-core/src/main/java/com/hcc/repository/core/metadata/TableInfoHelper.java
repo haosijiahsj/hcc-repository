@@ -4,9 +4,11 @@ import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -59,8 +61,12 @@ public class TableInfoHelper {
         }
 
         List<TableColumnInfo> tableColumnInfos = new ArrayList<>();
-        Field[] fields = clazz.getDeclaredFields();
+        List<Field> fields = ReflectUtils.getAllDeclaredFields(clazz);
         for (Field field : fields) {
+            // 被final和static修饰的字段不处理映射关系
+            if (Modifier.isFinal(field.getModifiers()) || Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
             String fieldName = field.getName();
             if (CollUtils.isNotEmpty(tableInfo.getIgnorePropertyNames()) && tableInfo.getIgnorePropertyNames().contains(fieldName)) {
                 continue;

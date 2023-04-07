@@ -45,7 +45,6 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Assert.isTrue(args != null && args[0] != null, "sql参数不能为空");
 

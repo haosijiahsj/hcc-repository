@@ -14,7 +14,7 @@ public interface Interceptor {
      * 能否更新
      * @return
      */
-    default boolean canUpdate(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {
+    default boolean canUpdate(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {
         return true;
     }
 
@@ -22,16 +22,16 @@ public interface Interceptor {
      * 能否查询
      * @return
      */
-    default boolean canQuery(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {
+    default boolean canQuery(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {
         return true;
     }
 
     /**
      * 更新之前调用
-     * @param jdbcTemplateWrapper
+     * @param jdbcTemplateProxy
      * @param context
      */
-    default void beforeUpdate(JdbcTemplateProxy jdbcTemplateWrapper, SqlExecuteContext context) {}
+    default void beforeUpdate(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
 
     /**
      * 查询之前调用

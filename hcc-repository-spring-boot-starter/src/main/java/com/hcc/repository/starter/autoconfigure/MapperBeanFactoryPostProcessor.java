@@ -22,11 +22,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * MapperBeanFactoryPostProcessor
+ * 这个会导致数据源提前加载不出来
  *
  * @author hushengjun
  * @date 2023/4/6
  */
+@Deprecated
 public class MapperBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     private final RepositoryProperties properties;
