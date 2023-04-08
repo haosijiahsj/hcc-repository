@@ -31,6 +31,7 @@ public class LambdaQueryChainCondition<T, ID extends Serializable>
     public BaseMapper<T, ID> getBaseMapper() {
         return baseMapper;
     }
+
     @SafeVarargs
     @Override
     public final LambdaQueryChainCondition<T, ID> select(SFunction<T, ?>... columns) {

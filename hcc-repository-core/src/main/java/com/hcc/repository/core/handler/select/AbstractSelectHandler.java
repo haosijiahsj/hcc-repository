@@ -16,7 +16,7 @@ import com.hcc.repository.core.handler.AbstractMethodHandler;
 public abstract class AbstractSelectHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         ICondition<?> condition;
         if (firstArgIsNull()) {
             condition = new DefaultQueryCondition<>(entityClass);

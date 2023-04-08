@@ -50,9 +50,9 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     @Override
-    public void setEntityClass(Class entityClass) {
+    public void setEntityClass(Class<?> entityClass) {
         if (this.entity == null || this.entityClass == null) {
-            this.entityClass = entityClass;
+            this.entityClass = (Class<T>) entityClass;
         }
     }
 

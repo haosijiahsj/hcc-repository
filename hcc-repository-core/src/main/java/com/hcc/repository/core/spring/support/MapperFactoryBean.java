@@ -34,7 +34,9 @@ public class MapperFactoryBean<T> implements FactoryBean<T> {
         configuration = Optional.ofNullable(configuration).orElse(new RepositoryConfiguration());
         T mapperProxy = MapperProxyFactory.create(mapperClass, dataSource, configuration);
 
-        log.debug("mapper: {} 代理创建完成", mapperClass.getName());
+        if (log.isDebugEnabled()) {
+            log.debug("mapper: {} 代理创建完成", mapperClass.getName());
+        }
 
         return mapperProxy;
     }

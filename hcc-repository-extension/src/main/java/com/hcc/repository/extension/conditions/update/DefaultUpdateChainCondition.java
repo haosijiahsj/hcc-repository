@@ -21,6 +21,7 @@ public class DefaultUpdateChainCondition<T, ID extends Serializable>
 
     public DefaultUpdateChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
+        super.ch = new DefaultUpdateCondition<>();
     }
 
     @Override

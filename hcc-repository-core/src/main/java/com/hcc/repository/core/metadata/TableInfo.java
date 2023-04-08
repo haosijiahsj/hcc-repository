@@ -20,5 +20,7 @@ public class TableInfo {
     private Class<?> clazz;
     private TableColumnInfo idColumnInfo;
     private List<TableColumnInfo> columnInfos;
+    private boolean hasIdColumn = false;
+    private boolean hasLogicDeleteColumn = false;
 
 }

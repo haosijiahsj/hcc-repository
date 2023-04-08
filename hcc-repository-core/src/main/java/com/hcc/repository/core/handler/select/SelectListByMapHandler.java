@@ -18,7 +18,7 @@ public class SelectListByMapHandler extends AbstractMethodHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         DefaultQueryCondition<?> condition = new DefaultQueryCondition<>();
         if (!firstArgIsNull()) {
             Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();

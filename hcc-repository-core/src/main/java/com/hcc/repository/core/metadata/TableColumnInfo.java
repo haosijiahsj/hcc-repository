@@ -5,6 +5,7 @@ import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
+import com.hcc.repository.annotation.LogicDelValueType;
 import lombok.Data;
 
 import java.lang.reflect.Field;
@@ -25,6 +26,12 @@ public class TableColumnInfo {
     private IdType idType;
     private Class<? extends IdGenerator> generator;
     private Class<? extends IConverter> converter = DefaultConverter.class;
+
+    // 逻辑删除
+    private boolean logicDelete = false;
+    private String logicDelVal;
+    private String logicNotDelVal;
+    private LogicDelValueType logicDelValueType;
 
     public boolean needConvert() {
         return !DefaultConverter.class.equals(converter) && !IConverter.class.equals(converter);

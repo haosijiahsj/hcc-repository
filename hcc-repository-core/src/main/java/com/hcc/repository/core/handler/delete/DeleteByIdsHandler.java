@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.delete;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
+import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -17,11 +18,11 @@ import java.util.Collection;
 public class DeleteByIdsHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
 
-        DefaultQueryCondition<?> condition = new DefaultQueryCondition<>(entityClass)
+        DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass)
                 .in(idColumnName, (Collection<?>) firstArg);
         condition.setExecuteSqlType(ExecuteSqlTypeEnum.DELETE);
 

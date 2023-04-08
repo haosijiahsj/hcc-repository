@@ -15,7 +15,7 @@ import com.hcc.repository.core.metadata.TableInfoHelper;
 public class DeleteByIdHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
 

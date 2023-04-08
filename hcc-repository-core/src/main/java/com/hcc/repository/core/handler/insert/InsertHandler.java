@@ -24,10 +24,15 @@ import java.util.List;
 public class InsertHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         return assembleCondition(getFirstArg());
     }
 
+    /**
+     * 组装Condition
+     * @param entity
+     * @return
+     */
     protected ICondition<?> assembleCondition(Object entity) {
         DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(entity);
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
@@ -44,10 +49,8 @@ public class InsertHandler extends AbstractMethodHandler {
         });
 
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null) {
-            if (!IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
-                condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, entity));
-            }
+        if (idColumnInfo != null && IdType.GENERATED.equals(idColumnInfo.getIdType())) {
+            condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, entity));
         }
 
         return condition;
@@ -57,7 +60,7 @@ public class InsertHandler extends AbstractMethodHandler {
     protected Object executeSql(String sql, Object[] args) {
         Object firstArg = getFirstArg();
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null && !IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
+        if (idColumnInfo != null && IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
             Pair<Number, Integer> pair = jdbcTemplateProxy.updateForKey(sql, args);
             Object value = NumberUtils.convertNumberToTargetClass(pair.getLeft(), (Class<? extends Number>) idClass);
             // 回填id到实体中

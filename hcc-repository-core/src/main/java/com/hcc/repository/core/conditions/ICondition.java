@@ -20,8 +20,16 @@ public abstract class ICondition<T> {
      */
     public abstract Class<?> getEntityClass();
 
-    public void setEntityClass(Class entityClass) {}
+    /**
+     * set实体class
+     * @param entityClass
+     */
+    public void setEntityClass(Class<?> entityClass) {}
 
+    /**
+     * 设置执行的sql类型，会改变获取sql的类型
+     * @param selectSqlType
+     */
     public void setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {}
 
     /**

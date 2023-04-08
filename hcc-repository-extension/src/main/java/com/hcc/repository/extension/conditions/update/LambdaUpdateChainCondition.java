@@ -22,6 +22,7 @@ public class LambdaUpdateChainCondition<T, ID extends Serializable>
 
     public LambdaUpdateChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
+        super.ch = new LambdaUpdateCondition<>();
     }
 
     @Override

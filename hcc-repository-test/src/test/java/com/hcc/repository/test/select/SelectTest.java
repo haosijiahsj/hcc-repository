@@ -17,6 +17,7 @@ public class SelectTest extends BaseTest {
     @Test
     public void listTest() {
         List<ProductPo> list = productService.lambdaQuery().list();
+        ProductPo list1 = productService.lambdaQuery().eq(ProductPo::getId, 1).one();
     }
 
 }

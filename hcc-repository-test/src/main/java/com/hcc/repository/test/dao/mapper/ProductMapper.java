@@ -10,6 +10,6 @@ import com.hcc.repository.test.domain.po.ProductPo;
  * @author hushengjun
  * @date 2023/4/6
  */
-//@DS("dataSource")
+//@DS("dataSource1")
 public interface ProductMapper extends BaseMapper<ProductPo, Long> {
 }

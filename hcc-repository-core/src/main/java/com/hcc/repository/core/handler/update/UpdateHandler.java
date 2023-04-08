@@ -14,7 +14,7 @@ import com.hcc.repository.core.handler.AbstractMethodHandler;
 public class UpdateHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         ICondition<?> condition = getFirstArg(ICondition.class);
         if (!(condition instanceof AbstractUpdateCondition)) {
             throw new UnsupportedOperationException("update仅支持使用Update的Condition");

@@ -27,7 +27,7 @@ public class UpdateByIdHandler extends AbstractMethodHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
         // 使用对象拼接update sql

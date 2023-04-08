@@ -38,7 +38,7 @@ public class MapperProxyFactory {
         JdbcTemplateProxy jdbcTemplateProxy = ReflectUtils.newProxy(JdbcTemplateProxy.class, jdbcTemplateProxyInvocationHandler);
 
         // Mapper代理创建
-        MapperMethodInvocationHandler invocationHandler = new MapperMethodInvocationHandler(jdbcTemplateProxy, interfaceType);
+        MapperMethodInvocationHandler invocationHandler = new MapperMethodInvocationHandler(jdbcTemplateProxy, interfaceType, configuration);
 
         return ReflectUtils.newProxy(interfaceType, invocationHandler);
     }

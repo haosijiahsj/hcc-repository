@@ -22,7 +22,7 @@ public class SelectByIdHandler extends AbstractSelectHandler {
     }
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
 

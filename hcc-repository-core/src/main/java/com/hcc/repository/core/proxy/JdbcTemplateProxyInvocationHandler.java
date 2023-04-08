@@ -6,7 +6,6 @@ import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
-import com.hcc.repository.core.utils.Pair;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
@@ -21,7 +20,6 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -62,18 +60,11 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
 
         // 拦截器处理逻辑
         for (Interceptor interceptor : interceptors) {
+            interceptor.beforeExecute(jdbcTemplateProxy, context);
             if (SqlTypeEnum.SELECT.equals(context.getSqlType())) {
-                boolean canQuery = interceptor.canQuery(jdbcTemplateProxy, context);
-                if (!canQuery) {
-                    return defaultValueForQuery(returnType);
-                }
-                interceptor.beforeQuery(jdbcTemplateProxy, context);
+                interceptor.beforeExecuteQuery(jdbcTemplateProxy, context);
             } else {
-                boolean canUpdate = interceptor.canUpdate(jdbcTemplateProxy, context);
-                if (!canUpdate) {
-                    return defaultValueForUpdate(returnType);
-                }
-                interceptor.beforeUpdate(jdbcTemplateProxy, context);
+                interceptor.beforeExecuteUpdate(jdbcTemplateProxy, context);
             }
         }
 
@@ -142,36 +133,6 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
         }
 
         throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
-    }
-
-    /**
-     * 被canUpdate拦截后返回的默认值
-     * @param returnType
-     * @return
-     */
-    private Object defaultValueForUpdate(Class<?> returnType) {
-        if (returnType.equals(int.class)) {
-            return -1;
-        } else if (returnType.equals(int[].class)) {
-            return new int[] {};
-        } else if (returnType.equals(Pair.class)){
-            return Pair.of(null, -1);
-        }
-
-        return null;
-    }
-
-    /**
-     * 被canQuery拦截后返回的默认值
-     * @param returnType
-     * @return
-     */
-    private Object defaultValueForQuery(Class<?> returnType) {
-        if (Collection.class.isAssignableFrom(returnType)) {
-            return Collections.emptyList();
-        }
-
-        return null;
     }
 
 }

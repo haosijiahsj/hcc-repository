@@ -68,22 +68,25 @@ public class ClassPathMapperScanner extends ClassPathBeanDefinitionScanner {
             Class<?> mapperBeanClass = ReflectUtils.forName(beanClassName);
             DS ds = ReflectUtils.getAnnotation(mapperBeanClass, DS.class);
             if (ds != null && StrUtils.isNotEmpty(ds.value())) {
-                log.debug("mapper {} 使用了DS注解指定数据源bean为：{}", beanClassName, ds.value());
+                if (log.isDebugEnabled()) {
+                    log.debug("mapper {} 使用了DS注解指定数据源bean为：{}", beanClassName, ds.value());
+                }
                 dataSourceRef = ds.value();
             }
 
-            boolean autoWiredDataSource = true;
+//            boolean autoWiredDataSource = true;
             if (StrUtils.isNotEmpty(dataSourceRef)) {
                 definition.getPropertyValues().add("dataSource", new RuntimeBeanReference(dataSourceRef));
-                autoWiredDataSource = false;
+//                autoWiredDataSource = false;
             }
             if (StrUtils.isNotEmpty(configurationRef)) {
                 definition.getPropertyValues().add("configuration", new RuntimeBeanReference(configurationRef));
             }
             // 自动注入数据源依赖，DynamicDaoFactoryBean继承的setDataSource方法会自动执行
-            if (autoWiredDataSource) {
-                definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
-            }
+//            if (autoWiredDataSource) {
+//                definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
+//            }
+            definition.setAutowireMode(AbstractBeanDefinition.AUTOWIRE_BY_TYPE);
         }
     }
 

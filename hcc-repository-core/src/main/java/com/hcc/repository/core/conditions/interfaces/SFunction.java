@@ -18,7 +18,6 @@ import java.util.function.Function;
 public interface SFunction<T, R> extends Function<T, R>, Serializable {
 
     default SerializedLambda getSerializedLambda() throws Exception {
-        // writeReplace改了好像会报异常
         Method write = this.getClass().getDeclaredMethod("writeReplace");
         write.setAccessible(true);
         return (SerializedLambda) write.invoke(this);

@@ -21,7 +21,7 @@ import java.util.List;
 public class SelectPageHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         return null;
     }
 

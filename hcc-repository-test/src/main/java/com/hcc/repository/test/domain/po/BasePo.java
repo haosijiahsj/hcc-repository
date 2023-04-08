@@ -1,5 +1,7 @@
 package com.hcc.repository.test.domain.po;
 
+import com.hcc.repository.annotation.LogicDelValueType;
+import com.hcc.repository.annotation.LogicDelete;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -15,5 +17,7 @@ public class BasePo {
 
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
+    @LogicDelete(value = "0", delValue = "1", logicDelValueType = LogicDelValueType.UUID)
+    private String deleted;
 
 }

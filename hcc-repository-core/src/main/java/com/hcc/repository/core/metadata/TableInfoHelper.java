@@ -2,6 +2,7 @@ package com.hcc.repository.core.metadata;
 
 import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
+import com.hcc.repository.annotation.LogicDelete;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
@@ -88,11 +89,13 @@ public class TableInfoHelper {
                 tableColumnInfo.setPrimaryKey(true);
 
                 tableInfo.setIdColumnInfo(tableColumnInfo);
+                tableInfo.setHasIdColumn(true);
 
                 tableColumnInfos.add(tableColumnInfo);
                 continue;
             }
             Column columnAnnotation = field.getAnnotation(Column.class);
+            LogicDelete logicDeleteAnnotation = field.getAnnotation(LogicDelete.class);
             if (columnAnnotation != null) {
                 if (columnAnnotation.ignore()) {
                     continue;
@@ -102,6 +105,13 @@ public class TableInfoHelper {
                 tableColumnInfo.setConverter(columnAnnotation.converter());
             } else {
                 tableColumnInfo.setColumnName(StrUtils.humpToUnderline(fieldName));
+            }
+            if (logicDeleteAnnotation != null) {
+                tableColumnInfo.setLogicDelete(true);
+                tableColumnInfo.setLogicNotDelVal(logicDeleteAnnotation.value());
+                tableColumnInfo.setLogicDelVal(logicDeleteAnnotation.delValue());
+                tableColumnInfo.setLogicDelValueType(logicDeleteAnnotation.logicDelValueType());
+                tableInfo.setHasLogicDeleteColumn(true);
             }
 
             tableColumnInfos.add(tableColumnInfo);
@@ -148,6 +158,21 @@ public class TableInfoHelper {
      */
     public static TableColumnInfo getIdColumnInfo(Class<?> clazz) {
         return getTableInfo(clazz).getIdColumnInfo();
+    }
+
+    /**
+     * 获取逻辑删除列
+     * @param clazz
+     * @return
+     */
+    public static TableColumnInfo getLogicDeleteColumnInfo(Class<?> clazz) {
+        for (TableColumnInfo columnInfo : getTableInfo(clazz).getColumnInfos()) {
+            if (columnInfo.isLogicDelete()) {
+                return columnInfo;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -238,6 +263,15 @@ public class TableInfoHelper {
      */
     public static boolean hasIdColumn(Class<?> clazz) {
         return getIdColumnInfo(clazz) != null;
+    }
+
+    /**
+     * 判断是否有逻辑删除列信息
+     * @param clazz
+     * @return
+     */
+    public static boolean hasLogicDeleteColumn(Class<?> clazz) {
+        return getTableInfo(clazz).isHasLogicDeleteColumn();
     }
 
 }

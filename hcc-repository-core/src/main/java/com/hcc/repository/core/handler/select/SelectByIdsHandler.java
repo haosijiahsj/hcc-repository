@@ -16,7 +16,7 @@ import java.util.Collection;
 public class SelectByIdsHandler extends SelectByIdHandler {
 
     @Override
-    protected ICondition<?> assembleCondition() {
+    protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
 

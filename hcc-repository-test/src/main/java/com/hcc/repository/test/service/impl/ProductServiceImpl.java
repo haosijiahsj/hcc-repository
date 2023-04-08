@@ -18,8 +18,4 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(rollbackFor = Exception.class)
 public class ProductServiceImpl extends IRepositoryImpl<ProductMapper, ProductPo, Long> implements ProductService {
 
-    public ProductServiceImpl(ProductMapper mapper) {
-        super(mapper);
-    }
-
 }

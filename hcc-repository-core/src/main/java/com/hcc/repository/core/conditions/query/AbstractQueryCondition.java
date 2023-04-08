@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/3/25
  */
-public class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
+public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
 
     private List<String> selectColumns;
 

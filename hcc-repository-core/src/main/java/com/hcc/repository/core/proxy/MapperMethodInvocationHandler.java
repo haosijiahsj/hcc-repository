@@ -4,6 +4,7 @@ import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.MethodHandlerFactory;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.mapper.BaseMapper;
+import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.MethodHandlesUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -22,12 +23,14 @@ import java.lang.reflect.Type;
 @Slf4j
 public class MapperMethodInvocationHandler implements InvocationHandler {
 
-    private JdbcTemplateProxy jdbcTemplateProxy;
-    private Class<?> baseMapperClass;
+    private final JdbcTemplateProxy jdbcTemplateProxy;
+    private final Class<?> baseMapperClass;
+    private final RepositoryConfiguration configuration;
 
-    public MapperMethodInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, Class<?> baseMapperClass) {
+    public MapperMethodInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, Class<?> baseMapperClass, RepositoryConfiguration configuration) {
         this.jdbcTemplateProxy = jdbcTemplateProxy;
         this.baseMapperClass = baseMapperClass;
+        this.configuration = configuration;
     }
 
     @Override
@@ -50,6 +53,7 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
         handler.setMethod(method);
         handler.setJdbcTemplateProxy(jdbcTemplateProxy);
         handler.setArgs(args);
+        handler.setConfiguration(configuration);
 
         // 解析出BaseMapper上的泛型
         Type[] classes = ReflectUtils.getGenericClassesForInterface(baseMapperClass);

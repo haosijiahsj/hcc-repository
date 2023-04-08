@@ -27,7 +27,7 @@ public class SqlExecuteContext {
      */
     private String sql;
     /**
-     * map类型，数组，也可能为List（批量处理时）
+     * map类型，数组
      */
     private Object sqlParameter;
 

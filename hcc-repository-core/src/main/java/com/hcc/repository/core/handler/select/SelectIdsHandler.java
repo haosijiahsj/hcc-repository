@@ -29,8 +29,8 @@ public class SelectIdsHandler extends AbstractSelectHandler {
 
     @Override
     @SuppressWarnings("unchecked")
-    protected ICondition<?> assembleCondition() {
-        ICondition<?> condition = super.assembleCondition();
+    protected ICondition<?> prepareCondition() {
+        ICondition<?> condition = super.prepareCondition();
         String idColumnName = TableInfoHelper.getIdColumnName(entityClass);
         if (condition instanceof DefaultQueryCondition) {
             DefaultQueryCondition<?> defaultQueryCondition = (DefaultQueryCondition<?>) condition;

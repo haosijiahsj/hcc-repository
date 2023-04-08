@@ -6,6 +6,7 @@ import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.ArrayList;
@@ -17,7 +18,7 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/3/25
  */
-public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SetClause<C, R> {
+public abstract class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SetClause<C, R> {
 
     private List<String> sqlSets;
 
@@ -73,10 +74,10 @@ public class AbstractUpdateCondition<T, R, C extends AbstractCondition<T, R, C>>
     }
 
     public String getSqlUpdate() {
-        String sqlSet = getSqlSet();
-        if (StrUtils.isEmpty(sqlSet)) {
+        if (CollUtils.isEmpty(sqlSets)) {
             throw new IllegalArgumentException("没有set的sql片段");
         }
+        String sqlSet = getSqlSet();
 
         return StrUtils.joinSpace(
                 SqlKeywordEnum.UPDATE.getKeyword(),

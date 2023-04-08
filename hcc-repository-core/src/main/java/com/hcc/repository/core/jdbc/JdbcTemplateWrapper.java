@@ -9,6 +9,9 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
 import javax.sql.DataSource;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -86,7 +89,13 @@ public class JdbcTemplateWrapper implements JdbcTemplateProxy {
     @Override
     public Pair<Number, Integer> updateForKey(String sql, Object[] args) {
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        int affectRow = jdbcTemplate.update(sql, args, keyHolder);
+        int affectRow = jdbcTemplate.update(connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            for (int i = 0; i < args.length; i++) {
+                ps.setObject(i + 1, args[i]);
+            }
+            return ps;
+        }, keyHolder);
 
         return Pair.of(keyHolder.getKey(), affectRow);
     }
