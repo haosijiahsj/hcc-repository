@@ -16,9 +16,9 @@ public class UpdateHandler extends AbstractMethodHandler {
     @Override
     protected ICondition<?> prepareCondition() {
         ICondition<?> condition = getFirstArg(ICondition.class);
-        if (!(condition instanceof AbstractUpdateCondition)) {
-            throw new UnsupportedOperationException("update仅支持使用Update的Condition");
-        }
+//        if (!(condition instanceof AbstractUpdateCondition)) {
+//            throw new UnsupportedOperationException("update仅支持使用Update的Condition");
+//        }
         condition.setExecuteSqlType(ExecuteSqlTypeEnum.UPDATE);
 
         return condition;

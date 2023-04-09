@@ -7,7 +7,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * LogicDelete
+ * 逻辑删除注解<br/>
+ * 配置拦截器后生效，列无法使用converter转换器，拦截器中未处理<br/>
  *
  * @author hushengjun
  * @date 2023/3/23
@@ -30,7 +31,7 @@ public @interface LogicDelete {
     String delValue() default "";
 
     /**
-     * 删除的值类型
+     * 删除的值类型，解决唯一索引的问题
      * @return
      */
     LogicDelValueType logicDelValueType() default LogicDelValueType.ASSIGNED;

@@ -28,6 +28,13 @@ public interface BaseMapper<T, ID extends Serializable> {
     int insert(T entity);
 
     /**
+     * 从Condition插入
+     * @param condition
+     * @return
+     */
+    int insertByCondition(ICondition<T> condition);
+
+    /**
      * 批量插入
      * @param entities
      * @return
@@ -171,6 +178,23 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @return
      */
     List<T> selectListByMap(Map<String, Object> paramMap);
+
+    /**
+     * 通过map查询一条
+     * @param paramMap
+     * @return
+     */
+    default T selectOneByMap(Map<String, Object> paramMap) {
+        List<T> results = selectListByMap(paramMap);
+        if (results.isEmpty()) {
+            return null;
+        }
+        if (results.size() > 1) {
+            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
+        }
+
+        return results.get(0);
+    }
 
     /**
      * 分页查询

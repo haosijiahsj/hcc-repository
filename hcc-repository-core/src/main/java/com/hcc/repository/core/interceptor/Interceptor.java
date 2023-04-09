@@ -34,17 +34,14 @@ public interface Interceptor {
     default void beforeExecute(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
 
     /**
-     * 更新之前调用
+     * 返回之前调用
      * @param jdbcTemplateProxy
      * @param context
+     * @param result
+     * @return
      */
-    default void beforeExecuteUpdate(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
-
-    /**
-     * 查询之前调用
-     * @param jdbcTemplateProxy
-     * @param context
-     */
-    default void beforeExecuteQuery(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
+    default Object beforeReturn(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context, Object result) {
+        return result;
+    }
 
 }

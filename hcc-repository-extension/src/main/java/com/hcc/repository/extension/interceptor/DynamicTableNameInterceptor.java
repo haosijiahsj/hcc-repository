@@ -5,6 +5,7 @@ import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.extension.utils.TableNameParser;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
  * @author hushengjun
  * @date 2023/4/7
  */
+@Slf4j
 public class DynamicTableNameInterceptor implements Interceptor {
 
     private final TableNameHandler tableNameHandler;
@@ -25,7 +27,10 @@ public class DynamicTableNameInterceptor implements Interceptor {
 
     @Override
     public void beforeExecute(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {
-        context.setSql(this.changeTableName(context.getSql()));
+        log.info("original sql: {}", context.getSql());
+        String newSql = this.changeTableName(context.getSql());
+        log.info("change table name sql: {}", context.getSql());
+        context.setSql(newSql);
     }
 
     /**

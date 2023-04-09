@@ -5,6 +5,7 @@ import com.hcc.repository.annotation.Table;
 import com.hcc.repository.test.domain.enums.ProductStatusEnum;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.math.BigDecimal;
 
@@ -16,6 +17,7 @@ import java.math.BigDecimal;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
+@ToString(callSuper = true)
 @Table("product")
 public class ProductPo extends BasePo {
 

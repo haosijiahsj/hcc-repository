@@ -61,45 +61,17 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
         // 拦截器处理逻辑
         for (Interceptor interceptor : interceptors) {
             interceptor.beforeExecute(jdbcTemplateProxy, context);
-            if (SqlTypeEnum.SELECT.equals(context.getSqlType())) {
-                interceptor.beforeExecuteQuery(jdbcTemplateProxy, context);
-            } else {
-                interceptor.beforeExecuteUpdate(jdbcTemplateProxy, context);
-            }
         }
 
         // 经过拦截器重新赋值
         args[0] = context.getSql();
         args[1] = context.getSqlParameter();
 
-        if (log.isDebugEnabled()) {
-            log.debug("==>  Preparing:  {}", context.getSql());
-            if (context.getSqlParameter() instanceof Object[]) {
-                String paramStr = Arrays.stream((Object[])context.getSqlParameter())
-                        .map(param -> param == null ? "null" : param + "(" + param.getClass().getSimpleName() + ")")
-                        .collect(Collectors.joining(", "));
-                log.debug("==>  Parameters: {}", paramStr);
-            } else {
-                log.debug("==>  Parameters: {}", context.getSqlParameter());
-            }
-        }
-
+        // 执行方法
         Object result = method.invoke(jdbcTemplateProxy, args);
-        // 打印结果
-        if (log.isDebugEnabled()) {
-            String logMsg = "<==       Total: {}";
-            int total = 0;
-            if (result != null) {
-                if (result instanceof Collection) {
-                    Collection<?> coll = (Collection<?>) result;
-                    total = coll.size();
-                    coll.forEach(o -> log.debug("<==         Row: {}", o));
-                } else {
-                    total = 1;
-                    log.debug("<==         Row: {}", result);
-                }
-            }
-            log.debug(logMsg, total);
+        // 执行查询后的拦截器
+        for (Interceptor interceptor : interceptors) {
+            result = interceptor.beforeReturn(jdbcTemplateProxy, context, result);
         }
 
         return result;

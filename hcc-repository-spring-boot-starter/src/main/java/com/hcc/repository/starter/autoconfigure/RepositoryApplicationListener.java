@@ -40,7 +40,9 @@ public class RepositoryApplicationListener implements ApplicationListener<Applic
                     .collect(Collectors.toSet());
             TableInfoHelper.loadAll(entityClasses);
 
-            log.debug("加载类：{} metadata到缓存完成", entityClasses);
+            if (log.isDebugEnabled()) {
+                log.debug("加载类：{} metadata到缓存完成", entityClasses);
+            }
         }
     }
 

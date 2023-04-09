@@ -24,8 +24,10 @@ public class SelectListByMapHandler extends AbstractMethodHandler {
             Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();
             if (CollUtils.isNotEmpty(paramMap)) {
                 paramMap.forEach((k, v) -> {
-                    if (v instanceof Collection || v.getClass().isArray()) {
-                        condition.in(k, v);
+                    if (v instanceof Collection) {
+                        condition.in(k, (Collection<?>) v);
+                    } else if (v.getClass().isArray()) {
+                        condition.in(k, (Object[]) v);
                     } else {
                         condition.eq(k, v);
                     }
@@ -38,7 +40,7 @@ public class SelectListByMapHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return null;
+        return jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
     }
 
 }

@@ -1,7 +1,6 @@
 package com.hcc.repository.core.utils;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
@@ -28,8 +27,8 @@ import java.lang.reflect.Method;
  * <p>
  * 如果是普通类型Class,需要使用jdk9开始提供的 MethodHandles#privateLookupIn(java.lang.Class, java.lang.invoke.MethodHandles.Lookup)方法.
  */
+@Slf4j
 public class MethodHandlesUtils {
-    private static final Logger logger = LoggerFactory.getLogger(MethodHandlesUtils.class);
 
     private static final int ALLOWED_MODES = MethodHandles.Lookup.PRIVATE | MethodHandles.Lookup.PROTECTED
             | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC;
@@ -38,16 +37,16 @@ public class MethodHandlesUtils {
     private static Method privateLookupInMethod;
 
     static {
-        //先查询jdk9 开始提供的java.lang.invoke.MethodHandles.privateLookupIn方法,
-        //如果没有说明是jdk8的版本.(不考虑jdk8以下版本)
+        // 先查询jdk9 开始提供的java.lang.invoke.MethodHandles.privateLookupIn方法,
+        // 如果没有说明是jdk8的版本.(不考虑jdk8以下版本)
         try {
             privateLookupInMethod = MethodHandles.class.getMethod("privateLookupIn", Class.class, MethodHandles.Lookup.class);
         } catch (NoSuchMethodException e) {
             privateLookupInMethod = null;
-            logger.info("There is no [java.lang.invoke.MethodHandles.privateLookupIn(Class, Lookup)] method in this version of JDK");
+            log.debug("There is no [java.lang.invoke.MethodHandles.privateLookupIn(Class, Lookup)] method in this version of JDK");
         }
-        //jdk8
-        //这种方式其实也适用于jdk9及以上的版本,但是上面优先,可以避免 jdk9 反射警告
+        // jdk8
+        // 这种方式其实也适用于jdk9及以上的版本,但是上面优先,可以避免 jdk9 反射警告
         if (privateLookupInMethod == null) {
             try {
                 java8LookupConstructor = MethodHandles.Lookup.class.getDeclaredConstructor(Class.class, int.class);

@@ -2,6 +2,7 @@ package com.hcc.repository.test.config;
 
 import com.hcc.repository.core.spring.MapperScan;
 import com.hcc.repository.extension.interceptor.DynamicTableNameInterceptor;
+import com.hcc.repository.extension.interceptor.LogInterceptor;
 import com.hcc.repository.extension.interceptor.LogicDeleteInterceptor;
 import com.hcc.repository.starter.autoconfigure.RepositoryInterceptor;
 import com.hcc.repository.test.dao.interceptor.TestInterceptor;
@@ -24,6 +25,7 @@ public class HccRepositoryConfig {
         interceptor.addInterceptor(new TestInterceptor());
         interceptor.addInterceptor(new LogicDeleteInterceptor());
         interceptor.addInterceptor(new DynamicTableNameInterceptor(((originalTableName, curSql) -> originalTableName)));
+        interceptor.addInterceptor(new LogInterceptor());
 
         return interceptor;
     }

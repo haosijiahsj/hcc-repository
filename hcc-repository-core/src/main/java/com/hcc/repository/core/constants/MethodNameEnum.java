@@ -3,6 +3,7 @@ package com.hcc.repository.core.constants;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.delete.DeleteByIdsHandler;
 import com.hcc.repository.core.handler.delete.DeleteHandler;
+import com.hcc.repository.core.handler.insert.InsertByConditionHandler;
 import com.hcc.repository.core.handler.insert.InsertHandler;
 import com.hcc.repository.core.handler.select.SelectByIdsHandler;
 import com.hcc.repository.core.handler.select.SelectCountHandler;
@@ -26,6 +27,7 @@ public enum MethodNameEnum {
 
     // 增
     INSERT("insert", "插入数据", InsertHandler.class),
+    INSERT_BY_CONDITION("insertByCondition", "插入数据", InsertByConditionHandler.class),
     BATCH_INSERT("batchInsert", "批量插入数据", null),
 
     // 删
@@ -56,7 +58,7 @@ public enum MethodNameEnum {
     private static final List<MethodNameEnum> SELECT_METHODS;
 
     static {
-        INSERT_METHODS = Arrays.asList(INSERT, BATCH_INSERT);
+        INSERT_METHODS = Arrays.asList(INSERT, INSERT_BY_CONDITION, BATCH_INSERT);
         DELETE_METHODS = Arrays.asList(DELETE, DELETE_BY_ID, DELETE_BY_IDS);
         UPDATE_METHODS = Arrays.asList(UPDATE, UPDATE_BY_ID);
         SELECT_METHODS = Arrays.asList(SELECT_BY_ID, SELECT_BY_IDS, SELECT_COUNT, SELECT_IDS, SELECT_LIST, SELECT_MAPS,

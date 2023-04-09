@@ -42,7 +42,9 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
         }
 
         String methodName = method.getName();
-        log.debug("当前执行的方法：{}", methodName);
+        if (log.isDebugEnabled()) {
+            log.debug("当前执行的方法：{}", methodName);
+        }
 
         if (method.isDefault()) {
             MethodHandle methodHandle = MethodHandlesUtils.getSpecialMethodHandle(method).bindTo(proxy);

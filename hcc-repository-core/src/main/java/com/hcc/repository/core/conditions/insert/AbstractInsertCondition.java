@@ -17,20 +17,21 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/3/22
  */
-public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
+@SuppressWarnings("unchecked")
+public abstract class AbstractInsertCondition<T, R, C extends AbstractInsertCondition<T, R, C>> extends ICondition<T> {
 
     private T entity;
     private Class<T> entityClass;
     protected Map<String, Object> columnValuePairs;
 
+    protected C typeThis = (C) this;
+
     protected List<String> sqlColumns;
-    protected List<String> sqlValues;
 
     protected void init(T entity) {
         this.entity = entity;
         this.columnValuePairs = new HashMap<>(32);
         this.sqlColumns = new ArrayList<>(32);
-        this.sqlValues = new ArrayList<>(32);
     }
 
     @Override
@@ -39,8 +40,17 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
     }
 
     @Override
-    public Class<?> getEntityClass() {
-        return entity == null ? entityClass : entity.getClass();
+    public Class<T> getEntityClass() {
+        return entity == null ? entityClass : (Class<T>) entity.getClass();
+    }
+
+    @Override
+    public void setEntityClass(Class<?> entityClass) {
+        this.entityClass = (Class<T>) entityClass;
+    }
+
+    public List<String> getSqlColumns() {
+        return sqlColumns;
     }
 
     @Override
@@ -48,18 +58,25 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
         return columnValuePairs;
     }
 
-    public AbstractInsertCondition<T, R> value(boolean condition, R column, Object val) {
+    /**
+     * 拼接insert
+     * @param condition
+     * @param column
+     * @param val
+     * @return
+     */
+    public C value(boolean condition, R column, Object val) {
         if (condition) {
             String columnName = (String) column;
             sqlColumns.add(columnName);
-            sqlValues.add(columnName);
+//            sqlValues.add(columnName);
             columnValuePairs.put(columnName, val);
         }
 
-        return this;
+        return typeThis;
     }
 
-    public AbstractInsertCondition<T, R> value(R column, Object val) {
+    public C value(R column, Object val) {
         return value(true, column, val);
     }
 
@@ -67,7 +84,7 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
     public String getExecuteSql() {
         String columnField = StrPool.L_BRACKET + String.join(StrPool.COMMA_SPACE, sqlColumns) + StrPool.R_BRACKET;
         String namedField = StrPool.L_BRACKET
-                + sqlValues.stream().map(c -> StrPool.COLON + c).collect(Collectors.joining(StrPool.COMMA_SPACE))
+                + sqlColumns.stream().map(c -> StrPool.COLON + c).collect(Collectors.joining(StrPool.COMMA_SPACE))
                 + StrPool.R_BRACKET;
 
         return String.join(StrPool.SPACE,
@@ -78,4 +95,5 @@ public abstract class AbstractInsertCondition<T, R> extends ICondition<T> {
                 namedField
         );
     }
+
 }

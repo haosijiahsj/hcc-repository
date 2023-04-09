@@ -84,23 +84,24 @@ public class SegmentContainer {
         }
 
         // 去掉第一个AND OR
-        String firstWhere = whereSqlSegments.get(0);
-        if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword()) || firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
-            if (firstWhere.startsWith(SqlKeywordEnum.AND.getKeyword())) {
-                if (firstWhere.endsWith(StrPool.SPACE)) {
-                    firstWhere = firstWhere.substring(4);
+        String firstCondition = whereSqlSegments.get(0);
+        if (firstCondition.startsWith(SqlKeywordEnum.AND.getKeyword())
+                || firstCondition.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+            if (firstCondition.startsWith(SqlKeywordEnum.AND.getKeyword())) {
+                if (firstCondition.endsWith(StrPool.SPACE)) {
+                    firstCondition = firstCondition.substring(4);
                 } else {
-                    firstWhere = firstWhere.substring(3);
+                    firstCondition = firstCondition.substring(3);
                 }
-            } else if (firstWhere.startsWith(SqlKeywordEnum.OR.getKeyword())) {
-                if (firstWhere.endsWith(StrPool.SPACE)) {
-                    firstWhere = firstWhere.substring(3);
+            } else if (firstCondition.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+                if (firstCondition.endsWith(StrPool.SPACE)) {
+                    firstCondition = firstCondition.substring(3);
                 } else {
-                    firstWhere = firstWhere.substring(2);
+                    firstCondition = firstCondition.substring(2);
                 }
             }
             whereSqlSegments.remove(0);
-            whereSqlSegments.add(0, firstWhere);
+            whereSqlSegments.add(0, firstCondition.trim());
         }
 
         return SqlKeywordEnum.WHERE.getKeyword() + StrPool.SPACE + String.join(StrPool.SPACE, whereSqlSegments);
