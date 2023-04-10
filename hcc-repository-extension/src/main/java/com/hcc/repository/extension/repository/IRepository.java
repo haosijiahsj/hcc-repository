@@ -23,7 +23,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * IRepository
+ * 基础Repository接口
  *
  * @author hushengjun
  * @date 2023/3/3
@@ -90,7 +90,10 @@ public interface IRepository<T, ID extends Serializable> {
      * @param entities
      * @return
      */
-    boolean batchSave(Collection<T> entities);
+    default boolean batchSave(Collection<T> entities) {
+        entities.forEach(this::save);
+        return true;
+    }
 
     /**
      * 通过id更新实体
@@ -291,6 +294,8 @@ public interface IRepository<T, ID extends Serializable> {
      * @param pageParam
      * @return
      */
-    IPage<T> page(ICondition<T> condition, IPage<T> pageParam);
+    default IPage<T> page(ICondition<T> condition, IPage<T> pageParam) {
+        throw new UnsupportedOperationException("暂不支持");
+    }
 
 }
