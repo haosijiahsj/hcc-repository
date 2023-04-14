@@ -33,6 +33,11 @@ public abstract class ICondition<T> {
     public void setExecuteSqlType(ExecuteSqlTypeEnum selectSqlType) {}
 
     /**
+     * 重置
+     */
+    public void reset() {}
+
+    /**
      * 获取执行的sql
      * @return
      */

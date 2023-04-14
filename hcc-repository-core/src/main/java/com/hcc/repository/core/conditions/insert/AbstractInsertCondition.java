@@ -49,6 +49,11 @@ public abstract class AbstractInsertCondition<T, R, C extends AbstractInsertCond
         this.entityClass = (Class<T>) entityClass;
     }
 
+    @Override
+    public void reset() {
+        this.init(null);
+    }
+
     public List<String> getSqlColumns() {
         return sqlColumns;
     }

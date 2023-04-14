@@ -60,6 +60,7 @@ public class RepositoryAutoConfiguration {
         RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
         RepositoryConfiguration configuration = new RepositoryConfiguration();
         configuration.setInterceptors(repositoryInterceptor.getInterceptors());
+        configuration.setExtConfigMap(properties.getExtConfigMap());
 
         return configuration;
     }

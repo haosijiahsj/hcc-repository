@@ -4,6 +4,7 @@ import com.hcc.repository.core.interceptor.Interceptor;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * 配置类
@@ -15,5 +16,6 @@ import java.util.List;
 public class RepositoryConfiguration {
 
     private List<Interceptor> interceptors;
+    private Map<String, Object> extConfigMap;
 
 }

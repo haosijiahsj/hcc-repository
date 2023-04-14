@@ -21,4 +21,7 @@ hcc:
     enableBanner: true
     entityPackages:
       - com.hcc.repository.test.domain.po
+    extConfigMap:
+      WORKER_ID: 1
+      DATACENTER_ID: 3
 #debug: true

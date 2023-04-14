@@ -42,11 +42,8 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
         }
 
         String methodName = method.getName();
-        if (log.isDebugEnabled()) {
-            log.debug("当前执行的方法：{}", methodName);
-        }
-
         if (method.isDefault()) {
+            // 默认方法执行
             MethodHandle methodHandle = MethodHandlesUtils.getSpecialMethodHandle(method).bindTo(proxy);
             return methodHandle.invokeWithArguments(args);
         }
@@ -64,15 +61,7 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
             handler.setIdClass((Class<?>) classes[1]);
         }
 
-        long start = System.currentTimeMillis();
-        Object returnVal = handler.handle();
-        long end = System.currentTimeMillis();
-
-        if (log.isDebugEnabled()) {
-            log.debug("方法：{}执行耗时：{}ms", methodName, end - start);
-        }
-
-        return returnVal;
+        return handler.handle();
     }
 
 }

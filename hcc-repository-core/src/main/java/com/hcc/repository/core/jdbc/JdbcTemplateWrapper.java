@@ -33,6 +33,16 @@ public class JdbcTemplateWrapper implements JdbcTemplateProxy {
     }
 
     @Override
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+
+    @Override
+    public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
+        return namedParameterJdbcTemplate;
+    }
+
+    @Override
     public int namedUpdate(String sql, Map<String, ?> paramMap) {
         return namedParameterJdbcTemplate.update(sql, paramMap);
     }

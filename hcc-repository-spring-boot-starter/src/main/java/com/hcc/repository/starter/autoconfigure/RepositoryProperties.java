@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * RepositoryProperties
@@ -20,5 +21,6 @@ public class RepositoryProperties {
     private boolean enableBanner = true;
     private List<String> entityPackages;
     private List<String> basePackages;
+    private Map<String, Object> extConfigMap;
 
 }

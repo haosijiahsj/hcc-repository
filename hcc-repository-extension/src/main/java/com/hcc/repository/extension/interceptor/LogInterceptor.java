@@ -19,15 +19,18 @@ import java.util.stream.Collectors;
 @Slf4j
 public class LogInterceptor implements ExtInterceptor {
 
+    private static final ThreadLocal<Long> startTime = new ThreadLocal<>();
+
     @Override
     public void beforePrepareCondition(MethodNameEnum methodNameEnum, Object[] args) {
+        startTime.set(System.currentTimeMillis());
         log.info("方法：{}，参数：{}", methodNameEnum.getMethodName(), Arrays.toString(args));
     }
 
     @Override
     public void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {
-        log.info("方法：{}，condition sql: {}, condition paramMap: {}", methodNameEnum.getMethodName(), condition.getExecuteSql(),
-                condition.getColumnValuePairs());
+        log.info("方法：{}，condition sql: {}", methodNameEnum.getMethodName(), condition.getExecuteSql());
+        log.info("方法：{}，condition paramMap: {}", methodNameEnum.getMethodName(), condition.getColumnValuePairs());
     }
 
     @Override
@@ -58,6 +61,7 @@ public class LogInterceptor implements ExtInterceptor {
             }
         }
         log.info(logMsg, total);
+        log.info("耗时：{}ms", System.currentTimeMillis() - startTime.get());
         return result;
     }
 

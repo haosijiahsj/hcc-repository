@@ -128,11 +128,10 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * 重置
      * @return
      */
-    public OriginalSqlCondition<T> reset() {
+    public void reset() {
         this.sql = null;
         this.paramMap.clear();
         this.args = new ArrayList<>(16);
-        return this;
     }
 
 }

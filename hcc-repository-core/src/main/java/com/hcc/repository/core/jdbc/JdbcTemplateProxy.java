@@ -3,6 +3,8 @@ package com.hcc.repository.core.jdbc;
 import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -14,6 +16,10 @@ import java.util.Map;
  * @date 2023/3/26
  */
 public interface JdbcTemplateProxy {
+
+    JdbcTemplate getJdbcTemplate();
+
+    NamedParameterJdbcTemplate getNamedParameterJdbcTemplate();
 
     /**
      * 具名更新

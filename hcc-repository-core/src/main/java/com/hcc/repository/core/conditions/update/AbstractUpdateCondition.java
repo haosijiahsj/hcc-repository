@@ -30,6 +30,13 @@ public abstract class AbstractUpdateCondition<T, R, C extends AbstractCondition<
     }
 
     @Override
+    public void reset() {
+        super.reset();
+        sqlSets = new ArrayList<>(32);
+        super.executeSqlType = ExecuteSqlTypeEnum.UPDATE;
+    }
+
+    @Override
     public C set(boolean condition, R column, Object val) {
         if (condition) {
             String columnName = this.getColumnName(column);

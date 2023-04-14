@@ -61,6 +61,11 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         this.executeSqlType = executeSqlType;
     }
 
+    @Override
+    public void reset() {
+        this.init();
+    }
+
     public void setEntity(T entity) {
         this.entity = entity;
     }

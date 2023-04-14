@@ -8,10 +8,13 @@ import com.hcc.repository.core.conditions.insert.DefaultInsertCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.util.NumberUtils;
 
+import java.lang.reflect.Constructor;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -85,8 +88,7 @@ public class InsertHandler extends AbstractMethodHandler {
             // 用户指定值
             idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
         } else if (IdType.GENERATED.equals(idType)) {
-            Class<? extends IdGenerator> generator = idColumnInfo.getGenerator();
-            idValue = ReflectUtils.newInstance(generator).nextId();
+            idValue = newInstance(idColumnInfo.getGenerator()).nextId();
         }
         if (idValue != null) {
             // 回填id到实体中
@@ -94,6 +96,29 @@ public class InsertHandler extends AbstractMethodHandler {
         }
 
         return idValue;
+    }
+
+    /**
+     * 实例化IdGenerator
+     * @param generatorClass
+     * @return
+     */
+    private IdGenerator<?> newInstance(Class<? extends IdGenerator> generatorClass) {
+        Constructor<?>[] constructors = generatorClass.getDeclaredConstructors();
+        Assert.isTrue(constructors.length >= 1, String.format("%s 无构造方法", generatorClass.getName()));
+        for (Constructor<?> constructor : constructors) {
+            int parameterCount = constructor.getParameterCount();
+            if (parameterCount == 1) {
+                try {
+                    return (IdGenerator<?>) constructor.newInstance(configuration);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        }
+
+        // 默认返回无参的
+        return ReflectUtils.newInstance(generatorClass);
     }
 
 }

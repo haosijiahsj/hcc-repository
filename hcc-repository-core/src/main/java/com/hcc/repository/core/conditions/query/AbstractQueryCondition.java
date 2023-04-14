@@ -33,6 +33,13 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
         super.executeSqlType = ExecuteSqlTypeEnum.SELECT;
     }
 
+    @Override
+    public void reset() {
+        super.reset();
+        selectColumns = new ArrayList<>(32);
+        super.executeSqlType = ExecuteSqlTypeEnum.SELECT;
+    }
+
     public List<String> getSelectColumns() {
         return selectColumns;
     }

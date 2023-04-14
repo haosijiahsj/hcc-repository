@@ -107,15 +107,6 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
         return this;
     }
 
-    /**
-     * 重置
-     * @return
-     */
-    public OriginalSqlChainCondition<T, ID> reset() {
-        condition.reset();
-        return this;
-    }
-
     @Override
     public BaseMapper<T, ID> getBaseMapper() {
         return baseMapper;
