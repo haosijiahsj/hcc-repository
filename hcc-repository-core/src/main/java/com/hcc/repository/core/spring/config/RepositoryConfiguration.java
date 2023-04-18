@@ -15,7 +15,13 @@ import java.util.Map;
 @Data
 public class RepositoryConfiguration {
 
+    /**
+     * 拦截器
+     */
     private List<Interceptor> interceptors;
-    private Map<String, Object> extConfigMap;
+    /**
+     * 配置信息
+     */
+    private Map<String, Object> properties;
 
 }

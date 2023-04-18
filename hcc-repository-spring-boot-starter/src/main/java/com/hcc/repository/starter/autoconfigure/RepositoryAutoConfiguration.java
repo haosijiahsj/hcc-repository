@@ -2,16 +2,13 @@ package com.hcc.repository.starter.autoconfigure;
 
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
-import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.proxy.JdbcTemplateProxyInvocationHandler;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.spring.support.InjectMapperBeanPostProcessor;
 import com.hcc.repository.core.spring.support.MapperBeanDefinitionRegistryPostProcessor;
 import com.hcc.repository.core.spring.support.MapperFactoryBean;
 import com.hcc.repository.core.spring.support.MapperScanBeanRegistrar;
-import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
-import com.hcc.repository.core.utils.ScanUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import com.hcc.repository.extension.transaction.TransactionHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +22,6 @@ import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.web.ResourceProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,10 +31,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.sql.DataSource;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 自动配置类
@@ -60,7 +53,7 @@ public class RepositoryAutoConfiguration {
         RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
         RepositoryConfiguration configuration = new RepositoryConfiguration();
         configuration.setInterceptors(repositoryInterceptor.getInterceptors());
-        configuration.setExtConfigMap(properties.getExtConfigMap());
+        configuration.setProperties(properties.getProperties());
 
         return configuration;
     }

@@ -26,6 +26,7 @@ public class TableColumnInfo {
     private IdType idType;
     private Class<? extends IdGenerator> generator;
     private Class<? extends IConverter> converter = DefaultConverter.class;
+    private boolean useSingletonIdGenerator = true;
 
     // 逻辑删除
     private boolean logicDelete = false;

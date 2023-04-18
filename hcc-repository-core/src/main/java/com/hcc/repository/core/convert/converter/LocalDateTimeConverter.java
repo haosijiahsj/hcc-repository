@@ -16,7 +16,6 @@ import java.time.format.DateTimeFormatter;
 public class LocalDateTimeConverter implements ValueConverter<LocalDateTime> {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Override
     public LocalDateTime convert(Object value, Class<?> targetClass) {

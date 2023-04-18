@@ -20,9 +20,9 @@ public class SnowFlakeIdGenerator implements IdGenerator<Long> {
     public SnowFlakeIdGenerator(RepositoryConfiguration config) {
         Long workerId = null;
         Long datacenterId = null;
-        if (config != null && config.getExtConfigMap() != null) {
-            Object workerIdObj = config.getExtConfigMap().get(WORKER_ID);
-            Object datacenterIdObj = config.getExtConfigMap().get(DATACENTER_ID);
+        if (config != null && config.getProperties() != null) {
+            Object workerIdObj = config.getProperties().get(WORKER_ID);
+            Object datacenterIdObj = config.getProperties().get(DATACENTER_ID);
             workerId = (workerIdObj == null ? null : Long.valueOf(workerIdObj.toString()));
             datacenterId = datacenterIdObj == null ? null : Long.valueOf(datacenterIdObj.toString());
         }

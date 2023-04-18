@@ -77,7 +77,7 @@ public interface JdbcTemplateProxy {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException("结果不唯一");
+            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);
@@ -125,7 +125,7 @@ public interface JdbcTemplateProxy {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException("结果不唯一");
+            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);

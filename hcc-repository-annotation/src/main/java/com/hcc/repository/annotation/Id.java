@@ -23,4 +23,6 @@ public @interface Id {
 
     Class<? extends IdGenerator> generator() default DefaultIdGenerator.class;
 
+    boolean useSingletonIdGenerator() default true;
+
 }

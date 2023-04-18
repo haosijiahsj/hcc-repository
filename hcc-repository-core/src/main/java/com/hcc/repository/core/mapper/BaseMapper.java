@@ -157,7 +157,7 @@ public interface BaseMapper<T, ID extends Serializable> {
         return selectMaps(condition).stream()
                 .map(m -> {
                     if (m.size() > 1) {
-                        throw new RepositoryException("存在多列数据");
+                        throw new RepositoryException(String.format("预期一列数据，实际%s列数据", m.size()));
                     }
 
                     return m.values().stream().findFirst().orElse(null);

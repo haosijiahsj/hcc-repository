@@ -21,6 +21,6 @@ public class RepositoryProperties {
     private boolean enableBanner = true;
     private List<String> entityPackages;
     private List<String> basePackages;
-    private Map<String, Object> extConfigMap;
+    private Map<String, Object> properties;
 
 }

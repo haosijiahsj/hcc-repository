@@ -87,6 +87,7 @@ public class TableInfoHelper {
                 tableColumnInfo.setIdType(idAnnotation.idType());
                 tableColumnInfo.setGenerator(idAnnotation.generator());
                 tableColumnInfo.setPrimaryKey(true);
+                tableColumnInfo.setUseSingletonIdGenerator(idAnnotation.useSingletonIdGenerator());
 
                 tableInfo.setIdColumnInfo(tableColumnInfo);
                 tableInfo.setHasIdColumn(true);
