@@ -27,12 +27,24 @@ public @interface Column {
      * 转换器
      * @return
      */
-    Class<? extends IConverter> converter() default DefaultConverter.class;
+    Class<? extends IConverter> converter() default UnknownConverter.class;
 
     /**
      * 是否忽略该字段
      * @return
      */
     boolean ignore() default false;
+
+    /**
+     * 插入填充策略
+     * @return
+     */
+    Class<? extends AutoFillStrategy> insertStrategy() default UnknownFillStrategy.class;
+
+    /**
+     * 更新填充策略
+     * @return
+     */
+    Class<? extends AutoFillStrategy> updateStrategy() default UnknownFillStrategy.class;
 
 }

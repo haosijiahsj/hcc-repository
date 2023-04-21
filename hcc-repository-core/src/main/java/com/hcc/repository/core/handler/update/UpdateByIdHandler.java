@@ -1,10 +1,13 @@
 package com.hcc.repository.core.handler.update;
 
+import com.hcc.repository.annotation.AutoFillContext;
+import com.hcc.repository.annotation.AutoFillStrategy;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.ReflectUtils;
@@ -40,14 +43,41 @@ public class UpdateByIdHandler extends AbstractMethodHandler {
             if (c.needConvert()) {
                 targetValue = ReflectUtils.newInstance(c.getConverter()).convertToColumn(value);
             } else if (c.isAssignableFromIEnum()) {
-                targetValue = ((IEnum)value).getValue();
+                targetValue = ((IEnum<?>) value).getValue();
             }
+            if (c.needAutoFillUpdate()) {
+                targetValue = this.getUpdateAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c, targetValue);
+            }
+
             condition.set(c.getColumnName(), targetValue);
         });
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         condition.eq(idColumnInfo.getColumnName(), ReflectUtils.getValue(firstArg, idColumnInfo.getField()));
 
         return condition;
+    }
+
+    /**
+     * 获取填充值
+     * @param tableInfo
+     * @param columnInfo
+     * @param targetValue
+     * @return
+     */
+    private Object getUpdateAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo, Object targetValue) {
+        AutoFillContext context = new AutoFillContext();
+        context.setFieldName(columnInfo.getFieldName());
+        context.setColumnName(columnInfo.getColumnName());
+        context.setFieldType(columnInfo.getField().getType());
+        context.setTableName(tableInfo.getTableName());
+        context.setEntityClass(tableInfo.getClazz());
+
+        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstance(columnInfo.getInsertStrategy());
+        if (!autoFillStrategy.autoFill(context)) {
+            return targetValue;
+        }
+
+        return autoFillStrategy.fill(context);
     }
 
     @Override

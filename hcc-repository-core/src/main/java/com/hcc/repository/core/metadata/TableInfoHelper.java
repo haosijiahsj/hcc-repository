@@ -104,6 +104,8 @@ public class TableInfoHelper {
                 String columnName = StrUtils.isEmpty(columnAnnotation.value()) ? StrUtils.humpToUnderline(fieldName) : columnAnnotation.value();
                 tableColumnInfo.setColumnName(columnName);
                 tableColumnInfo.setConverter(columnAnnotation.converter());
+                tableColumnInfo.setInsertStrategy(columnAnnotation.insertStrategy());
+                tableColumnInfo.setUpdateStrategy(columnAnnotation.updateStrategy());
             } else {
                 tableColumnInfo.setColumnName(StrUtils.humpToUnderline(fieldName));
             }

@@ -8,7 +8,7 @@ import java.io.Serializable;
  * @author hushengjun
  * @date 2023/3/5
  */
-public class DefaultIdGenerator implements IdGenerator<Serializable> {
+public class UnknownIdGenerator implements IdGenerator<Serializable> {
 
     @Override
     public Serializable nextId() {

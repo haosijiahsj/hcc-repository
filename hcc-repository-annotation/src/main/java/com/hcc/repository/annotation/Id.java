@@ -21,7 +21,7 @@ public @interface Id {
 
     IdType idType() default IdType.IDENTITY;
 
-    Class<? extends IdGenerator> generator() default DefaultIdGenerator.class;
+    Class<? extends IdGenerator> generator() default UnknownIdGenerator.class;
 
     boolean useSingletonIdGenerator() default true;
 

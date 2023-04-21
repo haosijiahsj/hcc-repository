@@ -6,16 +6,16 @@ package com.hcc.repository.annotation;
  * @author hushengjun
  * @date 2023/3/3
  */
-public class DefaultConverter implements IConverter<Object, Object> {
+public class UnknownConverter implements IConverter<Object, Object> {
 
     @Override
     public Object convertToColumn(Object attributeValue) {
-        return attributeValue;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public Object convertToAttribute(Object columnValue) {
-        return columnValue;
+        throw new UnsupportedOperationException();
     }
 
 }
