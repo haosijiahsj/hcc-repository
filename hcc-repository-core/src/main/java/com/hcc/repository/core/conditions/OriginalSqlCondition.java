@@ -19,7 +19,7 @@ import java.util.Map;
 public class OriginalSqlCondition<T> extends ICondition<T> {
 
     private String sql;
-    private final Map<String, Object> paramMap;
+    private Map<String, Object> paramMap;
     private List<Object> args;
 
     public OriginalSqlCondition() {
@@ -34,7 +34,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
 
     @Override
     public Class<?> getEntityClass() {
-        throw new UnsupportedOperationException();
+        return null;
     }
 
     @Override
@@ -130,7 +130,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      */
     public void reset() {
         this.sql = null;
-        this.paramMap.clear();
+        this.paramMap = new HashMap<>(16);
         this.args = new ArrayList<>(16);
     }
 

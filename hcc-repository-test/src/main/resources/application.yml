@@ -22,6 +22,6 @@ hcc:
     entityPackages:
       - com.hcc.repository.test.domain.po
     properties:
-      WORKER_ID: 1
-      DATACENTER_ID: 3
+      workerId: 1
+      datacenterId: 3
 #debug: true

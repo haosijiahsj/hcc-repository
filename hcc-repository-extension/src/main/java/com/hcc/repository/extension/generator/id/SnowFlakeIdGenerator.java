@@ -11,33 +11,71 @@ import com.hcc.repository.core.spring.config.RepositoryConfiguration;
  */
 public class SnowFlakeIdGenerator implements IdGenerator<Long> {
 
-    private static final String WORKER_ID = "WORKER_ID";
-    private static final String DATACENTER_ID = "DATACENTER_ID";
+    private static final String WORKER_ID = "workerId";
+    private static final String DATACENTER_ID = "datacenterId";
+    private static final String SNOW_FLAKE_BEGIN_TIMESTAMP = "snowflakeBeginTimestamp";
+    private final RepositoryConfiguration configuration;
 
     private final SnowFlake snowFlake;
 
-    // 会自动注入
-    public SnowFlakeIdGenerator(RepositoryConfiguration config) {
-        Long workerId = null;
-        Long datacenterId = null;
-        if (config != null && config.getProperties() != null) {
-            Object workerIdObj = config.getProperties().get(WORKER_ID);
-            Object datacenterIdObj = config.getProperties().get(DATACENTER_ID);
-            workerId = (workerIdObj == null ? null : Long.valueOf(workerIdObj.toString()));
-            datacenterId = datacenterIdObj == null ? null : Long.valueOf(datacenterIdObj.toString());
-        }
+    // 框架会自动注入config值
+    public SnowFlakeIdGenerator(RepositoryConfiguration configuration) {
+        this.configuration = configuration;
+        Long snowFlakeBeginTimestamp = this.getValue(this.getSnowFlakeBeginTimestampKey());
+        Long workerId = this.getValue(this.getWorkerIdKey());
+        Long datacenterId = this.getValue(this.getDatacenterIdKey());
         if (workerId == null) {
             throw new RuntimeException("workerId未指定");
         }
         if (datacenterId == null) {
             throw new RuntimeException("datacenterId未指定");
         }
-        snowFlake = new SnowFlake(workerId, datacenterId, 1L);
+        snowFlake = new SnowFlake(snowFlakeBeginTimestamp, workerId, datacenterId, 0L);
     }
 
     @Override
     public synchronized Long nextId() {
         return snowFlake.nextId();
+    }
+
+    protected String getSnowFlakeBeginTimestampKey() {
+        return SNOW_FLAKE_BEGIN_TIMESTAMP;
+    }
+
+    protected String getWorkerIdKey() {
+        return WORKER_ID;
+    }
+
+    protected String getDatacenterIdKey() {
+        return DATACENTER_ID;
+    }
+
+    /**
+     * 先找配置文件，再找properties，再找环境变量
+     * @return
+     */
+    protected Long getValue(String key) {
+        Long value = null;
+        Object obj = configuration.getProperties().get(key);
+        if (obj != null) {
+            value = Long.valueOf(obj.toString());
+        }
+
+        if (value == null) {
+            Object propObj = System.getProperties().get(key);
+            if (propObj != null) {
+                value = Long.valueOf(propObj.toString());
+            }
+        }
+
+        if (value == null) {
+            String envVal = System.getenv().get(key);
+            if (envVal != null) {
+                value = Long.valueOf(envVal);
+            }
+        }
+
+        return value;
     }
 
 }

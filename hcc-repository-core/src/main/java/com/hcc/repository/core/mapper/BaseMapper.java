@@ -121,7 +121,7 @@ public interface BaseMapper<T, ID extends Serializable> {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
+            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);
@@ -157,9 +157,8 @@ public interface BaseMapper<T, ID extends Serializable> {
         return selectMaps(condition).stream()
                 .map(m -> {
                     if (m.size() > 1) {
-                        throw new RepositoryException(String.format("预期一列数据，实际%s列数据", m.size()));
+                        throw new RepositoryException(String.format("预期1列数据，实际%s列数据", m.size()));
                     }
-
                     return m.values().stream().findFirst().orElse(null);
                 })
                 .collect(Collectors.toList());
@@ -190,7 +189,7 @@ public interface BaseMapper<T, ID extends Serializable> {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
+            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);

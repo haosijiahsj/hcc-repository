@@ -76,8 +76,12 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
         return SqlKeywordEnum.SELECT.getKeyword() + StrPool.SPACE + sqlSelect;
     }
 
-    public String getSqlWhere() {
-        return getSegmentContainer().getSqlSegmentAfterWhere();
+    /**
+     * 获取整个where后的sql
+     * @return
+     */
+    public String getSqlSegmentAfterWhere() {
+        return this.getSegmentContainer().getSqlSegmentAfterWhere();
     }
 
     private String tableName() {
@@ -92,7 +96,7 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
         return StrUtils.joinSpace(
                 SqlKeywordEnum.DELETE_FROM.getKeyword(),
                 tableName(),
-                getSqlWhere()
+                getSqlSegmentAfterWhere()
         );
     }
 
@@ -105,7 +109,7 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
                 getSqlSelect(),
                 SqlKeywordEnum.FROM.getKeyword(),
                 tableName(),
-                getSqlWhere()
+                getSqlSegmentAfterWhere()
         );
     }
 
@@ -119,7 +123,7 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
                 SqlKeywordEnum.COUNT.getKeyword(),
                 SqlKeywordEnum.FROM.getKeyword(),
                 tableName(),
-                getSqlWhere()
+                getSqlSegmentAfterWhere()
         );
     }
 

@@ -18,10 +18,25 @@ import java.util.List;
 @Getter
 public class SegmentContainer {
 
+    /**
+     * where语句
+     */
     private final List<String> whereSqlSegments;
+    /**
+     * order by语句
+     */
     private final List<String> orderBySegments;
+    /**
+     * group by语句
+     */
     private final List<String> groupBySegments;
+    /**
+     * having语句
+     */
     private final List<String> havingSegments;
+    /**
+     * 直接拼接的最后一句sql
+     */
     private String lastSql;
 
     public SegmentContainer() {
@@ -31,9 +46,13 @@ public class SegmentContainer {
         havingSegments = new ArrayList<>(8);
     }
 
+    /**
+     * 添加AND语句
+     * @param sqlSegment
+     */
     public void addAndSegment(String sqlSegment) {
         if (CollUtils.isEmpty(whereSqlSegments)) {
-            // 第一个不拼AND
+            // 当这个为空时，说明当前是第一个条件则不拼AND
             whereSqlSegments.add(sqlSegment);
         } else {
             String curLast = whereSqlSegments.get(whereSqlSegments.size() - 1);
@@ -42,23 +61,41 @@ public class SegmentContainer {
                 // 加入前的最后一个为OR则移除，同时本次拼接OR
                 sqlSegmentStr = SqlKeywordEnum.OR.getKeyword();
                 whereSqlSegments.remove(whereSqlSegments.size() - 1);
+            } else if (curLast.equals(SqlKeywordEnum.AND.getKeyword())) {
+                whereSqlSegments.remove(whereSqlSegments.size() - 1);
             }
             whereSqlSegments.add(sqlSegmentStr + StrPool.SPACE + sqlSegment);
         }
     }
 
+    /**
+     * 添加普通语句
+     * @param sqlSegment
+     */
     public void addPlainSegment(String sqlSegment) {
         whereSqlSegments.add(sqlSegment);
     }
 
+    /**
+     * 添加order by语句
+     * @param sqlSegment
+     */
     public void addOrderBySegment(String sqlSegment) {
         orderBySegments.add(sqlSegment);
     }
 
+    /**
+     * 添加group by语句
+     * @param sqlSegment
+     */
     public void addGroupBySegment(String sqlSegment) {
         groupBySegments.add(sqlSegment);
     }
 
+    /**
+     * 添加having语句
+     * @param sqlSegment
+     */
     public void addHavingSegment(String sqlSegment) {
         havingSegments.add(sqlSegment);
     }
@@ -112,7 +149,7 @@ public class SegmentContainer {
      * @return
      */
     public String getSqlOrderBy() {
-        List<String> orderBySegments = getOrderBySegments();
+        List<String> orderBySegments = this.getOrderBySegments();
         if (CollUtils.isEmpty(orderBySegments)) {
             return StrPool.EMPTY;
         }
@@ -125,7 +162,7 @@ public class SegmentContainer {
      * @return
      */
     public String getSqlGroupBy() {
-        List<String> groupBySegments = getGroupBySegments();
+        List<String> groupBySegments = this.getGroupBySegments();
         if (CollUtils.isEmpty(groupBySegments)) {
             return StrPool.EMPTY;
         }
@@ -138,7 +175,7 @@ public class SegmentContainer {
      * @return
      */
     public String getSqlHaving() {
-        List<String> havingSegments = getHavingSegments();
+        List<String> havingSegments = this.getHavingSegments();
         if (CollUtils.isEmpty(havingSegments)) {
             return StrPool.EMPTY;
         }
@@ -152,25 +189,25 @@ public class SegmentContainer {
      */
     public String getSqlSegmentAfterWhere() {
         StringBuilder sb = new StringBuilder();
-        String sqlWhere = getSqlWhere();
+        String sqlWhere = this.getSqlWhere();
         if (StrUtils.isNotEmpty(sqlWhere)) {
             sb.append(sqlWhere);
         }
-        String sqlGroupBy = getSqlGroupBy();
+        String sqlGroupBy = this.getSqlGroupBy();
         if (StrUtils.isNotEmpty(sqlGroupBy)) {
             if (sb.length() > 0) {
                 sb.append(StrPool.SPACE);
             }
             sb.append(sqlGroupBy);
         }
-        String sqlHaving = getSqlHaving();
+        String sqlHaving = this.getSqlHaving();
         if (StrUtils.isNotEmpty(sqlHaving)) {
             if (sb.length() > 0) {
                 sb.append(StrPool.SPACE);
             }
             sb.append(sqlHaving);
         }
-        String sqlOrderBy = getSqlOrderBy();
+        String sqlOrderBy = this.getSqlOrderBy();
         if (StrUtils.isNotEmpty(sqlOrderBy)) {
             if (sb.length() > 0) {
                 sb.append(StrPool.SPACE);

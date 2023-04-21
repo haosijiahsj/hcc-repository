@@ -98,7 +98,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     protected String getNamedColumnName(String originalColumnName) {
-        return originalColumnName + "#POS_" + pos.incrementAndGet();
+        return originalColumnName + "#HCC_REPO_NAMED_POS_" + pos.incrementAndGet();
     }
 
     /**
@@ -297,7 +297,6 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
 
     @Override
     public C last(boolean condition, String lastSql) {
-//        this.lastSql = lastSql;
         if (condition) {
             segmentContainer.setLastSql(lastSql);
         }
@@ -350,6 +349,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String sqlKeywordStr = sqlKeyword == null ? StrPool.EMPTY : sqlKeyword.getKeyword();
             String sqlSegment = newC.getSegmentContainer().getSqlSegmentAfterWhere();
             if (StrUtils.isNotEmpty(sqlSegment)) {
+                // 去掉where关键字
                 sqlSegment = sqlSegment.replaceAll(SqlKeywordEnum.WHERE.getKeyword(), StrPool.EMPTY).trim();
                 String sqlNested = sqlKeywordStr + StrPool.SPACE + StrPool.L_BRACKET + sqlSegment + StrPool.R_BRACKET;
                 segmentContainer.addPlainSegment(sqlNested);
@@ -358,6 +358,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return typeThis;
     }
 
+    /**
+     * 返回新实例，嵌套语句使用
+     * @return
+     */
     protected C newInstance() {
         return null;
     }

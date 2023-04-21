@@ -42,6 +42,9 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
     @Override
     public void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {
         Class<?> entityClass = condition.getEntityClass();
+        if (entityClass == null) {
+            return;
+        }
         TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
         if (!predicate.test(tableInfo)) {
             log.debug("table name: {}忽略逻辑删除拦截器", tableInfo.getTableName());

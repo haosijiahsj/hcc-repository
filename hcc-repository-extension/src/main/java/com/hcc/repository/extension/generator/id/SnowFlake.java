@@ -1,9 +1,5 @@
 package com.hcc.repository.extension.generator.id;
 
-import java.lang.management.ManagementFactory;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
-
 /**
  * 雪花算法java实现
  *
@@ -31,7 +27,7 @@ public class SnowFlake {
     /**
      * 设置一个时间初始值(这个用自己业务系统上线的时间)    2^41 - 1   差不多可以用69年
      */
-    private long twepoch = 1585644268888L;
+    private long twepoch = 1595952000000L;
 
     /**
      * 5位的机器id
@@ -83,14 +79,18 @@ public class SnowFlake {
      */
     private long lastTimestamp = -1L;
 
+    public SnowFlake(long workerId, long datacenterId, long sequence) {
+        this(null, workerId, datacenterId, sequence);
+    }
+
     /**
      * 构造函数
-     *
+     * @param beginTimestamp
      * @param workerId
      * @param datacenterId
      * @param sequence
      */
-    public SnowFlake(long workerId, long datacenterId, long sequence) {
+    public SnowFlake(Long beginTimestamp, long workerId, long datacenterId, long sequence) {
         // 检查机房id和机器id是否超过最大值，不能小于0
         if (workerId > maxWorkerId || workerId < 0) {
             throw new IllegalArgumentException(String.format("worker Id can't be greater than %d or less than 0", maxWorkerId));
@@ -99,7 +99,9 @@ public class SnowFlake {
         if (datacenterId > maxDatacenterId || datacenterId < 0) {
             throw new IllegalArgumentException(String.format("datacenter Id can't be greater than %d or less than 0", maxDatacenterId));
         }
-
+        if (beginTimestamp != null) {
+            this.twepoch = beginTimestamp;
+        }
         this.workerId = workerId;
         this.datacenterId = datacenterId;
         this.sequence = sequence;
@@ -141,9 +143,10 @@ public class SnowFlake {
         // 这儿就是最核心的二进制位运算操作，生成一个64bit的id
         // 先将当前时间戳左移，放到41 bit那儿；将机房id左移放到5 bit那儿；将机器id左移放到5 bit那儿；将序号放最后12 bit
         // 最后拼接起来成一个64 bit的二进制数字，转换成10进制就是个long型
-        return ((timestamp - twepoch) << timestampLeftShift) |
-                (datacenterId << datacenterIdShift) |
-                (workerId << workerIdShift) | sequence;
+        return ((timestamp - twepoch) << timestampLeftShift)
+                | (datacenterId << datacenterIdShift)
+                | (workerId << workerIdShift)
+                | sequence;
     }
 
     /**
@@ -169,16 +172,5 @@ public class SnowFlake {
         return System.currentTimeMillis();
     }
 
-    /**
-     * main 测试类
-     *
-     * @param args
-     */
-//    public static void main(String[] args) {
-//        SnowFlake worker = new SnowFlake(1, 1, 1);
-//        for (int i = 0; i < 22; i++) {
-//            System.out.println(worker.nextId());
-//        }
-//    }
 }
 
