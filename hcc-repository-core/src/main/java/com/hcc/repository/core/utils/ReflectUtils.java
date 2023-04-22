@@ -14,6 +14,8 @@ import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -21,6 +23,8 @@ import java.util.List;
  * @date 8/7 0007
  */
 public class ReflectUtils {
+
+    private static final Map<Class<?>, Object> INSTANCE_CACHE = new ConcurrentHashMap<>(64);
 
     private ReflectUtils() {}
 
@@ -116,7 +120,7 @@ public class ReflectUtils {
      * @param annotationClass
      * @return
      */
-    public static boolean hasAnnotation(Class clazz, Class annotationClass) {
+    public static boolean hasAnnotation(Class<?> clazz, Class<? extends Annotation> annotationClass) {
         return clazz.getAnnotation(annotationClass) != null;
     }
 
@@ -202,6 +206,17 @@ public class ReflectUtils {
         } catch (InstantiationException | IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public static <T> T newInstanceForCache(Class<T> clazz) {
+        Object instance = INSTANCE_CACHE.get(clazz);
+        if (instance != null) {
+            return (T) instance;
+        }
+        T newInstance = newInstance(clazz);
+        INSTANCE_CACHE.put(clazz, newInstance);
+
+        return newInstance;
     }
 
     /**

@@ -40,7 +40,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
     }
 
     @Override
-    public void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {
+    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
         Class<?> entityClass = condition.getEntityClass();
         if (entityClass == null) {
             return;

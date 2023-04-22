@@ -1,6 +1,6 @@
 package com.hcc.repository.core.spring.support;
 
-import com.hcc.repository.core.spring.MapperScan;
+import com.hcc.repository.core.spring.EnableRepository;
 import com.hcc.repository.core.utils.StrUtils;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -25,7 +25,7 @@ public class MapperScanBeanRegistrar implements ImportBeanDefinitionRegistrar {
     public void registerBeanDefinitions(AnnotationMetadata annotationMetadata, BeanDefinitionRegistry beanDefinitionRegistry) {
         // 获取MapperScan注解信息
         AnnotationAttributes mapperScanAttrs
-                = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(MapperScan.class.getName()));
+                = AnnotationAttributes.fromMap(annotationMetadata.getAnnotationAttributes(EnableRepository.class.getName()));
         if (mapperScanAttrs == null) {
             throw new IllegalArgumentException("无法找到MapperScan注解信息");
         }

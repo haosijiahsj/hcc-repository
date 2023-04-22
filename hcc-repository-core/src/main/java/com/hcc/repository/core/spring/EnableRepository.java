@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 @Documented
 @Import(MapperScanBeanRegistrar.class)
-public @interface MapperScan {
+public @interface EnableRepository {
 
     /**
      * 包扫描的路径

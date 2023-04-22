@@ -22,7 +22,7 @@ public class TestInterceptor implements ExtInterceptor {
     }
 
     @Override
-    public void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {
+    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
     }
 
     @Override

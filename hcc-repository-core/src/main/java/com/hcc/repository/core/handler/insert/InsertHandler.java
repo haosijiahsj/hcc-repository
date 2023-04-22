@@ -54,13 +54,13 @@ public class InsertHandler extends AbstractMethodHandler {
             // 转换
             Object targetValue = value;
             if (c.needConvert()) {
-                targetValue = ReflectUtils.newInstance(c.getConverter()).convertToColumn(value);
+                targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
             } else if (c.isAssignableFromIEnum()) {
                 targetValue = ((IEnum<?>) value).getValue();
             }
             // 自动填充处理
-            if (c.needAutoFillInsert()) {
-                targetValue = this.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c, targetValue);
+            if (c.needAutoFillInsert() && targetValue == null) {
+                targetValue = this.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c);
             }
 
             condition.value(c.getColumnName(), targetValue);
@@ -117,10 +117,9 @@ public class InsertHandler extends AbstractMethodHandler {
      * 获取填充值
      * @param tableInfo
      * @param columnInfo
-     * @param targetValue
      * @return
      */
-    private Object getInsertAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo, Object targetValue) {
+    private Object getInsertAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo) {
         AutoFillContext context = new AutoFillContext();
         context.setFieldName(columnInfo.getFieldName());
         context.setColumnName(columnInfo.getColumnName());
@@ -128,9 +127,9 @@ public class InsertHandler extends AbstractMethodHandler {
         context.setTableName(tableInfo.getTableName());
         context.setEntityClass(tableInfo.getClazz());
 
-        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstance(columnInfo.getInsertStrategy());
+        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstanceForCache(columnInfo.getInsertStrategy());
         if (!autoFillStrategy.autoFill(context)) {
-            return targetValue;
+            return null;
         }
 
         return autoFillStrategy.fill(context);

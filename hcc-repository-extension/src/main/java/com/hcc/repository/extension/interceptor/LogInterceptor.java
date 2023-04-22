@@ -28,7 +28,7 @@ public class LogInterceptor implements ExtInterceptor {
     }
 
     @Override
-    public void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {
+    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
         log.info("方法：{}，condition sql: {}", methodNameEnum.getMethodName(), condition.getExecuteSql());
         log.info("方法：{}，condition paramMap: {}", methodNameEnum.getMethodName(), condition.getColumnValuePairs());
     }

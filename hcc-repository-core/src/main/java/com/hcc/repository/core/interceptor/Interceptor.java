@@ -22,9 +22,10 @@ public interface Interceptor {
     /**
      * 准备condition后调用
      * @param methodNameEnum
+     * @param args
      * @param condition
      */
-    default void afterPrepareCondition(MethodNameEnum methodNameEnum, ICondition<?> condition) {}
+    default void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {}
 
     /**
      * 执行语句之前

@@ -54,7 +54,7 @@ public abstract class AbstractMethodHandler {
         condition.setEntityClass(entityClass);
 
         // 拦截器准备后方法
-        interceptors.forEach(interceptor -> interceptor.afterPrepareCondition(methodNameEnum, condition));
+        interceptors.forEach(interceptor -> interceptor.afterPrepareCondition(methodNameEnum, args, condition));
 
         // 解析sql
         Pair<String, Object[]> pair = this.parseSql(condition);

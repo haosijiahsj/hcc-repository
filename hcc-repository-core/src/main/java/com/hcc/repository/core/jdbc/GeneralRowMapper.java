@@ -57,7 +57,7 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
             Object targetValue;
             if (tableColumnInfo.needConvert()) {
                 // 用户自定义转换器
-                targetValue = ReflectUtils.newInstance(tableColumnInfo.getConverter())
+                targetValue = ReflectUtils.newInstanceForCache(tableColumnInfo.getConverter())
                         .convertToAttribute(columnValue);
             } else if (tableColumnInfo.isAssignableFromIEnum()) {
                 // 枚举处理

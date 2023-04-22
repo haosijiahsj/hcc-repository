@@ -1,6 +1,6 @@
 package com.hcc.repository.test.config;
 
-import com.hcc.repository.core.spring.MapperScan;
+import com.hcc.repository.core.spring.EnableRepository;
 import com.hcc.repository.extension.interceptor.DynamicTableNameInterceptor;
 import com.hcc.repository.extension.interceptor.LogInterceptor;
 import com.hcc.repository.extension.interceptor.LogicDeleteInterceptor;
@@ -16,7 +16,7 @@ import org.springframework.context.annotation.Configuration;
  * @date 2023/4/6
  */
 @Configuration
-@MapperScan("com.hcc.repository.test.dao.mapper")
+@EnableRepository("com.hcc.repository.test.dao.mapper")
 public class HccRepositoryConfig {
 
     @Bean

@@ -1,5 +1,8 @@
 package com.hcc.repository.extension.interceptor;
 
+import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.query.AbstractQueryCondition;
+import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
@@ -20,14 +23,14 @@ public class PaginationInterceptor implements ExtInterceptor {
     }
 
     @Override
-    public void beforeExecuteQuery(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {
-        // 执行count语句
-        String originalSql = context.getSql();
-
-        // 改写sql
-//        jdbcTemplateProxy.namedQueryForObject()
-
-        // 将总数放入threadLocal中
+    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
+        if (MethodNameEnum.SELECT_PAGE.getMethodName().equals(methodNameEnum.getMethodName())) {
+            if (condition instanceof AbstractQueryCondition) {
+                if (DbType.MYSQL.equals(dbType)) {
+                    ((AbstractQueryCondition<?, ?, ?>) condition).last(String.format("LIMIT %s, %s", 1, 10));
+                }
+            }
+        }
     }
 
 }
