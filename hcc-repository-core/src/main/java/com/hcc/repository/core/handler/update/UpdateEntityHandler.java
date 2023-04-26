@@ -1,0 +1,88 @@
+package com.hcc.repository.core.handler.update;
+
+import com.hcc.repository.annotation.AutoFillContext;
+import com.hcc.repository.annotation.AutoFillStrategy;
+import com.hcc.repository.annotation.IEnum;
+import com.hcc.repository.core.conditions.AbstractCondition;
+import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.SegmentContainer;
+import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
+import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfo;
+import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.ReflectUtils;
+
+import java.util.List;
+
+/**
+ * UpdateEntityHandler
+ *
+ * @author hushengjun
+ * @date 2023/4/25
+ */
+public class UpdateEntityHandler extends AbstractUpdateHandler {
+
+    @Override
+    protected void prepare() {
+        Assert.isFalse(firstArgIsNull(), "实体不能为空！");
+    }
+
+    @Override
+    protected ICondition<?> prepareCondition() {
+        Object entity = getFirstArg();
+        ICondition<?> originalCondition = (ICondition<?>) args[1];
+
+        DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
+        List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
+        // set语句
+        columnInfos.forEach(c -> condition.set(c.getColumnName(), processTargetValue(entity, c)));
+        if (originalCondition instanceof AbstractCondition) {
+            // 直接赋值segmentContainer
+            SegmentContainer segmentContainer = ((AbstractCondition<?, ?, ?>) originalCondition).getSegmentContainer();
+            condition.setSegmentContainer(segmentContainer);
+        }
+
+        return condition;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Object processTargetValue(Object entity, TableColumnInfo c) {
+        Object value = ReflectUtils.getValue(entity, c.getField());
+        // 转换
+        Object targetValue = value;
+        if (c.needConvert()) {
+            targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
+        } else if (c.isAssignableFromIEnum()) {
+            targetValue = ((IEnum<?>) value).getValue();
+        }
+        if (c.needAutoFillUpdate() && targetValue == null) {
+            targetValue = this.getUpdateAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c);
+        }
+
+        return targetValue;
+    }
+
+    /**
+     * 获取填充值
+     * @param tableInfo
+     * @param columnInfo
+     * @return
+     */
+    private Object getUpdateAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo) {
+        AutoFillContext context = new AutoFillContext();
+        context.setFieldName(columnInfo.getFieldName());
+        context.setColumnName(columnInfo.getColumnName());
+        context.setFieldType(columnInfo.getField().getType());
+        context.setTableName(tableInfo.getTableName());
+        context.setEntityClass(tableInfo.getClazz());
+
+        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstanceForCache(columnInfo.getInsertStrategy());
+        if (!autoFillStrategy.autoFill(context)) {
+            return null;
+        }
+
+        return autoFillStrategy.fill(context);
+    }
+
+}

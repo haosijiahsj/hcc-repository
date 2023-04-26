@@ -3,9 +3,6 @@ package com.hcc.repository.extension.interceptor;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.query.AbstractQueryCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
-import com.hcc.repository.core.interceptor.Interceptor;
-import com.hcc.repository.core.interceptor.SqlExecuteContext;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
 import com.hcc.repository.extension.interceptor.page.DbType;
 
 /**

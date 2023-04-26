@@ -23,7 +23,7 @@ public class SelectTest extends BaseTest {
     @Test
     public void complexListTest() {
         productService.lambdaQuery().or(c -> c.like(ProductPo::getName, "a")).or().eq(ProductPo::getId, 1).list();
-        productService.originalSql().sql("select * from product").one();
+        productService.originalSql().sql("select * from product limit 1").one();
     }
 
 }

@@ -27,7 +27,7 @@ public @interface Column {
      * 转换器
      * @return
      */
-    Class<? extends IConverter> converter() default UnknownConverter.class;
+    Class<? extends IConverter> converter() default Constants.UnknownConverter.class;
 
     /**
      * 是否忽略该字段
@@ -39,12 +39,12 @@ public @interface Column {
      * 插入填充策略
      * @return
      */
-    Class<? extends AutoFillStrategy> insertStrategy() default UnknownFillStrategy.class;
+    Class<? extends AutoFillStrategy> insertStrategy() default Constants.UnknownFillStrategy.class;
 
     /**
      * 更新填充策略
      * @return
      */
-    Class<? extends AutoFillStrategy> updateStrategy() default UnknownFillStrategy.class;
+    Class<? extends AutoFillStrategy> updateStrategy() default Constants.UnknownFillStrategy.class;
 
 }

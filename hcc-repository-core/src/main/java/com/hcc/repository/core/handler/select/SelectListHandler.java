@@ -13,7 +13,7 @@ public class SelectListHandler extends AbstractSelectHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
+        return jdbcOperations.queryForEntityList(sql, args, entityClass);
     }
 
 }

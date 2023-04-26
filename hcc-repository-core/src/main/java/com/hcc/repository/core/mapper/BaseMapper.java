@@ -77,11 +77,19 @@ public interface BaseMapper<T, ID extends Serializable> {
     int delete(ICondition<T> condition);
 
     /**
-     * 根据实体更新
+     * 根据实体更新，必须有id字段
      * @param entity
      * @return
      */
     int updateById(T entity);
+
+    /**
+     * 通过条件更新实体
+     * @param entity
+     * @param condition
+     * @return
+     */
+    int updateEntity(T entity, ICondition<T> condition);
 
     /**
      * 根据条件更新

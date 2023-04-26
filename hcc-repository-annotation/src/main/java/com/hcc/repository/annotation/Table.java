@@ -35,4 +35,10 @@ public @interface Table {
      */
     String[] ignorePropertyNames() default {};
 
+    /**
+     * 属性设置监听器
+     * @return
+     */
+    Class<? extends PropSetListener> propSet() default Constants.DefPropSetListener.class;
+
 }

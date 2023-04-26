@@ -43,7 +43,7 @@ public class SelectPageHandler extends AbstractMethodHandler {
         // 查询总数
         Long count;
         try {
-           count = jdbcTemplateProxy.namedQueryForObject(condition.getExecuteSql(), condition.getColumnValuePairs(), Long.class);
+           count = jdbcOperations.namedQueryForObject(condition.getExecuteSql(), condition.getColumnValuePairs(), Long.class);
         } catch (Exception e) {
             count = 0L;
         }
@@ -74,7 +74,7 @@ public class SelectPageHandler extends AbstractMethodHandler {
         ((AbstractQueryCondition) condition).setExecuteSqlType(ExecuteSqlTypeEnum.SELECT);
 
         // 查询数据
-        List results = jdbcTemplateProxy.namedQueryForEntityList(condition.getExecuteSql(), condition.getColumnValuePairs(), entityClass);
+        List results = jdbcOperations.namedQueryForEntityList(condition.getExecuteSql(), condition.getColumnValuePairs(), entityClass);
         pageResult.setRecords(results);
 
         return pageResult;

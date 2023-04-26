@@ -13,13 +13,17 @@ public interface IConverter<ATTR, COL> {
      * @param attribute
      * @return
      */
-    COL convertToColumn(ATTR attribute);
+    default COL convertToColumn(ATTR attribute) {
+        throw new UnsupportedOperationException();
+    }
 
     /**
      * 转换到实体属性
      * @param column
      * @return
      */
-    ATTR convertToAttribute(COL column);
+    default ATTR convertToAttribute(COL column) {
+        throw new UnsupportedOperationException();
+    }
 
 }

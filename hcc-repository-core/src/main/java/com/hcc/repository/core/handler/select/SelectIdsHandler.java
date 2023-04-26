@@ -51,7 +51,7 @@ public class SelectIdsHandler extends AbstractSelectHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        List<?> results = jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
+        List<?> results = jdbcOperations.queryForEntityList(sql, args, entityClass);
         if (CollUtils.isEmpty(results)) {
             return Collections.emptyList();
         }

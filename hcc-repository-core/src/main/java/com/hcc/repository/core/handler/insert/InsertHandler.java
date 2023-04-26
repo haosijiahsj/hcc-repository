@@ -67,7 +67,7 @@ public class InsertHandler extends AbstractMethodHandler {
         });
 
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null && IdType.GENERATED.equals(idColumnInfo.getIdType())) {
+        if (idColumnInfo != null && IdType.GENERATE.equals(idColumnInfo.getIdType())) {
             condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, entity));
         }
 
@@ -78,8 +78,8 @@ public class InsertHandler extends AbstractMethodHandler {
     protected Object executeSql(String sql, Object[] args) {
         Object firstArg = getFirstArg();
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null && IdType.IDENTITY.equals(idColumnInfo.getIdType())) {
-            Pair<Number, Integer> pair = jdbcTemplateProxy.updateForKey(sql, args);
+        if (idColumnInfo != null && IdType.AUTO.equals(idColumnInfo.getIdType())) {
+            Pair<Number, Integer> pair = jdbcOperations.updateForKey(sql, args);
             Object value = NumberUtils.convertNumberToTargetClass(pair.getLeft(), (Class<? extends Number>) idClass);
             // 回填id到实体中
             ReflectUtils.setValue(firstArg, idColumnInfo.getField(), value);
@@ -87,7 +87,7 @@ public class InsertHandler extends AbstractMethodHandler {
             return pair.getRight();
         }
 
-        return jdbcTemplateProxy.update(sql, args);
+        return jdbcOperations.update(sql, args);
     }
 
     /**
@@ -99,10 +99,10 @@ public class InsertHandler extends AbstractMethodHandler {
     protected Object getIdValue(TableColumnInfo idColumnInfo, Object entity) {
         Object idValue = null;
         IdType idType = idColumnInfo.getIdType();
-        if (IdType.ASSIGNED.equals(idType)) {
+        if (IdType.SPECIFY.equals(idType)) {
             // 用户指定值
             idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
-        } else if (IdType.GENERATED.equals(idType)) {
+        } else if (IdType.GENERATE.equals(idType)) {
             idValue = newInstance(idColumnInfo.getGenerator(), idColumnInfo.isUseSingletonIdGenerator()).nextId();
         }
         if (idValue != null) {

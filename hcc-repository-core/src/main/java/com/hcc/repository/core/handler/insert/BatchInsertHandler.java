@@ -33,7 +33,7 @@ public class BatchInsertHandler extends InsertHandler {
             sql = condition.getExecuteSql();
         }
 
-        return jdbcTemplateProxy.namedBatchUpdate(sql, paramMaps);
+        return jdbcOperations.namedBatchUpdate(sql, paramMaps);
     }
 
 }

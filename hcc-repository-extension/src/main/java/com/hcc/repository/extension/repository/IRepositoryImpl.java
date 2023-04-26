@@ -1,6 +1,6 @@
 package com.hcc.repository.extension.repository;
 
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.mapper.BaseMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -18,7 +18,7 @@ public class IRepositoryImpl<M extends BaseMapper<T, ID>, T, ID extends Serializ
     protected M mapper;
 
     @Autowired
-    protected JdbcTemplateProxy jdbcTemplateProxy;
+    protected JdbcOperations jdbcOperations;
 
     @Override
     public M getBaseMapper() {

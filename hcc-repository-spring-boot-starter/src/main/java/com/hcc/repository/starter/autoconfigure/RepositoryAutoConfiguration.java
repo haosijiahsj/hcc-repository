@@ -1,7 +1,7 @@
 package com.hcc.repository.starter.autoconfigure;
 
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
-import com.hcc.repository.core.jdbc.JdbcTemplateWrapper;
+import com.hcc.repository.core.jdbc.JdbcOperations;
+import com.hcc.repository.core.jdbc.JdbcOperationsImpl;
 import com.hcc.repository.core.proxy.JdbcTemplateProxyInvocationHandler;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.spring.support.InjectMapperBeanPostProcessor;
@@ -68,13 +68,13 @@ public class RepositoryAutoConfiguration {
     }
 
     @Bean
-    public JdbcTemplateProxy jdbcTemplateProxy(DataSource dataSource,
-                                               ObjectProvider<RepositoryInterceptor> repositoryInterceptorObjectProvider) {
+    public JdbcOperations jdbcTemplateProxy(DataSource dataSource,
+                                            ObjectProvider<RepositoryInterceptor> repositoryInterceptorObjectProvider) {
         RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
         JdbcTemplateProxyInvocationHandler jdbcTemplateProxyInvocationHandler
-                = new JdbcTemplateProxyInvocationHandler(new JdbcTemplateWrapper(dataSource), repositoryInterceptor.getInterceptors());
+                = new JdbcTemplateProxyInvocationHandler(new JdbcOperationsImpl(dataSource), repositoryInterceptor.getInterceptors());
 
-        return ReflectUtils.newProxy(JdbcTemplateProxy.class, jdbcTemplateProxyInvocationHandler);
+        return ReflectUtils.newProxy(JdbcOperations.class, jdbcTemplateProxyInvocationHandler);
     }
 
     @Bean

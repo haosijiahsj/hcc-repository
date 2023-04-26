@@ -19,7 +19,7 @@ public class SelectCountHandler extends AbstractSelectHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        List<Map<String, Object>> results = jdbcTemplateProxy.queryForList(sql, args);
+        List<Map<String, Object>> results = jdbcOperations.queryForList(sql, args);
         if (CollUtils.isEmpty(results)) {
             return null;
         }

@@ -2,6 +2,7 @@ package com.hcc.repository.test.domain.po;
 
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.IdType;
+import com.hcc.repository.annotation.PropSetListener;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.extension.generator.id.SnowFlakeIdGenerator;
 import com.hcc.repository.test.domain.enums.ProductStatusEnum;
@@ -20,13 +21,20 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ToString(callSuper = true)
-@Table("product")
+@Table(value = "product")
 public class ProductPo extends BasePo {
 
-    @Id(idType = IdType.GENERATED, generator = SnowFlakeIdGenerator.class)
+    @Id(idType = IdType.GENERATE, generator = SnowFlakeIdGenerator.class)
     private Long id;
     private String name;
     private BigDecimal price;
     private ProductStatusEnum productStatus;
+
+    public static class TestPropSetListener implements PropSetListener {
+        @Override
+        public Object onPropSet(Object entity, Object value, String propName, String columnName) {
+            return value;
+        }
+    }
 
 }

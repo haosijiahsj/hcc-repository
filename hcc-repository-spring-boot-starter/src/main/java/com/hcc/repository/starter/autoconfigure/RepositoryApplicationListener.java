@@ -29,9 +29,12 @@ public class RepositoryApplicationListener implements ApplicationListener<Applic
     public void onApplicationEvent(ApplicationReadyEvent event) {
         RepositoryProperties properties = applicationContext.getBean(RepositoryProperties.class);
         if (properties.isEnableBanner()) {
-            System.out.println("==========================");
-            System.out.println("======hcc-repository======");
-            System.out.println("==========================");
+            System.out.println();
+            System.out.println("|_  _ ___.__ ._  _  _o_|_ _ ._  ");
+            System.out.println("| |(_(_  |(/_|_)(_)_>| |_(_)|\\/ ");
+            System.out.println("             |               /  ");
+            System.out.println("hcc-repository       version=0.0.1");
+            System.out.println();
         }
         if (CollUtils.isNotEmpty(properties.getEntityPackages())) {
             Set<Class<?>> entityClasses = properties.getEntityPackages().stream()

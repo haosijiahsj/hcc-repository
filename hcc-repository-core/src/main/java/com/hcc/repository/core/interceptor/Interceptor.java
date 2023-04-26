@@ -2,7 +2,7 @@ package com.hcc.repository.core.interceptor;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 
 /**
  * 拦截器
@@ -29,19 +29,19 @@ public interface Interceptor {
 
     /**
      * 执行语句之前
-     * @param jdbcTemplateProxy
+     * @param jdbcOperations
      * @param context
      */
-    default void beforeExecute(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {}
+    default void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {}
 
     /**
      * 返回之前调用
-     * @param jdbcTemplateProxy
+     * @param jdbcOperations
      * @param context
      * @param result
      * @return
      */
-    default Object beforeReturn(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context, Object result) {
+    default Object beforeReturn(JdbcOperations jdbcOperations, SqlExecuteContext context, Object result) {
         return result;
     }
 

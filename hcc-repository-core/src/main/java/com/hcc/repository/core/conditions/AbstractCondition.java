@@ -89,6 +89,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return segmentContainer;
     }
 
+    public void setSegmentContainer(SegmentContainer segmentContainer) {
+        this.segmentContainer = segmentContainer;
+    }
+
     protected String getColumnName(R column) {
         if (column instanceof String) {
             return (String) column;

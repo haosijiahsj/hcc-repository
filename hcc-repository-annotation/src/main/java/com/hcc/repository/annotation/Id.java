@@ -19,9 +19,9 @@ public @interface Id {
 
     String value() default "";
 
-    IdType idType() default IdType.IDENTITY;
+    IdType idType() default IdType.AUTO;
 
-    Class<? extends IdGenerator> generator() default UnknownIdGenerator.class;
+    Class<? extends IdGenerator> generator() default Constants.UnknownIdGenerator.class;
 
     boolean useSingletonIdGenerator() default true;
 

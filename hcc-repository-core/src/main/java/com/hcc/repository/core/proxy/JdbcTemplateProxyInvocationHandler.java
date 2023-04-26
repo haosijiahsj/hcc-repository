@@ -3,7 +3,7 @@ package com.hcc.repository.core.proxy;
 import com.hcc.repository.core.constants.SqlTypeEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -18,10 +18,7 @@ import net.sf.jsqlparser.statement.update.Update;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * JdbcTemplateProxyInvocationHandler
@@ -33,10 +30,10 @@ import java.util.stream.Collectors;
 public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
 
     private List<Interceptor> interceptors = new ArrayList<>();
-    private final JdbcTemplateProxy jdbcTemplateProxy;
+    private final JdbcOperations jdbcOperations;
 
-    public JdbcTemplateProxyInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, List<Interceptor> interceptors) {
-        this.jdbcTemplateProxy = jdbcTemplateProxy;
+    public JdbcTemplateProxyInvocationHandler(JdbcOperations jdbcOperations, List<Interceptor> interceptors) {
+        this.jdbcOperations = jdbcOperations;
         if (CollUtils.isNotEmpty(interceptors)) {
             this.interceptors = interceptors;
         }
@@ -60,7 +57,7 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
 
         // 拦截器处理逻辑
         for (Interceptor interceptor : interceptors) {
-            interceptor.beforeExecute(jdbcTemplateProxy, context);
+            interceptor.beforeExecute(jdbcOperations, context);
         }
 
         // 经过拦截器重新赋值
@@ -68,10 +65,10 @@ public class JdbcTemplateProxyInvocationHandler implements InvocationHandler {
         args[1] = context.getSqlParameter();
 
         // 执行方法
-        Object result = method.invoke(jdbcTemplateProxy, args);
+        Object result = method.invoke(jdbcOperations, args);
         // 执行查询后的拦截器
         for (Interceptor interceptor : interceptors) {
-            result = interceptor.beforeReturn(jdbcTemplateProxy, context, result);
+            result = interceptor.beforeReturn(jdbcOperations, context, result);
         }
 
         return result;

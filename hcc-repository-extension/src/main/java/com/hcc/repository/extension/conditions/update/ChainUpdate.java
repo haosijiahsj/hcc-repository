@@ -18,6 +18,13 @@ public interface ChainUpdate<T, ID extends Serializable> extends ChainCondition<
         return getBaseMapper().update(getCondition()) >= 0;
     }
 
+    default boolean update(T entity) {
+        if (entity == null) {
+            return update();
+        }
+        return getBaseMapper().updateEntity(entity, getCondition()) >= 0;
+    }
+
     default boolean remove() {
         ICondition<T> condition = getCondition();
         condition.setExecuteSqlType(ExecuteSqlTypeEnum.DELETE);

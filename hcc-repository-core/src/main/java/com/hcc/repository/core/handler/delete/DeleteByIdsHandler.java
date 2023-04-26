@@ -1,7 +1,6 @@
 package com.hcc.repository.core.handler.delete;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
@@ -31,7 +30,7 @@ public class DeleteByIdsHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateProxy.update(sql, args);
+        return jdbcOperations.update(sql, args);
     }
 
 }

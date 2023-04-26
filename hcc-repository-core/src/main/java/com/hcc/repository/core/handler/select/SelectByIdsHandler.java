@@ -4,6 +4,7 @@ import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.Assert;
 
 import java.util.Collection;
 
@@ -13,7 +14,13 @@ import java.util.Collection;
  * @author hushengjun
  * @date 2023/3/21
  */
-public class SelectByIdsHandler extends SelectByIdHandler {
+public class SelectByIdsHandler extends AbstractSelectHandler {
+
+    @Override
+    protected void prepare() {
+        Assert.isTrue(TableInfoHelper.hasIdColumn(entityClass),
+                String.format("表：%s，没有定义id字段", TableInfoHelper.getTableName(entityClass)));
+    }
 
     @Override
     protected ICondition<?> prepareCondition() {
@@ -27,7 +34,7 @@ public class SelectByIdsHandler extends SelectByIdHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
+        return jdbcOperations.queryForEntityList(sql, args, entityClass);
     }
 
 }

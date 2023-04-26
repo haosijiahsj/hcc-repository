@@ -105,6 +105,16 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
+     * 通过id批量更新实体
+     * @param entities
+     * @return
+     */
+    default boolean batchUpdateById(Collection<T> entities) {
+        entities.forEach(this::updateById);
+        return true;
+    }
+
+    /**
      * 通过条件更新
      * @param condition
      * @return

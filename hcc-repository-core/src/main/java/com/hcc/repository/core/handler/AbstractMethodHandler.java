@@ -4,7 +4,7 @@ import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.OriginalSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.Pair;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @Slf4j
 public abstract class AbstractMethodHandler {
 
-    protected JdbcTemplateProxy jdbcTemplateProxy;
+    protected JdbcOperations jdbcOperations;
     protected Method method;
     private String methodName;
     private MethodNameEnum methodNameEnum;
@@ -66,9 +66,7 @@ public abstract class AbstractMethodHandler {
     }
 
     protected void prepare() {
-        if (firstArgIsNull()) {
-            throw new IllegalArgumentException("参数不能为空！");
-        }
+        Assert.isFalse(firstArgIsNull(), "第一个参数不能为空！");
     }
 
     /**
@@ -104,8 +102,8 @@ public abstract class AbstractMethodHandler {
         return pair;
     }
 
-    public void setJdbcTemplateProxy(JdbcTemplateProxy jdbcTemplateProxy) {
-        this.jdbcTemplateProxy = jdbcTemplateProxy;
+    public void setJdbcTemplateProxy(JdbcOperations jdbcOperations) {
+        this.jdbcOperations = jdbcOperations;
     }
 
     public void setMethod(Method method) {

@@ -15,7 +15,7 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/3/26
  */
-public interface JdbcTemplateProxy {
+public interface JdbcOperations {
 
     JdbcTemplate getJdbcTemplate();
 

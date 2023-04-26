@@ -59,6 +59,7 @@ public class TableInfoHelper {
         if (tableAnnotation != null) {
             tableInfo.setColumnPrefix(tableAnnotation.columnPrefix());
             tableInfo.setIgnorePropertyNames(Arrays.asList(tableAnnotation.ignorePropertyNames()));
+            tableInfo.setPropSet(tableAnnotation.propSet());
         }
 
         List<TableColumnInfo> tableColumnInfos = new ArrayList<>();

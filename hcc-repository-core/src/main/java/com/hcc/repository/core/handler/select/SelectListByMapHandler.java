@@ -40,7 +40,7 @@ public class SelectListByMapHandler extends AbstractMethodHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateProxy.queryForEntityList(sql, args, entityClass);
+        return jdbcOperations.queryForEntityList(sql, args, entityClass);
     }
 
 }

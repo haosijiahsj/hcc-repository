@@ -1,5 +1,7 @@
 package com.hcc.repository.core.metadata;
 
+import com.hcc.repository.annotation.Constants;
+import com.hcc.repository.annotation.PropSetListener;
 import lombok.Data;
 
 import java.util.Collections;
@@ -18,6 +20,7 @@ public class TableInfo {
     private String columnPrefix = "";
     private List<String> ignorePropertyNames = Collections.emptyList();
     private Class<?> clazz;
+    private Class<? extends PropSetListener> propSet = Constants.DefPropSetListener.class;
     private TableColumnInfo idColumnInfo;
     private List<TableColumnInfo> columnInfos;
     private boolean hasIdColumn = false;

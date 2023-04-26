@@ -1,20 +1,18 @@
-package com.hcc.repository.core.handler.insert;
+package com.hcc.repository.core.handler.update;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
- * InsertByConditionHandler
+ * AbstractUpdateHandler
  *
  * @author hushengjun
- * @date 2023/4/9
+ * @date 2023/4/25
  */
-public class InsertByConditionHandler extends AbstractMethodHandler {
+public abstract class AbstractUpdateHandler extends AbstractMethodHandler {
 
     @Override
-    protected ICondition<?> prepareCondition() {
-        return getFirstArg(ICondition.class);
-    }
+    protected abstract ICondition<?> prepareCondition();
 
     @Override
     protected Object executeSql(String sql, Object[] args) {

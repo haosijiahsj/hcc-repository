@@ -12,6 +12,7 @@ import com.hcc.repository.core.handler.select.SelectListByMapHandler;
 import com.hcc.repository.core.handler.select.SelectListHandler;
 import com.hcc.repository.core.handler.select.SelectMapsHandler;
 import com.hcc.repository.core.handler.update.UpdateByIdHandler;
+import com.hcc.repository.core.handler.update.UpdateEntityHandler;
 import com.hcc.repository.core.handler.update.UpdateHandler;
 
 import java.util.Arrays;
@@ -37,6 +38,7 @@ public enum MethodNameEnum {
 
     // 改
     UPDATE_BY_ID("updateById", "通过id更新", UpdateByIdHandler.class),
+    UPDATE_ENTITY("updateEntity", "通过condition更新实体", UpdateEntityHandler.class),
     UPDATE("update", "更新", UpdateHandler.class),
 
     // 查

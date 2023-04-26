@@ -2,7 +2,7 @@ package com.hcc.repository.core.proxy;
 
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.MethodHandlerFactory;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.MethodHandlesUtils;
@@ -23,12 +23,12 @@ import java.lang.reflect.Type;
 @Slf4j
 public class MapperMethodInvocationHandler implements InvocationHandler {
 
-    private final JdbcTemplateProxy jdbcTemplateProxy;
+    private final JdbcOperations jdbcOperations;
     private final Class<?> baseMapperClass;
     private final RepositoryConfiguration configuration;
 
-    public MapperMethodInvocationHandler(JdbcTemplateProxy jdbcTemplateProxy, Class<?> baseMapperClass, RepositoryConfiguration configuration) {
-        this.jdbcTemplateProxy = jdbcTemplateProxy;
+    public MapperMethodInvocationHandler(JdbcOperations jdbcOperations, Class<?> baseMapperClass, RepositoryConfiguration configuration) {
+        this.jdbcOperations = jdbcOperations;
         this.baseMapperClass = baseMapperClass;
         this.configuration = configuration;
     }
@@ -50,7 +50,7 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
 
         AbstractMethodHandler handler = MethodHandlerFactory.create(methodName);
         handler.setMethod(method);
-        handler.setJdbcTemplateProxy(jdbcTemplateProxy);
+        handler.setJdbcTemplateProxy(jdbcOperations);
         handler.setArgs(args);
         handler.setConfiguration(configuration);
 

@@ -1,6 +1,5 @@
 package com.hcc.repository.core.jdbc;
 
-import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -11,7 +10,6 @@ import org.springframework.jdbc.support.KeyHolder;
 import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.Statement;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +20,12 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/3/17
  */
-public class JdbcTemplateWrapper implements JdbcTemplateProxy {
+public class JdbcOperationsImpl implements JdbcOperations {
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public JdbcTemplateWrapper(DataSource dataSource) {
+    public JdbcOperationsImpl(DataSource dataSource) {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }

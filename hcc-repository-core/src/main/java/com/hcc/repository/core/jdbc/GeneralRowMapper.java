@@ -4,6 +4,7 @@ import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
 import com.hcc.repository.core.metadata.TableColumnInfo;
+import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.jdbc.core.RowMapper;
@@ -37,6 +38,7 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
     public T mapRow(ResultSet rs, int i) throws SQLException {
         T instance = ReflectUtils.newInstance(entityClass);
 
+        TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
         Map<String, TableColumnInfo> columnNameColumnInfoMap = TableInfoHelper.getColumnNameColumnInfoMap(entityClass);
         ResultSetMetaData rsmd = rs.getMetaData();
 
@@ -72,6 +74,10 @@ public class GeneralRowMapper<T> implements RowMapper<T> {
                     targetValue = JdbcUtils.getResultSetValue(rs, index, field.getType());
                 }
             }
+
+            // 执行监听器
+            targetValue = ReflectUtils.newInstanceForCache(tableInfo.getPropSet())
+                    .onPropSet(instance, targetValue, field.getName(), columnName);
 
             // 反射赋值
             ReflectUtils.setValue(instance, field, targetValue);

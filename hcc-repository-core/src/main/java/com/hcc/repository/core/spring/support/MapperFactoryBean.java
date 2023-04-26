@@ -5,6 +5,7 @@ import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.InitializingBean;
 
 import javax.sql.DataSource;
 import java.util.Optional;
@@ -16,7 +17,7 @@ import java.util.Optional;
  * @date 2023/4/5
  */
 @Slf4j
-public class MapperFactoryBean<T> implements FactoryBean<T> {
+public class MapperFactoryBean<T> implements FactoryBean<T>, InitializingBean {
 
     private final Class<T> mapperClass;
 
@@ -44,6 +45,10 @@ public class MapperFactoryBean<T> implements FactoryBean<T> {
     @Override
     public Class<?> getObjectType() {
         return mapperClass;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
     }
 
 }

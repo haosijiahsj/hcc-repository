@@ -20,6 +20,8 @@ public interface AutoFillStrategy {
      * 返回填充值
      * @return
      */
-    Object fill(AutoFillContext context);
+    default Object fill(AutoFillContext context) {
+        throw new UnsupportedOperationException();
+    }
 
 }

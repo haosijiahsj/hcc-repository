@@ -2,7 +2,7 @@ package com.hcc.repository.extension.interceptor;
 
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
-import com.hcc.repository.core.jdbc.JdbcTemplateProxy;
+import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.extension.utils.TableNameParser;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class DynamicTableNameInterceptor implements Interceptor {
     }
 
     @Override
-    public void beforeExecute(JdbcTemplateProxy jdbcTemplateProxy, SqlExecuteContext context) {
+    public void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {
         log.info("original sql: {}", context.getSql());
         String newSql = this.changeTableName(context.getSql());
         log.info("change table name sql: {}", context.getSql());

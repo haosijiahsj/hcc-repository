@@ -12,7 +12,7 @@ public class DeleteHandler extends AbstractSelectHandler {
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcTemplateProxy.update(sql, args);
+        return jdbcOperations.update(sql, args);
     }
 
 }
