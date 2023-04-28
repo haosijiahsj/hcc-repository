@@ -41,14 +41,13 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
             return method.invoke(this, args);
         }
 
-        String methodName = method.getName();
         if (method.isDefault()) {
             // 默认方法执行
             MethodHandle methodHandle = MethodHandlesUtils.getSpecialMethodHandle(method).bindTo(proxy);
             return methodHandle.invokeWithArguments(args);
         }
 
-        AbstractMethodHandler handler = MethodHandlerFactory.create(methodName);
+        AbstractMethodHandler handler = MethodHandlerFactory.create(method);
         handler.setMethod(method);
         handler.setJdbcTemplateProxy(jdbcOperations);
         handler.setArgs(args);

@@ -1,5 +1,6 @@
 package com.hcc.repository.core.jdbc;
 
+import com.hcc.repository.core.jdbc.mapper.GeneralRowMapper;
 import com.hcc.repository.core.utils.Pair;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -87,6 +88,16 @@ public class JdbcOperationsImpl implements JdbcOperations {
     @Override
     public <T> List<T> queryForEntityList(String sql, Object[] args, Class<T> targetClass) {
         return jdbcTemplate.query(sql, args, new GeneralRowMapper<>(targetClass));
+    }
+
+    @Override
+    public <T> List<T> query(String sql, Object[] args, BasicRowMapper<T> rowMapper) {
+        return jdbcTemplate.query(sql, args, rowMapper);
+    }
+
+    @Override
+    public <T> T queryForObject(String sql, Object[] args, BasicRowMapper<T> rowMapper) {
+        return jdbcTemplate.queryForObject(sql, args, rowMapper);
     }
 
     @Override

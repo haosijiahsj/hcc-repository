@@ -6,6 +6,7 @@ package com.hcc.repository.core.convert;
  * @author hushengjun
  * @date 2023/3/24
  */
+@FunctionalInterface
 public interface ValueConverter<T> {
 
     /**

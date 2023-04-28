@@ -112,6 +112,26 @@ public interface JdbcOperations {
     <T> List<T> queryForEntityList(String sql, Object[] args, Class<T> entityClass);
 
     /**
+     * 自定义映射器查询列表
+     * @param sql
+     * @param args
+     * @param rowMapper
+     * @return
+     * @param <T>
+     */
+    <T> List<T> query(String sql, Object[] args, BasicRowMapper<T> rowMapper);
+
+    /**
+     * 自定义映射器查询对象
+     * @param sql
+     * @param args
+     * @param rowMapper
+     * @return
+     * @param <T>
+     */
+    <T> T queryForObject(String sql, Object[] args, BasicRowMapper<T> rowMapper);
+
+    /**
      * 查询实体对象
      * @param sql
      * @param args
