@@ -8,7 +8,7 @@ import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
- * AbstractCrudMethodHandler
+ * AbstractSelectHandler
  *
  * @author hushengjun
  * @date 2023/3/23

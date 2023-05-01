@@ -1,8 +1,9 @@
 package com.hcc.repository.core.interceptor;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.jdbc.JdbcOperations;
+
+import java.lang.reflect.Method;
 
 /**
  * 拦截器
@@ -14,34 +15,49 @@ public interface Interceptor {
 
     /**
      * 准备condition前调用
-     * @param methodNameEnum
-     * @param args
+     * @param method
+     * @param parameters
      */
-    default void beforePrepareCondition(MethodNameEnum methodNameEnum, Object[] args) {}
+    default void beforePrepareCondition(Method method, Object[] parameters) {}
 
     /**
      * 准备condition后调用
-     * @param methodNameEnum
-     * @param args
+     * @param method
+     * @param parameters
      * @param condition
      */
-    default void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {}
+    default void afterPrepareCondition(Method method, Object[] parameters, ICondition<?> condition) {}
 
     /**
      * 执行语句之前
+     * @param method
+     * @param parameters
      * @param jdbcOperations
      * @param context
      */
-    default void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {}
+    default void beforeExecute(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {}
 
     /**
-     * 返回之前调用
+     * 执行语句之后
+     * @param method
+     * @param parameters
      * @param jdbcOperations
      * @param context
      * @param result
      * @return
      */
-    default Object beforeReturn(JdbcOperations jdbcOperations, SqlExecuteContext context, Object result) {
+    default Object afterExecute(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context, Object result) {
+        return result;
+    }
+
+    /**
+     * 返回结果之前
+     * @param method
+     * @param context
+     * @param result
+     * @return
+     */
+    default Object beforeReturn(Method method, Object[] parameters, SqlExecuteContext context, Object result) {
         return result;
     }
 

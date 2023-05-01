@@ -32,10 +32,10 @@ public class MapperProxyFactory {
         Assert.isTrue(interfaceType.isInterface(), String.format("mapper class必须为接口，当前class: %s不是接口", interfaceType.getName()));
 
 
-        // jdbcTemplateProxy代理创建
-        JdbcTemplateProxyInvocationHandler jdbcTemplateProxyInvocationHandler
-                = new JdbcTemplateProxyInvocationHandler(new JdbcOperationsImpl(dataSource), configuration.getInterceptors());
-        JdbcOperations jdbcOperations = ReflectUtils.newProxy(JdbcOperations.class, jdbcTemplateProxyInvocationHandler);
+        // JdbcOperations代理创建
+        JdbcOperationsInvocationHandler jdbcOperationsInvocationHandler
+                = new JdbcOperationsInvocationHandler(new JdbcOperationsImpl(dataSource), configuration);
+        JdbcOperations jdbcOperations = ReflectUtils.newProxy(JdbcOperations.class, jdbcOperationsInvocationHandler);
 
         // Mapper代理创建
         MapperMethodInvocationHandler invocationHandler = new MapperMethodInvocationHandler(jdbcOperations, interfaceType, configuration);

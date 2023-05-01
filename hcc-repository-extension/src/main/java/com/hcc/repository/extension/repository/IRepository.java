@@ -8,7 +8,7 @@ import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.conditions.ChainConditions;
-import com.hcc.repository.extension.conditions.OriginalSqlChainCondition;
+import com.hcc.repository.extension.conditions.original.OriginalSqlChainCondition;
 import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
 import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
 import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
@@ -305,7 +305,7 @@ public interface IRepository<T, ID extends Serializable> {
      * @return
      */
     default IPage<T> page(ICondition<T> condition, IPage<T> pageParam) {
-        throw new UnsupportedOperationException("暂不支持");
+        return getBaseMapper().selectPage(condition, pageParam);
     }
 
 }

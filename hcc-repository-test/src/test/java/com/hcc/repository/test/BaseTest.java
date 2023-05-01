@@ -1,5 +1,6 @@
 package com.hcc.repository.test;
 
+import com.hcc.repository.test.dao.mapper.ProductMapper;
 import com.hcc.repository.test.service.ProductService;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,5 +19,8 @@ public class BaseTest {
 
     @Autowired
     protected ProductService productService;
+
+    @Autowired
+    protected ProductMapper productMapper;
 
 }

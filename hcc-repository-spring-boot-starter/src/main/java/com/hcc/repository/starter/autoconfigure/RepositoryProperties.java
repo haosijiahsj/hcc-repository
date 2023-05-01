@@ -19,6 +19,7 @@ import java.util.Map;
 public class RepositoryProperties {
 
     private boolean enableBanner = true;
+    private boolean printSqlLog = false;
     private List<String> entityPackages;
     private List<String> basePackages;
     private Map<String, Object> properties;

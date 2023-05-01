@@ -20,6 +20,10 @@ public class RepositoryConfiguration {
      */
     private List<Interceptor> interceptors;
     /**
+     * 是否打印sql日志
+     */
+    private boolean printSqlLog;
+    /**
      * 配置信息
      */
     private Map<String, Object> properties;

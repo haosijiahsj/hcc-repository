@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.utils;
+package com.hcc.repository.extension.interceptor.dynamictablename;
 
 
 import java.util.*;

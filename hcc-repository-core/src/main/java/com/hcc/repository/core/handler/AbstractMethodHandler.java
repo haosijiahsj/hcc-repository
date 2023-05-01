@@ -1,17 +1,20 @@
 package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
+import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.SqlParseUtils;
+import com.hcc.repository.core.utils.SqlParserUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +46,7 @@ public abstract class AbstractMethodHandler {
         List<Interceptor> interceptors = Optional.ofNullable(configuration.getInterceptors())
                 .orElse(Collections.emptyList());
         // 拦截器准备前方法
-        interceptors.forEach(interceptor -> interceptor.beforePrepareCondition(methodNameEnum, args));
+        interceptors.forEach(interceptor -> interceptor.beforePrepareCondition(method, args));
 
         // prepare
         this.prepare();
@@ -54,15 +57,51 @@ public abstract class AbstractMethodHandler {
         condition.setEntityClass(entityClass);
 
         // 拦截器准备后方法
-        interceptors.forEach(interceptor -> interceptor.afterPrepareCondition(methodNameEnum, args, condition));
+        interceptors.forEach(interceptor -> interceptor.afterPrepareCondition(method, args, condition));
 
         // 解析sql
         Pair<String, Object[]> pair = this.parseSql(condition);
         String sqlToUse = pair.getLeft();
-        Object[] params = pair.getRight();
+        Object[] sqlParameters = pair.getRight();
+
+        // sql执行上下文
+        SqlExecuteContext context = new SqlExecuteContext();
+        context.setSql(sqlToUse);
+        context.setSqlType(SqlParserUtils.getSqlType(context.getSql()));
+        context.setSqlParameters(sqlParameters);
+
+        // sql执行前拦截方法
+        for (Interceptor interceptor : interceptors) {
+            interceptor.beforeExecute(method, args, jdbcOperations, context);
+            if (context.isAbortExecute()) {
+                return context.getReturnValueSupplier().get();
+            }
+        }
 
         // 执行sql
-        return this.executeSql(sqlToUse, params);
+        Object result = this.executeSql(context.getSql(), context.getSqlParameters());
+
+        // sql执行后拦截方法
+        for (Interceptor interceptor : interceptors) {
+            result = interceptor.afterExecute(method, args, jdbcOperations, context, result);
+        }
+
+        // 返回前执行拦截方法
+        for (Interceptor interceptor : interceptors) {
+            result = interceptor.beforeReturn(method, args, context, result);
+        }
+
+        return result;
+    }
+
+    private Object returnIfNeed() {
+        if (int.class.equals(method.getReturnType())) {
+            return -1;
+        } else if (Collection.class.isAssignableFrom(method.getReturnType())) {
+            return Collections.emptyList();
+        }
+
+        return null;
     }
 
     protected void prepare() {

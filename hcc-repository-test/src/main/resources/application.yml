@@ -21,6 +21,7 @@ hcc:
     enableBanner: true
     entityPackages:
       - com.hcc.repository.test.domain.po
+    printSqlLog: true
     properties:
       workerId: 1
       datacenterId: 3

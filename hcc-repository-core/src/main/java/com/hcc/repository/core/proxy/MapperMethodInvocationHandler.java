@@ -3,7 +3,6 @@ package com.hcc.repository.core.proxy;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.MethodHandlerFactory;
 import com.hcc.repository.core.jdbc.JdbcOperations;
-import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.MethodHandlesUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
@@ -35,9 +34,8 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        if (Object.class.equals(method.getDeclaringClass())
-                || !BaseMapper.class.equals(method.getDeclaringClass())) {
-            // Object自带的方法，或者不是BaseMapper中定义的方法，不走代理调用
+        if (Object.class.equals(method.getDeclaringClass())) {
+            // Object自带的方法，不走代理调用
             return method.invoke(this, args);
         }
 

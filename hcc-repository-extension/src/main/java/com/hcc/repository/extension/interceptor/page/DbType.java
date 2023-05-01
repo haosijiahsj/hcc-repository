@@ -1,5 +1,8 @@
 package com.hcc.repository.extension.interceptor.page;
 
+import com.hcc.repository.extension.interceptor.page.dialect.MysqlPaginationDialect;
+import com.hcc.repository.extension.interceptor.page.dialect.PaginationDialect;
+
 /**
  * DbType
  *
@@ -8,6 +11,15 @@ package com.hcc.repository.extension.interceptor.page;
  */
 public enum DbType {
 
-    MYSQL
+    MYSQL(new MysqlPaginationDialect());
 
+    private final PaginationDialect handler;
+
+    DbType(PaginationDialect handler) {
+        this.handler = handler;
+    }
+
+    public PaginationDialect getDialectHandler() {
+        return handler;
+    }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/4/26
  */
-public class LinkedHashMapRowMapper extends HashMapRowMapper {
+public class LinkedHashMapResultMapper extends HashMapResultMapper {
 
     @Override
     protected Map<String, Object> newMapInstance(int columnCount) {

@@ -49,4 +49,12 @@ public abstract class ICondition<T> {
      */
     public abstract Map<String, Object> getColumnValuePairs();
 
+    /**
+     * 获取where后的sql
+     * @return
+     */
+    public String getSqlAfterWhere() {
+        return "";
+    }
+
 }

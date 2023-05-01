@@ -2,10 +2,7 @@ package com.hcc.repository.core.jdbc.mapper;
 
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
-import com.hcc.repository.core.jdbc.BasicRowMapper;
-import com.hcc.repository.core.metadata.TableColumnInfo;
-import com.hcc.repository.core.metadata.TableInfo;
-import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -25,13 +22,13 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/4/26
  */
-public class PlainEntityRowMapper<T> implements BasicRowMapper<T> {
+public class PlainEntityResultMapper<T> implements ResultMapper<T> {
 
     private final Class<T> entityClass;
     private final Map<String, Field> fieldNameMap;
     private final Map<String, Field> fieldUnderlineNameMap;
 
-    public PlainEntityRowMapper(Class<T> entityClass) {
+    public PlainEntityResultMapper(Class<T> entityClass) {
         this.entityClass = entityClass;
         List<Field> fields = ReflectUtils.getAllDeclaredFields(entityClass);
         fieldNameMap = fields.stream().collect(Collectors.toMap(Field::getName, Function.identity()));
@@ -99,7 +96,7 @@ public class PlainEntityRowMapper<T> implements BasicRowMapper<T> {
      * @return
      */
     protected boolean strictMode() {
-        return true;
+        return false;
     }
 
 }

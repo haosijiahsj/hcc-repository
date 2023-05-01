@@ -5,6 +5,8 @@ import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
 
+import java.lang.reflect.Method;
+
 /**
  * ExtInterceptor
  *
@@ -14,27 +16,31 @@ import com.hcc.repository.core.jdbc.JdbcOperations;
 public interface ExtInterceptor extends Interceptor {
 
     @Override
-    default void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {
+    default void beforeExecute(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
         if (SqlTypeEnum.SELECT.equals(context.getSqlType())) {
-            this.beforeExecuteQuery(jdbcOperations, context);
+            this.beforeExecuteQuery(method, parameters, jdbcOperations, context);
         } else {
-            this.beforeExecuteUpdate(jdbcOperations, context);
+            this.beforeExecuteUpdate(method, parameters, jdbcOperations, context);
         }
     }
 
     /**
      * 更新之前调用
+     * @param method
+     * @param parameters
      * @param jdbcOperations
      * @param context
      */
-    default void beforeExecuteUpdate(JdbcOperations jdbcOperations, SqlExecuteContext context) {}
+    default void beforeExecuteUpdate(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {}
 
     /**
      * 查询之前调用
+     * @param method
+     * @param parameters
      * @param jdbcOperations
      * @param context
      */
-    default void beforeExecuteQuery(JdbcOperations jdbcOperations, SqlExecuteContext context) {}
+    default void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {}
 
 
 }

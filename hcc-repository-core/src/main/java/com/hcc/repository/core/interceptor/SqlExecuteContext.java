@@ -3,10 +3,10 @@ package com.hcc.repository.core.interceptor;
 import com.hcc.repository.core.constants.SqlTypeEnum;
 import lombok.Data;
 
-import java.util.Map;
+import java.util.function.Supplier;
 
 /**
- * ExecuteContext
+ * sql执行上下文
  *
  * @author hushengjun
  * @date 2023/3/23
@@ -19,16 +19,20 @@ public class SqlExecuteContext {
      */
     private SqlTypeEnum sqlType;
     /**
-     * 是否具名sql
-     */
-    private boolean isNamedSql;
-    /**
      * sql
      */
     private String sql;
     /**
-     * map类型，数组
+     * sql参数
      */
-    private Object sqlParameter;
+    private Object[] sqlParameters;
+    /**
+     * 是否要中断执行
+     */
+    private boolean abortExecute = false;
+    /**
+     * abortExecute=true时的默认返回值
+     */
+    private Supplier<Object> returnValueSupplier = () -> null;
 
 }

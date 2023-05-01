@@ -7,6 +7,8 @@ import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Method;
+
 /**
  * TestInterceptor
  *
@@ -17,23 +19,19 @@ import lombok.extern.slf4j.Slf4j;
 public class TestInterceptor implements ExtInterceptor {
 
     @Override
-    public void beforePrepareCondition(MethodNameEnum methodNameEnum, Object[] args) {
+    public void beforePrepareCondition(Method method, Object[] parameters) {
     }
 
     @Override
-    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
+    public void afterPrepareCondition(Method method, Object[] parameters, ICondition<?> condition) {
     }
 
     @Override
-    public void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {
+    public void beforeExecuteUpdate(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
     }
 
     @Override
-    public void beforeExecuteUpdate(JdbcOperations jdbcOperations, SqlExecuteContext context) {
-    }
-
-    @Override
-    public void beforeExecuteQuery(JdbcOperations jdbcOperations, SqlExecuteContext context) {
+    public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
     }
 
 }

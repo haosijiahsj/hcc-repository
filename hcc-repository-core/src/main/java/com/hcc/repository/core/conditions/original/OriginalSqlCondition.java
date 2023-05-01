@@ -1,5 +1,6 @@
-package com.hcc.repository.core.conditions;
+package com.hcc.repository.core.conditions.original;
 
+import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 

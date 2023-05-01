@@ -1,6 +1,6 @@
 package com.hcc.repository.core.jdbc.mapper;
 
-import com.hcc.repository.core.jdbc.BasicRowMapper;
+import com.hcc.repository.core.jdbc.ResultMapper;
 import org.springframework.jdbc.support.JdbcUtils;
 
 import java.sql.ResultSet;
@@ -15,7 +15,7 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/4/26
  */
-public class HashMapRowMapper implements BasicRowMapper<Map<String, Object>> {
+public class HashMapResultMapper implements ResultMapper<Map<String, Object>> {
 
     @Override
     public Map<String, Object> resultMap(ResultSet rs, int rowNum) throws SQLException {

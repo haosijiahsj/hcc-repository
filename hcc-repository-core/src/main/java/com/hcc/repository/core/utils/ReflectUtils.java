@@ -177,6 +177,11 @@ public class ReflectUtils {
         return classes.toArray(new Class[0]);
     }
 
+    /**
+     * 获取interface上的反向类型
+     * @param clazz
+     * @return
+     */
     public static Type[] getGenericClassesForInterface(Class<?> clazz) {
         Type[] types = clazz.getGenericInterfaces();
         ParameterizedType target = null;
@@ -200,6 +205,12 @@ public class ReflectUtils {
         return target == null ? null : target.getActualTypeArguments();
     }
 
+    /**
+     * 实例化class
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public static <T> T newInstance(Class<T> clazz) {
         try {
             return clazz.newInstance();
@@ -208,6 +219,12 @@ public class ReflectUtils {
         }
     }
 
+    /**
+     * 实例化class，带缓存
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public static <T> T newInstanceForCache(Class<T> clazz) {
         Object instance = INSTANCE_CACHE.get(clazz);
         if (instance != null) {

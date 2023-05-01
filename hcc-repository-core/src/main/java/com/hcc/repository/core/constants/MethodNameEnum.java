@@ -11,6 +11,7 @@ import com.hcc.repository.core.handler.select.SelectIdsHandler;
 import com.hcc.repository.core.handler.select.SelectListByMapHandler;
 import com.hcc.repository.core.handler.select.SelectListHandler;
 import com.hcc.repository.core.handler.select.SelectMapsHandler;
+import com.hcc.repository.core.handler.select.SelectPageHandler;
 import com.hcc.repository.core.handler.update.UpdateByIdHandler;
 import com.hcc.repository.core.handler.update.UpdateEntityHandler;
 import com.hcc.repository.core.handler.update.UpdateHandler;
@@ -50,7 +51,7 @@ public enum MethodNameEnum {
     SELECT_MAPS("selectMaps", "查询map列表", SelectMapsHandler.class),
     SELECT_ONE("selectOne", "查询单个", null),
     SELECT_LIST_BY_MAP("selectListByMap", "通过map查询", SelectListByMapHandler.class),
-    SELECT_PAGE("selectPage", "分页查询", null),
+    SELECT_PAGE("selectPage", "分页查询", SelectPageHandler.class),
 
     ;
 

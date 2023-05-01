@@ -1,7 +1,7 @@
 package com.hcc.repository.core.convert;
 
 /**
- * IConverter
+ * 转换器，应对某些值无法自动转换的情况
  *
  * @author hushengjun
  * @date 2023/3/24

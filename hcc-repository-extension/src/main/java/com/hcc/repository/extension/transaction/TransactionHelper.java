@@ -6,7 +6,7 @@ import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.support.DefaultTransactionDefinition;
 
 /**
- * TransactionHelper
+ * 编程式事务支持
  *
  * @author hushengjun
  * @date 2023/4/5

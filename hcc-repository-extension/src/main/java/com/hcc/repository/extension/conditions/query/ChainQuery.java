@@ -2,6 +2,7 @@ package com.hcc.repository.extension.conditions.query;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
+import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.extension.conditions.ChainCondition;
 
 import java.io.Serializable;
@@ -89,6 +90,15 @@ public interface ChainQuery<T, ID extends Serializable> extends ChainCondition<T
      */
     default boolean exist() {
         return list().size() >= 1;
+    }
+
+    /**
+     * 分页查询
+     * @param pageParam
+     * @return
+     */
+    default IPage<T> page(IPage<T> pageParam) {
+        return getBaseMapper().selectPage(getCondition(), pageParam);
     }
 
 }

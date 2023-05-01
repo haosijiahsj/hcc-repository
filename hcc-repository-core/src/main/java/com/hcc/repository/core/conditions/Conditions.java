@@ -1,5 +1,6 @@
 package com.hcc.repository.core.conditions;
 
+import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;

@@ -13,7 +13,7 @@ import java.sql.SQLException;
  * @date 2023/4/26
  */
 @FunctionalInterface
-public interface BasicRowMapper<T> extends RowMapper<T> {
+public interface ResultMapper<T> extends RowMapper<T> {
 
     @Override
     default T mapRow(ResultSet rs, int rowNum) throws SQLException {

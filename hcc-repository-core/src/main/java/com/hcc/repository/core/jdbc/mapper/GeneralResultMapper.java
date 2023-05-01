@@ -3,7 +3,7 @@ package com.hcc.repository.core.jdbc.mapper;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.convert.ConverterFactory;
 import com.hcc.repository.core.convert.ValueConverter;
-import com.hcc.repository.core.jdbc.BasicRowMapper;
+import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 通用的rowMapper转换器
+ * 通用的ResultMapper转换器
  *
  * @author hushengjun
  * @date 2023/3/17
  */
-public class GeneralRowMapper<T> implements BasicRowMapper<T> {
+public class GeneralResultMapper<T> implements ResultMapper<T> {
 
     private final Class<T> entityClass;
 
-    public GeneralRowMapper(Class<T> entityClass) {
+    public GeneralResultMapper(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

@@ -1,12 +1,12 @@
-package com.hcc.repository.extension.interceptor;
+package com.hcc.repository.extension.interceptor.dynamictablename;
 
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.utils.Assert;
-import com.hcc.repository.extension.utils.TableNameParser;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,10 +26,14 @@ public class DynamicTableNameInterceptor implements Interceptor {
     }
 
     @Override
-    public void beforeExecute(JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        log.info("original sql: {}", context.getSql());
+    public void beforeExecute(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
+        if (log.isDebugEnabled()) {
+            log.debug("original sql: {}", context.getSql());
+        }
         String newSql = this.changeTableName(context.getSql());
-        log.info("change table name sql: {}", context.getSql());
+        if (log.isDebugEnabled()) {
+            log.debug("change table name sql: {}", context.getSql());
+        }
         context.setSql(newSql);
     }
 
@@ -58,11 +62,6 @@ public class DynamicTableNameInterceptor implements Interceptor {
             builder.append(sql.substring(last));
         }
         return builder.toString();
-    }
-
-    @FunctionalInterface
-    public interface TableNameHandler {
-        String tableName(String originalTableName, String curSql);
     }
 
 }

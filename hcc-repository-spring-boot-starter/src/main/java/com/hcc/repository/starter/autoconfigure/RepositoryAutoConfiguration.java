@@ -2,7 +2,7 @@ package com.hcc.repository.starter.autoconfigure;
 
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.jdbc.JdbcOperationsImpl;
-import com.hcc.repository.core.proxy.JdbcTemplateProxyInvocationHandler;
+import com.hcc.repository.core.proxy.JdbcOperationsInvocationHandler;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.spring.support.InjectMapperBeanPostProcessor;
 import com.hcc.repository.core.spring.support.MapperBeanDefinitionRegistryPostProcessor;
@@ -53,6 +53,7 @@ public class RepositoryAutoConfiguration {
         RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
         RepositoryConfiguration configuration = new RepositoryConfiguration();
         configuration.setInterceptors(repositoryInterceptor.getInterceptors());
+        configuration.setPrintSqlLog(properties.isPrintSqlLog());
         configuration.setProperties(properties.getProperties());
 
         return configuration;
@@ -68,13 +69,11 @@ public class RepositoryAutoConfiguration {
     }
 
     @Bean
-    public JdbcOperations jdbcTemplateProxy(DataSource dataSource,
-                                            ObjectProvider<RepositoryInterceptor> repositoryInterceptorObjectProvider) {
-        RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
-        JdbcTemplateProxyInvocationHandler jdbcTemplateProxyInvocationHandler
-                = new JdbcTemplateProxyInvocationHandler(new JdbcOperationsImpl(dataSource), repositoryInterceptor.getInterceptors());
+    public JdbcOperations jdbcOperations(DataSource dataSource, RepositoryConfiguration configuration) {
+        JdbcOperationsInvocationHandler jdbcOperationsInvocationHandler
+                = new JdbcOperationsInvocationHandler(new JdbcOperationsImpl(dataSource), configuration);
 
-        return ReflectUtils.newProxy(JdbcOperations.class, jdbcTemplateProxyInvocationHandler);
+        return ReflectUtils.newProxy(JdbcOperations.class, jdbcOperationsInvocationHandler);
     }
 
     @Bean

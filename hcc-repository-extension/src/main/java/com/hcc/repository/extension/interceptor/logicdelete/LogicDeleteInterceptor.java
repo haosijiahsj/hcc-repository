@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.interceptor;
+package com.hcc.repository.extension.interceptor.logicdelete;
 
 import com.hcc.repository.annotation.LogicDelValueType;
 import com.hcc.repository.core.conditions.ICondition;
@@ -13,8 +13,10 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -40,7 +42,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
     }
 
     @Override
-    public void afterPrepareCondition(MethodNameEnum methodNameEnum, Object[] args, ICondition<?> condition) {
+    public void afterPrepareCondition(Method method, Object[] parameters, ICondition<?> condition) {
         Class<?> entityClass = condition.getEntityClass();
         if (entityClass == null) {
             return;
@@ -77,6 +79,10 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         }
         String whereSqlSegment = String.format("AND %s = " + formatField, columnName, logicNotDelVal);
         // 通过condition判断并加入逻辑删除条件
+        MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
+        if (methodNameEnum == null) {
+            return;
+        }
         SqlTypeEnum sqlType = methodNameEnum.getSqlType();
         if (SqlTypeEnum.INSERT.equals(sqlType)) {
             if (condition instanceof AbstractInsertCondition) {

@@ -13,7 +13,14 @@ import java.lang.annotation.Target;
  * @date 2023/4/28
  */
 @Documented
-@Target(ElementType.TYPE_PARAMETER)
+@Target(ElementType.PARAMETER)
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Param {
+
+    /**
+     * 参数名称，参数类型为Map无需设定，其它必须设定
+     * @return
+     */
+    String value() default "";
+
 }

@@ -1,7 +1,7 @@
-package com.hcc.repository.extension.conditions;
+package com.hcc.repository.extension.conditions.original;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.extension.conditions.query.ChainQuery;
 import com.hcc.repository.extension.conditions.update.ChainUpdate;
@@ -23,7 +23,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
 
     public OriginalSqlChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
-        condition = new OriginalSqlCondition<>();
+        this.condition = new OriginalSqlCondition<>();
     }
 
     @Override

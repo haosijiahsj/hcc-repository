@@ -93,6 +93,14 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         this.segmentContainer = segmentContainer;
     }
 
+    @Override
+    public String getSqlAfterWhere() {
+        if (segmentContainer == null) {
+            return "";
+        }
+        return segmentContainer.getSqlSegmentAfterWhere();
+    }
+
     protected String getColumnName(R column) {
         if (column instanceof String) {
             return (String) column;

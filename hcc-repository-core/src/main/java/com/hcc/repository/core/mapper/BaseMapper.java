@@ -209,7 +209,6 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param pageParam
      * @return
      */
-    @Deprecated
     IPage<T> selectPage(ICondition<T> condition, IPage<T> pageParam);
 
 }
