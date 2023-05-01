@@ -14,7 +14,6 @@ import com.hcc.repository.core.utils.SqlParserUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,16 +93,6 @@ public abstract class AbstractMethodHandler {
         return result;
     }
 
-    private Object returnIfNeed() {
-        if (int.class.equals(method.getReturnType())) {
-            return -1;
-        } else if (Collection.class.isAssignableFrom(method.getReturnType())) {
-            return Collections.emptyList();
-        }
-
-        return null;
-    }
-
     protected void prepare() {
         Assert.isFalse(firstArgIsNull(), "第一个参数不能为空！");
     }
@@ -141,7 +130,7 @@ public abstract class AbstractMethodHandler {
         return pair;
     }
 
-    public void setJdbcTemplateProxy(JdbcOperations jdbcOperations) {
+    public void setJdbcOperations(JdbcOperations jdbcOperations) {
         this.jdbcOperations = jdbcOperations;
     }
 

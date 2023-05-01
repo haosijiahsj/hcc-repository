@@ -211,4 +211,12 @@ public interface BaseMapper<T, ID extends Serializable> {
      */
     IPage<T> selectPage(ICondition<T> condition, IPage<T> pageParam);
 
+    /**
+     * 分页查询map列表
+     * @param condition
+     * @param pageParam
+     * @return
+     */
+    IPage<Map<String, Object>> selectMapsPage(ICondition<T> condition, IPage<T> pageParam);
+
 }

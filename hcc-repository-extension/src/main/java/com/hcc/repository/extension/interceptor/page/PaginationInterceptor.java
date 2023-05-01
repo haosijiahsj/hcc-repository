@@ -24,7 +24,6 @@ public class PaginationInterceptor implements ExtInterceptor {
     private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
 
     private DbType dbType;
-    private boolean cacheTotal = false;
     private PaginationDialect paginationDialect;
 
     public PaginationInterceptor(DbType dbType) {
@@ -32,19 +31,8 @@ public class PaginationInterceptor implements ExtInterceptor {
         this.paginationDialect = dbType.getDialectHandler();
     }
 
-    public PaginationInterceptor(DbType dbType, boolean cacheTotal) {
-        this.dbType = dbType;
-        this.cacheTotal = cacheTotal;
-        this.paginationDialect = dbType.getDialectHandler();
-    }
-
     public PaginationInterceptor(PaginationDialect paginationDialect) {
         this.paginationDialect = paginationDialect;
-    }
-
-    public PaginationInterceptor(PaginationDialect paginationDialect, boolean cacheTotal) {
-        this.paginationDialect = paginationDialect;
-        this.cacheTotal = cacheTotal;
     }
 
     @Override
@@ -81,8 +69,12 @@ public class PaginationInterceptor implements ExtInterceptor {
 
         // 查询总数
         String countSql = paginationContext.getCountSql();
-        long total = Optional.ofNullable(jdbcOperations.queryForObject(countSql, context.getSqlParameters(), Long.class))
-                .orElse(0L);
+        // 分页参数如果传了totalRows，则不进行总数查询
+        long total = pageParam.getTotalRows();
+        if (total <= 0L) {
+            total = Optional.ofNullable(jdbcOperations.queryForObject(countSql, context.getSqlParameters(), Long.class))
+                    .orElse(0L);
+        }
 
         // 分页结果
         IPage<?> pageResult;
@@ -98,8 +90,9 @@ public class PaginationInterceptor implements ExtInterceptor {
         pageResult.setPageSize(pageParam.getPageSize());
         pageResult.setTotalRows(total);
         if (total == 0L) {
-            context.setAbortExecute(true);
             pageResult.setRecords(Collections.emptyList());
+            // 为0设置中断执行标记，后续不再执行返回ReturnValueSupplier获取的结果
+            context.setAbortExecute(true);
             context.setReturnValueSupplier(() -> pageResult);
             return;
         }

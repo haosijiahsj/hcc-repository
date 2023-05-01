@@ -11,6 +11,7 @@ import com.hcc.repository.core.handler.select.SelectIdsHandler;
 import com.hcc.repository.core.handler.select.SelectListByMapHandler;
 import com.hcc.repository.core.handler.select.SelectListHandler;
 import com.hcc.repository.core.handler.select.SelectMapsHandler;
+import com.hcc.repository.core.handler.select.SelectMapsPageHandler;
 import com.hcc.repository.core.handler.select.SelectPageHandler;
 import com.hcc.repository.core.handler.update.UpdateByIdHandler;
 import com.hcc.repository.core.handler.update.UpdateEntityHandler;
@@ -52,6 +53,7 @@ public enum MethodNameEnum {
     SELECT_ONE("selectOne", "查询单个", null),
     SELECT_LIST_BY_MAP("selectListByMap", "通过map查询", SelectListByMapHandler.class),
     SELECT_PAGE("selectPage", "分页查询", SelectPageHandler.class),
+    SELECT_MAPS_PAGE("selectMapsPage", "分页查询map列表", SelectMapsPageHandler.class),
 
     ;
 
@@ -65,7 +67,7 @@ public enum MethodNameEnum {
         DELETE_METHODS = Arrays.asList(DELETE, DELETE_BY_ID, DELETE_BY_IDS);
         UPDATE_METHODS = Arrays.asList(UPDATE, UPDATE_BY_ID);
         SELECT_METHODS = Arrays.asList(SELECT_BY_ID, SELECT_BY_IDS, SELECT_COUNT, SELECT_IDS, SELECT_LIST, SELECT_MAPS,
-                SELECT_ONE, SELECT_LIST_BY_MAP, SELECT_PAGE);
+                SELECT_ONE, SELECT_LIST_BY_MAP, SELECT_PAGE, SELECT_MAPS_PAGE);
     }
     private String methodName;
     private String desc;

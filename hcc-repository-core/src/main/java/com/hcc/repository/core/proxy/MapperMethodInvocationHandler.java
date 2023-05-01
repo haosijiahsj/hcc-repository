@@ -47,7 +47,7 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
 
         AbstractMethodHandler handler = MethodHandlerFactory.create(method);
         handler.setMethod(method);
-        handler.setJdbcTemplateProxy(jdbcOperations);
+        handler.setJdbcOperations(jdbcOperations);
         handler.setArgs(args);
         handler.setConfiguration(configuration);
 

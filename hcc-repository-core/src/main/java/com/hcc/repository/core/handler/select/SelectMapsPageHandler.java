@@ -6,14 +6,14 @@ package com.hcc.repository.core.handler.select;
  * @author hushengjun
  * @date 2023/3/26
  */
-public class SelectPageHandler extends AbstractSelectHandler {
+public class SelectMapsPageHandler extends AbstractSelectHandler {
 
     @Override
     protected void prepare() {}
 
     @Override
     protected Object executeSql(String sql, Object[] args) {
-        return jdbcOperations.queryForEntityList(sql, args, entityClass);
+        return jdbcOperations.queryForList(sql, args);
     }
 
 }

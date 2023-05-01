@@ -27,11 +27,11 @@ public class SqlExecuteContext {
      */
     private Object[] sqlParameters;
     /**
-     * 是否要中断执行
+     * 是否要中断执行，仅在beforeExecute方法生效，后续拦截器也不会执行
      */
     private boolean abortExecute = false;
     /**
-     * abortExecute=true时的默认返回值
+     * abortExecute=true时的返回值
      */
     private Supplier<Object> returnValueSupplier = () -> null;
 
