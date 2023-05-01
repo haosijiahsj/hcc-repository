@@ -1,7 +1,8 @@
 package com.hcc.repository.extension.interceptor.pagination;
 
-import com.hcc.repository.extension.interceptor.pagination.dialect.MysqlDialect;
 import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
+import com.hcc.repository.extension.interceptor.pagination.dialect.MysqlDialect;
+import com.hcc.repository.extension.interceptor.pagination.dialect.PostgreDialect;
 
 /**
  * DbType
@@ -11,7 +12,8 @@ import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
  */
 public enum DbType {
 
-    MYSQL(new MysqlDialect());
+    MYSQL(new MysqlDialect()),
+    POSTGRE_SQL(new PostgreDialect());
 
     private final IDialect dialectHandler;
 

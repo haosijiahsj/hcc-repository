@@ -33,11 +33,11 @@ public abstract class AbstractDialect implements IDialect {
     /**
      * 默认的生成分页sql参数
      * @param sqlParameters
-     * @param offset
-     * @param size
+     * @param first
+     * @param second
      * @return
      */
-    protected Object[] generatePageSqlParameter(Object[] sqlParameters, long offset, long size) {
+    protected Object[] generatePageSqlParameter(Object[] sqlParameters, long first, long second) {
         if (sqlParameters == null) {
             sqlParameters = new Object[] {};
         }
@@ -47,8 +47,8 @@ public abstract class AbstractDialect implements IDialect {
         if (sqlParameters.length > 0) {
             System.arraycopy(sqlParameters, 0, pageSqlParameters, 0, sqlParameters.length);
         }
-        pageSqlParameters[pageSqlParameters.length - 1] = size;
-        pageSqlParameters[pageSqlParameters.length - 2] = offset;
+        pageSqlParameters[pageSqlParameters.length - 2] = first;
+        pageSqlParameters[pageSqlParameters.length - 1] = second;
 
         return pageSqlParameters;
     }

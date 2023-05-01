@@ -21,7 +21,7 @@ public class PostgreDialect extends AbstractDialect {
 
         // 设置上下文中的参数
         context.setPageSql(context.getOriginalSql() + LIMIT + OFFSET);
-        context.setPageSqlParameters(this.generatePageSqlParameter(sqlParameters, pageParam.offset(), pageParam.getPageSize()));
+        context.setPageSqlParameters(this.generatePageSqlParameter(sqlParameters, pageParam.getPageSize(), pageParam.offset()));
     }
 
 }
