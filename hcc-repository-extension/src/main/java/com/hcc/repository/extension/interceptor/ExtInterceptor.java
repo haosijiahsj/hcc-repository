@@ -8,7 +8,7 @@ import com.hcc.repository.core.jdbc.JdbcOperations;
 import java.lang.reflect.Method;
 
 /**
- * ExtInterceptor
+ * 扩展的Interceptor
  *
  * @author hushengjun
  * @date 2023/4/9

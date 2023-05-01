@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.interceptor.page;
+package com.hcc.repository.extension.interceptor.pagination;
 
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
@@ -6,7 +6,7 @@ import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
-import com.hcc.repository.extension.interceptor.page.dialect.PaginationDialect;
+import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
 
 import java.lang.reflect.Method;
 import java.util.Collections;
@@ -24,15 +24,15 @@ public class PaginationInterceptor implements ExtInterceptor {
     private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
 
     private DbType dbType;
-    private PaginationDialect paginationDialect;
+    private IDialect iDialect;
 
     public PaginationInterceptor(DbType dbType) {
         this.dbType = dbType;
-        this.paginationDialect = dbType.getDialectHandler();
+        this.iDialect = dbType.getDialectHandler();
     }
 
-    public PaginationInterceptor(PaginationDialect paginationDialect) {
-        this.paginationDialect = paginationDialect;
+    public PaginationInterceptor(IDialect iDialect) {
+        this.iDialect = iDialect;
     }
 
     @Override
@@ -53,12 +53,12 @@ public class PaginationInterceptor implements ExtInterceptor {
         paginationContext.setOriginalSql(context.getSql());
         paginationContext.setOriginalSqlParameters(context.getSqlParameters());
 
-        if (paginationDialect == null) {
+        if (iDialect == null) {
             throw new IllegalArgumentException("没有方言处理器");
         }
 
         // 执行sql调整
-        paginationDialect.handler(paginationContext);
+        iDialect.handle(paginationContext);
 
         if (!IPage.class.isAssignableFrom(method.getReturnType())) {
             // 返回结果不是分页结果，无需执行count语句

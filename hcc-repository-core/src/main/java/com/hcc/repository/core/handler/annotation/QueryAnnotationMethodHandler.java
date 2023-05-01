@@ -12,7 +12,7 @@ import com.hcc.repository.core.utils.ArrayUtils;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
-import com.hcc.repository.core.utils.SqlParserUtils;
+import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import org.springframework.core.ResolvableType;
 
@@ -42,7 +42,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     @Override
     protected void prepare() {
         Assert.isTrue(StrUtils.isNotEmpty(queryAnnotation.value()), "sql不能为空");
-        SqlTypeEnum sqlType = SqlParserUtils.getSqlType(queryAnnotation.value());
+        SqlTypeEnum sqlType = JSqlParserUtils.getSqlType(queryAnnotation.value());
         Assert.isTrue(SqlTypeEnum.SELECT.equals(sqlType), "非select语句");
     }
 

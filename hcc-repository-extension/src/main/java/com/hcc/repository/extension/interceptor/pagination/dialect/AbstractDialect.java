@@ -1,57 +1,63 @@
-package com.hcc.repository.extension.interceptor.page.dialect;
+package com.hcc.repository.extension.interceptor.pagination.dialect;
 
-import com.hcc.repository.core.page.IPage;
-import com.hcc.repository.extension.interceptor.page.PaginationContext;
+import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * MysqlPageHandler
+ * 抽象方案处理器
  *
  * @author hushengjun
- * @date 2023/4/29
+ * @date 2023/5/1
  */
-public class MysqlPaginationDialect implements PaginationDialect {
-
-    private static final String LIMIT = " LIMIT ";
+public abstract class AbstractDialect implements IDialect {
 
     private static final Pattern SELECT_PATTERN = Pattern.compile("^\\s*SELECT\\s+DISTINCT\\s+(\\S+)\\s+FROM\\s+.+", Pattern.CASE_INSENSITIVE);
     private static final Pattern FROM_PATTERN = Pattern.compile("^.*\\s*(FROM)\\s+.+", Pattern.CASE_INSENSITIVE);
     private static final Pattern ORDER_BY_PATTERN = Pattern.compile("\\s+(ORDER\\s+BY)\\s+[^'\"]", Pattern.CASE_INSENSITIVE);
     private static final Pattern GROUP_BY_PATTERN = Pattern.compile("\\s+(GROUP\\s+BY)\\s+[^'\"]", Pattern.CASE_INSENSITIVE);
 
-
     @Override
-    public void handler(PaginationContext context) {
-        this.generateCountSql(context);
-        this.generatePageSql(context);
+    public void handle(PaginationContext context) {
+        this.handlePageSql(context);
+        this.handleCountSql(context);
     }
 
     /**
-     * 生成分页sql
+     * 分页语句
      * @param context
      */
-    public void generatePageSql(PaginationContext context) {
-        IPage<?> pageParam = context.getPageParam();
-        Object[] sqlParameters = context.getOriginalSqlParameters();
-        long offset = pageParam.offset();
+    abstract void handlePageSql(PaginationContext context);
 
-        String pageSql = context.getOriginalSql() + LIMIT + "?, ?";
-
+    /**
+     * 默认的生成分页sql参数
+     * @param sqlParameters
+     * @param offset
+     * @param size
+     * @return
+     */
+    protected Object[] generatePageSqlParameter(Object[] sqlParameters, long offset, long size) {
+        if (sqlParameters == null) {
+            sqlParameters = new Object[] {};
+        }
+        // 分页参数
         Object[] pageSqlParameters = new Object[sqlParameters.length + 2];
         // 原参数列表大于0才进行复制
         if (sqlParameters.length > 0) {
             System.arraycopy(sqlParameters, 0, pageSqlParameters, 0, sqlParameters.length);
         }
+        pageSqlParameters[pageSqlParameters.length - 1] = size;
         pageSqlParameters[pageSqlParameters.length - 2] = offset;
-        pageSqlParameters[pageSqlParameters.length - 1] = pageParam.getPageSize();
 
-        context.setPageSql(pageSql);
-        context.setPageSqlParameters(pageSqlParameters);
+        return pageSqlParameters;
     }
 
-    public void generateCountSql(PaginationContext context) {
+    /**
+     * count语句
+     * @param context
+     */
+    void handleCountSql(PaginationContext context) {
         String originalSql = context.getOriginalSql();
         // 拼接头部
         Matcher selectMatcher = SELECT_PATTERN.matcher(originalSql);
@@ -67,7 +73,7 @@ public class MysqlPaginationDialect implements PaginationDialect {
         int indexOfOrderBy = orderByMatcher.find() ? orderByMatcher.start(1) : -1;
         originalSql = indexOfOrderBy != -1 ? originalSql.substring(0, indexOfOrderBy) : originalSql;
 
-        // 若sql中含有GROUP BY，则还需要在外层包装一个COUNT(1)
+        // 若sql中含有GROUP BY，则还需要在外层包装一个COUNT(*)
         Matcher groupByMatcher = GROUP_BY_PATTERN.matcher(originalSql);
         originalSql = countSql + originalSql;
         if (groupByMatcher.find()) {

@@ -10,7 +10,7 @@ import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.SqlParseUtils;
-import com.hcc.repository.core.utils.SqlParserUtils;
+import com.hcc.repository.core.utils.JSqlParserUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -66,7 +66,7 @@ public abstract class AbstractMethodHandler {
         // sql执行上下文
         SqlExecuteContext context = new SqlExecuteContext();
         context.setSql(sqlToUse);
-        context.setSqlType(SqlParserUtils.getSqlType(context.getSql()));
+        context.setSqlType(JSqlParserUtils.getSqlType(context.getSql()));
         context.setSqlParameters(sqlParameters);
 
         // sql执行前拦截方法

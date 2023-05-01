@@ -6,7 +6,8 @@ import com.hcc.repository.core.jdbc.JdbcOperations;
 import java.lang.reflect.Method;
 
 /**
- * 拦截器
+ * 拦截器<br/>
+ * 仅能作用于mapper中的相关方法和sql
  *
  * @author hushengjun
  * @date 2023/3/3

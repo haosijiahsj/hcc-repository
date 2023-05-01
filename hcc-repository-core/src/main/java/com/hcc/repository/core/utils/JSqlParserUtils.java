@@ -15,7 +15,7 @@ import net.sf.jsqlparser.statement.update.Update;
  * @author hushengjun
  * @date 2023/5/1
  */
-public class SqlParserUtils {
+public class JSqlParserUtils {
 
     public static SqlTypeEnum getSqlType(String sql) {
         Statement statement;

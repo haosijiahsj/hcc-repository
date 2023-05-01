@@ -4,7 +4,7 @@ import com.hcc.repository.core.annotation.Modifying;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.constants.SqlTypeEnum;
 import com.hcc.repository.core.utils.Assert;
-import com.hcc.repository.core.utils.SqlParserUtils;
+import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.StrUtils;
 
 /**
@@ -25,7 +25,7 @@ public class ModifyingAnnotationMethodHandler extends QueryAnnotationMethodHandl
     @Override
     protected void prepare() {
         Assert.isTrue(StrUtils.isNotEmpty(queryAnnotation.value()), "sql不能为空");
-        SqlTypeEnum sqlType = SqlParserUtils.getSqlType(queryAnnotation.value());
+        SqlTypeEnum sqlType = JSqlParserUtils.getSqlType(queryAnnotation.value());
         Assert.isTrue(!SqlTypeEnum.SELECT.equals(sqlType), "非insert、update、delete语句");
     }
 
