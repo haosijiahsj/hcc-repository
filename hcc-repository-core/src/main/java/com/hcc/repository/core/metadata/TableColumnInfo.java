@@ -37,6 +37,9 @@ public class TableColumnInfo {
     private String logicNotDelVal;
     private LogicDelValueType logicDelValueType;
 
+    // 乐观锁
+    private boolean version = false;
+
     // 填充策略
     private Class<? extends AutoFillStrategy> insertStrategy = Constants.UnknownFillStrategy.class;
     private Class<? extends AutoFillStrategy> updateStrategy = Constants.UnknownFillStrategy.class;

@@ -13,7 +13,7 @@ public interface AutoFillStrategy {
      * @return
      */
     default boolean autoFill(AutoFillContext context) {
-        return false;
+        return true;
     }
 
     /**

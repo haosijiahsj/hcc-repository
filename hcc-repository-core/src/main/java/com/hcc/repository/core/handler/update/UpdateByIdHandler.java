@@ -19,6 +19,7 @@ public class UpdateByIdHandler extends UpdateEntityHandler {
 
     @Override
     protected void prepare() {
+        Assert.isFalse(firstArgIsNull(), "实体不能为空");
         Assert.isTrue(TableInfoHelper.hasIdColumn(entityClass),
                 String.format("表：%s，没有定义id字段", TableInfoHelper.getTableName(entityClass)));
     }
@@ -27,8 +28,8 @@ public class UpdateByIdHandler extends UpdateEntityHandler {
     protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
-        // 使用对象拼接update sql
-        List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
+        // 使用对象拼接update sql, 主键、乐观锁字段不set条件
+        List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfos(entityClass, c -> !c.isPrimaryKey() && !c.isVersion());
 
         // set语句
         columnInfos.forEach(c -> condition.set(c.getColumnName(), super.processTargetValue(firstArg, c)));

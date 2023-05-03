@@ -5,6 +5,7 @@ import com.hcc.repository.extension.interceptor.dynamictablename.DynamicTableNam
 import com.hcc.repository.extension.interceptor.logicdelete.LogicDeleteInterceptor;
 import com.hcc.repository.extension.interceptor.pagination.DbType;
 import com.hcc.repository.extension.interceptor.pagination.PaginationInterceptor;
+import com.hcc.repository.extension.interceptor.optimisticlock.OptimisticLockInterceptor;
 import com.hcc.repository.starter.autoconfigure.RepositoryInterceptor;
 import com.hcc.repository.test.dao.interceptor.TestInterceptor;
 import org.springframework.context.annotation.Bean;
@@ -25,6 +26,7 @@ public class HccRepositoryConfig {
         RepositoryInterceptor interceptor = new RepositoryInterceptor();
         interceptor.addInterceptor(new TestInterceptor());
         interceptor.addInterceptor(new LogicDeleteInterceptor());
+        interceptor.addInterceptor(new OptimisticLockInterceptor());
         interceptor.addInterceptor(new DynamicTableNameInterceptor(((originalTableName, curSql) -> originalTableName)));
 //        interceptor.addInterceptor(new LogInterceptor());
         interceptor.addInterceptor(new PaginationInterceptor(DbType.MYSQL));

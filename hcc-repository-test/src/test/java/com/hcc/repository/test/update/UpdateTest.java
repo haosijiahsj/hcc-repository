@@ -17,4 +17,17 @@ public class UpdateTest extends BaseTest {
         productService.lambdaUpdate().set(ProductPo::getName, "hsj").update();
     }
 
+    @Test
+    public void updateEntity() {
+        ProductPo productPo = productService.getById(1L);
+        productService.lambdaUpdate().set(ProductPo::getName, "hsj").eq(ProductPo::getId, 1L).update(productPo);
+    }
+
+    @Test
+    public void updateVersion() {
+        ProductPo productPo = productService.getById(1L);
+        productPo.setName("hcc_1");
+        productService.updateById(productPo);
+    }
+
 }

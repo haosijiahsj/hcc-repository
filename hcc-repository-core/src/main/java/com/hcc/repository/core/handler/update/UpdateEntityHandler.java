@@ -34,13 +34,16 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         ICondition<?> originalCondition = (ICondition<?>) args[1];
 
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
-        List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
+        // 主键、乐观锁字段不set条件
+        List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfos(entityClass, c -> !c.isPrimaryKey() && !c.isVersion());
         // set语句
         columnInfos.forEach(c -> condition.set(c.getColumnName(), processTargetValue(entity, c)));
         if (originalCondition instanceof AbstractCondition) {
             // 直接赋值segmentContainer
-            SegmentContainer segmentContainer = ((AbstractCondition<?, ?, ?>) originalCondition).getSegmentContainer();
+            AbstractCondition<?, ?, ?> abstractCondition = (AbstractCondition<?, ?, ?>) originalCondition;
+            SegmentContainer segmentContainer = (abstractCondition).getSegmentContainer();
             condition.setSegmentContainer(segmentContainer);
+            condition.getColumnValuePairs().putAll(abstractCondition.getColumnValuePairs());
         }
 
         return condition;

@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 抽象方案处理器
+ * 抽象分页处理器
  *
  * @author hushengjun
  * @date 2023/5/1
@@ -57,7 +57,7 @@ public abstract class AbstractDialect implements IDialect {
      * count语句
      * @param context
      */
-    void handleCountSql(PaginationContext context) {
+    protected void handleCountSql(PaginationContext context) {
         String originalSql = context.getOriginalSql();
         // 拼接头部
         Matcher selectMatcher = SELECT_PATTERN.matcher(originalSql);
@@ -77,7 +77,7 @@ public abstract class AbstractDialect implements IDialect {
         Matcher groupByMatcher = GROUP_BY_PATTERN.matcher(originalSql);
         originalSql = countSql + originalSql;
         if (groupByMatcher.find()) {
-            originalSql = "SELECT COUNT(*) FROM (" + originalSql + ") AS tmp";
+            originalSql = "SELECT COUNT(*) FROM (" + originalSql + ") AS t";
         }
 
         context.setCountSql(originalSql);

@@ -22,6 +22,7 @@ public class InsertTest extends BaseTest {
     public void insertTest() {
         for (int i = 0; i < 10; i++) {
             ProductPo productPo = JMockData.mock(ProductPo.class);
+            productPo.setCreateTime(null);
             productService.save(productPo);
             System.out.println("插入的id: " + productPo.getId());
         }

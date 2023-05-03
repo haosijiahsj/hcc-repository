@@ -4,6 +4,7 @@ import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.IdType;
 import com.hcc.repository.annotation.PropSetListener;
 import com.hcc.repository.annotation.Table;
+import com.hcc.repository.annotation.Version;
 import com.hcc.repository.extension.generator.id.SnowFlakeIdGenerator;
 import com.hcc.repository.test.domain.enums.ProductStatusEnum;
 import lombok.Data;
@@ -29,6 +30,8 @@ public class ProductPo extends BasePo {
     private String name;
     private BigDecimal price;
     private ProductStatusEnum productStatus;
+    @Version
+    private Integer version;
 
     public static class TestPropSetListener implements PropSetListener {
         @Override

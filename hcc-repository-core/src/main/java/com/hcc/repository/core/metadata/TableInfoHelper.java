@@ -4,6 +4,7 @@ import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.LogicDelete;
 import com.hcc.repository.annotation.Table;
+import com.hcc.repository.annotation.Version;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
@@ -18,6 +19,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -98,6 +100,7 @@ public class TableInfoHelper {
             }
             Column columnAnnotation = field.getAnnotation(Column.class);
             LogicDelete logicDeleteAnnotation = field.getAnnotation(LogicDelete.class);
+            Version versionAnnotation = field.getAnnotation(Version.class);
             if (columnAnnotation != null) {
                 if (columnAnnotation.ignore()) {
                     continue;
@@ -116,6 +119,9 @@ public class TableInfoHelper {
                 tableColumnInfo.setLogicDelVal(logicDeleteAnnotation.delValue());
                 tableColumnInfo.setLogicDelValueType(logicDeleteAnnotation.logicDelValueType());
                 tableInfo.setHasLogicDeleteColumn(true);
+            }
+            if (versionAnnotation != null) {
+                tableColumnInfo.setVersion(true);
             }
 
             tableColumnInfos.add(tableColumnInfo);
@@ -180,6 +186,21 @@ public class TableInfoHelper {
     }
 
     /**
+     * 获取乐观锁列
+     * @param clazz
+     * @return
+     */
+    public static TableColumnInfo getVersionColumnInfo(Class<?> clazz) {
+        for (TableColumnInfo columnInfo : getTableInfo(clazz).getColumnInfos()) {
+            if (columnInfo.isVersion()) {
+                return columnInfo;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * 获取表名
      * @param clazz
      * @return
@@ -217,6 +238,16 @@ public class TableInfoHelper {
      */
     public static List<TableColumnInfo> getColumnInfosWithOutIdColumn(Class<?> clazz) {
         return getTableInfo(clazz).getColumnInfos().stream().filter(c -> !c.isPrimaryKey()).collect(Collectors.toList());
+    }
+
+    /**
+     * 自行过滤
+     * @param clazz
+     * @param predicate
+     * @return
+     */
+    public static List<TableColumnInfo> getColumnInfos(Class<?> clazz, Predicate<TableColumnInfo> predicate) {
+        return getTableInfo(clazz).getColumnInfos().stream().filter(predicate).collect(Collectors.toList());
     }
 
     /**

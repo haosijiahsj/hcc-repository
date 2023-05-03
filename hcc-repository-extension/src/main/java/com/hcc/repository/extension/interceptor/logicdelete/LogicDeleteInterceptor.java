@@ -8,7 +8,6 @@ import com.hcc.repository.core.conditions.update.AbstractUpdateCondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.constants.SqlTypeEnum;
-import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -17,7 +16,9 @@ import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Predicate;
 
@@ -30,6 +31,22 @@ import java.util.function.Predicate;
  */
 @Slf4j
 public class LogicDeleteInterceptor implements ExtInterceptor {
+
+    private static final String logicDeleteColumnName = "HCC_LOGIC_DELETE_COLUMN";
+    private static final Set<String> trueValues = new HashSet<>(4);
+    private static final Set<String> falseValues = new HashSet<>(4);
+
+    static {
+        trueValues.add("true");
+        trueValues.add("on");
+        trueValues.add("yes");
+        trueValues.add("1");
+
+        falseValues.add("false");
+        falseValues.add("off");
+        falseValues.add("no");
+        falseValues.add("0");
+    }
 
     private final Predicate<TableInfo> predicate;
 
@@ -62,22 +79,12 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         Assert.isNotNull(logicDelColumnInfo, "未获取到logic delete列信息");
 
         String columnName = logicDelColumnInfo.getColumnName();
-        String logicDelVal = logicDelColumnInfo.getLogicDelVal();
-        String logicNotDelVal = logicDelColumnInfo.getLogicNotDelVal();
+        Object logicDelVal = this.getLogicDelVal(logicDelColumnInfo);
+        Object logicNotDelVal = this.getLogicNotDelVal(logicDelColumnInfo);
 
-        // 这里是处理逻辑删除字段作为唯一索引情况
-        if (LogicDelValueType.TIMESTAMP.equals(logicDelColumnInfo.getLogicDelValueType())) {
-            logicDelVal = String.valueOf(System.nanoTime());
-        } else if (LogicDelValueType.UUID.equals(logicDelColumnInfo.getLogicDelValueType())) {
-            logicDelVal = UUID.randomUUID().toString().replaceAll("-", "");
-        }
-
-        String formatField = "%s";
-        if (String.class.equals(logicDelColumnInfo.getField().getType())) {
-            // 字符串类型加上单引号
-            formatField = "'%s'";
-        }
-        String whereSqlSegment = String.format("AND %s = " + formatField, columnName, logicNotDelVal);
+        String notDelColumnName = logicDeleteColumnName + "_NOT_DEL";
+        String delColumnName = logicDeleteColumnName + "_DEL";
+        String whereSqlSegment = String.format("AND %s = %s", columnName, ":" + notDelColumnName);
         // 通过condition判断并加入逻辑删除条件
         MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
         if (methodNameEnum == null) {
@@ -94,21 +101,78 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
                 insertCondition.getColumnValuePairs().put(columnName, logicNotDelVal);
             }
         } else if (SqlTypeEnum.DELETE.equals(sqlType)) {
-            // 改写为更新语句
             condition.setExecuteSqlType(ExecuteSqlTypeEnum.UPDATE);
             if (condition instanceof AbstractUpdateCondition) {
-                ((AbstractUpdateCondition<?, ?, ?>) condition).setSql(String.format("%s = " + formatField, columnName, logicDelVal));
-                ((AbstractUpdateCondition<?, ?, ?>) condition).apply(whereSqlSegment);
+                AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
+                abstractUpdateCondition.setSql(String.format("%s = %s", columnName, ":" + delColumnName));
+                abstractUpdateCondition.getColumnValuePairs().put(delColumnName, logicDelVal);
+
+                abstractUpdateCondition.apply(whereSqlSegment);
+                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         } else if (SqlTypeEnum.UPDATE.equals(sqlType)) {
             if (condition instanceof AbstractUpdateCondition) {
-                ((AbstractUpdateCondition<?, ?, ?>) condition).apply(whereSqlSegment);
+                AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
+                abstractUpdateCondition.apply(whereSqlSegment);
+                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         } else {
             if (condition instanceof AbstractQueryCondition) {
-                ((AbstractQueryCondition<?, ?, ?>) condition).apply(whereSqlSegment);
+                AbstractQueryCondition<?, ?, ?> abstractQueryCondition = (AbstractQueryCondition<?, ?, ?>) condition;
+                abstractQueryCondition.apply(whereSqlSegment);
+                abstractQueryCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         }
+    }
+
+    /**
+     * 获取逻辑删除值
+     * @param logicDelColumnInfo
+     * @return
+     */
+    private Object getLogicDelVal(TableColumnInfo logicDelColumnInfo) {
+        String logicDelVal = logicDelColumnInfo.getLogicDelVal();
+        if (LogicDelValueType.ASSIGNED.equals(logicDelColumnInfo.getLogicDelValueType())) {
+            Class<?> fieldType = logicDelColumnInfo.getField().getType();
+            return this.convertValue(logicDelVal, fieldType);
+        }
+
+        // 这里是处理逻辑删除字段作为唯一索引情况
+        if (LogicDelValueType.TIMESTAMP.equals(logicDelColumnInfo.getLogicDelValueType())) {
+            logicDelVal = String.valueOf(System.nanoTime());
+        } else if (LogicDelValueType.UUID.equals(logicDelColumnInfo.getLogicDelValueType())) {
+            logicDelVal = UUID.randomUUID().toString().replaceAll("-", "");
+        }
+
+        return logicDelVal;
+    }
+
+    /**
+     * 获取逻辑未删除值
+     * @param logicDelColumnInfo
+     * @return
+     */
+    private Object getLogicNotDelVal(TableColumnInfo logicDelColumnInfo) {
+        String logicNotDelVal = logicDelColumnInfo.getLogicNotDelVal();
+        Class<?> fieldType = logicDelColumnInfo.getField().getType();
+        return this.convertValue(logicNotDelVal, fieldType);
+    }
+
+    private Object convertValue(String val, Class<?> fieldType) {
+        if (Integer.class.equals(fieldType) || int.class.equals(fieldType)) {
+            return Integer.valueOf(val);
+        } else if (Byte.class.equals(fieldType) || byte.class.equals(fieldType)) {
+            return Byte.valueOf(val);
+        } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
+            if (trueValues.contains(val)) {
+                return Boolean.TRUE;
+            }
+            else if (falseValues.contains(val)) {
+                return Boolean.FALSE;
+            }
+        }
+
+        return val;
     }
 
 }
