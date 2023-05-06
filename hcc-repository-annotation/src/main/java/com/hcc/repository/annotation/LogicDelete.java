@@ -34,6 +34,6 @@ public @interface LogicDelete {
      * 删除的值类型，解决唯一索引的问题
      * @return
      */
-    LogicDelValueType logicDelValueType() default LogicDelValueType.ASSIGNED;
+    LogicDelValueType logicDelValueType() default LogicDelValueType.SPECIFY;
 
 }

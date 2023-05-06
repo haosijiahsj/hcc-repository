@@ -11,7 +11,7 @@ public enum LogicDelValueType {
     /**
      * 指定值
      */
-    ASSIGNED,
+    SPECIFY,
     /**
      * 时间戳
      */

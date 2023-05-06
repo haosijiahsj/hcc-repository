@@ -132,7 +132,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
      */
     private Object getLogicDelVal(TableColumnInfo logicDelColumnInfo) {
         String logicDelVal = logicDelColumnInfo.getLogicDelVal();
-        if (LogicDelValueType.ASSIGNED.equals(logicDelColumnInfo.getLogicDelValueType())) {
+        if (LogicDelValueType.SPECIFY.equals(logicDelColumnInfo.getLogicDelValueType())) {
             Class<?> fieldType = logicDelColumnInfo.getField().getType();
             return this.convertValue(logicDelVal, fieldType);
         }
