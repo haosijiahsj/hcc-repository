@@ -45,4 +45,8 @@ public class SqlParseUtils {
         return Pair.of(sqlToUse, argsList.toArray());
     }
 
+    public static Pair<String, Object[]> parsePlaceholderSql(String namedSql, Map<String, Object> paramMap) {
+        return null;
+    }
+
 }

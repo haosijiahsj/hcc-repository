@@ -10,6 +10,7 @@ import com.hcc.repository.core.utils.ReflectUtils;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -32,11 +33,9 @@ public class MethodHandlerFactory {
         // 判断注解
         Query queryAnnotation = method.getAnnotation(Query.class);
         if (queryAnnotation != null) {
-            AbstractMethodHandler methodHandler = null;
+            AbstractMethodHandler methodHandler = new QueryAnnotationMethodHandler(queryAnnotation);
             Modifying modifyingAnnotation = method.getAnnotation(Modifying.class);
-            if (modifyingAnnotation == null) {
-                methodHandler = new QueryAnnotationMethodHandler(queryAnnotation);
-            } else {
+            if (modifyingAnnotation != null) {
                 methodHandler = new ModifyingAnnotationMethodHandler(queryAnnotation, modifyingAnnotation);
             }
             return methodHandler;
