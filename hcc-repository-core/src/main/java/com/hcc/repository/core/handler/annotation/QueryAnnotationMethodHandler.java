@@ -1,29 +1,42 @@
 package com.hcc.repository.core.handler.annotation;
 
+import com.hcc.repository.core.annotation.Condition;
+import com.hcc.repository.core.annotation.Conditions;
 import com.hcc.repository.core.annotation.Param;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
+import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.SqlTypeEnum;
+import com.hcc.repository.core.constants.StrPool;
+import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.ArrayUtils;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.ExpressionParseUtils;
+import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.JSqlParserUtils;
+import com.hcc.repository.core.utils.SqlParseUtils;
 import com.hcc.repository.core.utils.StrUtils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ResolvableType;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 查询注解处理器
@@ -31,6 +44,7 @@ import java.util.Set;
  * @author hushengjun
  * @date 2023/4/28
  */
+@Slf4j
 public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
 
     protected final Query queryAnnotation;
@@ -54,12 +68,24 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 existCondition = (ICondition<?>) arg;
             }
         }
+        Conditions conditions = method.getAnnotation(Conditions.class);
+        if (conditions != null && existCondition != null) {
+            throw new RepositoryException("@Conditions注解存在，不能再使用ICondition参数");
+        }
+
+        Map<String, Object> paramMap = this.collectParam();
+
         String sql = queryAnnotation.value();
+        String expressionSql = this.processCondition(sql, paramMap);
+
+        // 解析表达式sql
+        Pair<String, Object[]> pair = SqlParseUtils.parseExpressionSql(expressionSql, paramMap);
+
         OriginalSqlCondition<?> condition = new OriginalSqlCondition<>();
-        condition.sql(sql);
+        condition.sql(pair.getLeft());
+        condition.addArg(pair.getRight());
 
         // 设置sql参数
-        this.setConditionParam(condition);
         if (existCondition != null) {
             // 需要拼接用户sql
             String sqlAfterWhere = existCondition.getSqlAfterWhere();
@@ -73,12 +99,12 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     }
 
     /**
-     * 设置condition参数
-     * @param condition
+     * 收集参数到Map中
+     * @return
      */
-    private void setConditionParam(OriginalSqlCondition<?> condition) {
+    private Map<String, Object> collectParam() {
         if (ArrayUtils.isEmpty(args)) {
-            return;
+            return Collections.emptyMap();
         }
         // 参数上的注解
         Annotation[][] methodParaAnnotations = method.getParameterAnnotations();
@@ -91,33 +117,81 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
             Annotation[] argAnnotations = methodParaAnnotations[i];
             for (Annotation argAnnotation : argAnnotations) {
                 if (Param.class.equals(argAnnotation.annotationType())) {
-                    if (args[i] instanceof Map) {
-                        paramMap.putAll((Map<String, ?>) args[i]);
-                    } else {
-                        String parameterName = ((Param) argAnnotation).value();
-                        if (StrUtils.isEmpty(parameterName)) {
-                            throw new IllegalArgumentException(String.format("方法：%s，参数列表第%s个参数@Param注解在非Map类型的情况下需要指定value",
-                                    method.getDeclaringClass().getName() + "." + method.getName(), i + 1));
-                        }
-                        paramMap.put(parameterName, args[i]);
+                    String paramName = ((Param) argAnnotation).value();
+                    if (StrUtils.isEmpty(paramName)) {
+                        throw new IllegalArgumentException(String.format("方法：%s，参数列表第%s个参数@Param注解在需要指定value",
+                                method.getDeclaringClass().getName() + "." + method.getName(), i + 1));
                     }
+                    paramMap.put(paramName, args[i]);
                 }
             }
         }
 
-        // 具名方式
-        if (CollUtils.isNotEmpty(paramMap)) {
-            condition.putParamMap(paramMap);
-            return;
-        }
+        return paramMap;
+    }
 
-        // 普通方式，需要排除ICondition和IPage类型，这两个无法直接作为sql参数
-        for (Object arg : args) {
-            if (arg instanceof ICondition || arg instanceof IPage) {
+    /**
+     * 处理condition注解
+     * @param mainSql
+     * @param paramMap
+     * @return
+     */
+    private String processCondition(String mainSql, Map<String, Object> paramMap) {
+        Conditions conditions = method.getAnnotation(Conditions.class);
+        if (conditions == null || ArrayUtils.isEmpty(conditions.value())) {
+            return mainSql;
+        }
+        List<String> conditionSegments = new ArrayList<>();
+        for (Condition c : conditions.value()) {
+            if (StrUtils.isEmpty(c.value())) {
                 continue;
             }
-            condition.addArg(arg);
+            if (StrUtils.isEmpty(c.exp())) {
+                conditionSegments.add(c.value());
+                continue;
+            }
+            boolean parseResult = ExpressionParseUtils.assertExpression(c.exp(), paramMap);
+            if (parseResult) {
+                if (log.isDebugEnabled()) {
+                    log.debug("表达式：{} 解析为true", c.exp());
+                }
+                conditionSegments.add(c.value());
+            } else {
+                if (log.isDebugEnabled()) {
+                    log.debug("表达式：{} 解析为false", c.exp());
+                }
+            }
         }
+        if (CollUtils.isEmpty(conditionSegments)) {
+            return mainSql;
+        }
+
+        String first = conditionSegments.get(0).toUpperCase();
+
+        // 主sql含有where，直接拼接
+        if (mainSql.toUpperCase().contains(SqlKeywordEnum.WHERE.getKeyword())) {
+            return mainSql.trim()
+                    + StrPool.SPACE
+                    + String.join(StrPool.SPACE, conditionSegments);
+        }
+
+        // 自动生成where的，去掉第一条件的and或or
+        if (first.startsWith(SqlKeywordEnum.AND.getKeyword())
+                || first.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+            // 第一sql含and 或 or，去掉第一个and或or
+            String tempFirst = conditionSegments.get(0).replace(SqlKeywordEnum.AND.getKeyword(), "");
+            tempFirst = tempFirst.replace(SqlKeywordEnum.AND.getKeyword().toLowerCase(), "");
+            tempFirst = tempFirst.replace(SqlKeywordEnum.OR.getKeyword(), "");
+            tempFirst = tempFirst.replace(SqlKeywordEnum.OR.getKeyword().toLowerCase(), "");
+            conditionSegments.remove(0);
+            conditionSegments.add(0, tempFirst.trim());
+        }
+
+        return mainSql.trim()
+                + StrPool.SPACE
+                + SqlKeywordEnum.WHERE.getKeyword()
+                + StrPool.SPACE
+                + String.join(StrPool.SPACE, conditionSegments);
     }
 
     @Override

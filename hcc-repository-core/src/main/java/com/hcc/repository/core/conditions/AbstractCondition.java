@@ -110,7 +110,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     protected String getNamedColumnName(String originalColumnName) {
-        return originalColumnName + "#HCC_REPO_NAMED_POS_" + pos.incrementAndGet();
+        return originalColumnName + "_HCC_REPO_NAMED_POS_" + pos.incrementAndGet();
     }
 
     /**
@@ -127,7 +127,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String namedColumnName = this.getNamedColumnName(columnName);
 
             this.putColumnValue(namedColumnName, val);
-            String sqlSegment = String.format("%s %s %s", columnName, sqkKeyWord.getKeyword(), StrPool.COLON + namedColumnName);
+            String sqlSegment = String.format("%s %s %s", columnName, sqkKeyWord.getKeyword(), StrPool.getPlaceholder(namedColumnName));
             segmentContainer.addAndSegment(sqlSegment);
         }
 
@@ -168,14 +168,14 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         if (condition) {
             String columnName = this.getColumnName(column);
             String namedColumnName = this.getNamedColumnName(columnName);
-            String leftColumnName = namedColumnName + "#Left";
-            String rightColumnName = namedColumnName + "#Right";
+            String leftColumnName = namedColumnName + "_Left";
+            String rightColumnName = namedColumnName + "_Right";
             this.putColumnValue(leftColumnName, leftVal)
                     .putColumnValue(rightColumnName, rightVal);
             SqlKeywordEnum sqlKeyword = isBetween ? SqlKeywordEnum.BETWEEN : SqlKeywordEnum.NOT_BETWEEN;
             String sqlSegment = String.format("%s %s %s %s %s",
-                    columnName, sqlKeyword.getKeyword(), StrPool.COLON + leftColumnName,
-                    SqlKeywordEnum.AND.getKeyword(), StrPool.COLON + rightColumnName);
+                    columnName, sqlKeyword.getKeyword(), StrPool.getPlaceholder(leftColumnName),
+                    SqlKeywordEnum.AND.getKeyword(), StrPool.getPlaceholder(rightColumnName));
             segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
@@ -198,7 +198,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             this.putColumnValue(namedColumnName, sqlLikeEnum.getLikeVal(val));
             String sqlSegment = String.format("%s %s %s", columnName,
                     isLike ? SqlKeywordEnum.LIKE.getKeyword() : SqlKeywordEnum.NOT_LIKE.getKeyword(),
-                    StrPool.COLON + namedColumnName);
+                    StrPool.getPlaceholder(namedColumnName));
             segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;
@@ -250,7 +250,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String namedColumnName = this.getNamedColumnName(columnName);
             this.putColumnValue(namedColumnName, coll);
             String sqlSegment = String.format("%s %s %s", columnName,
-                    isIn ? SqlKeywordEnum.IN.getKeyword() : SqlKeywordEnum.NOT_IN.getKeyword(), StrPool.L_BRACKET + StrPool.COLON + namedColumnName + StrPool.R_BRACKET);
+                    isIn ? SqlKeywordEnum.IN.getKeyword() : SqlKeywordEnum.NOT_IN.getKeyword(), StrPool.L_BRACKET + StrPool.getPlaceholder(namedColumnName) + StrPool.R_BRACKET);
             segmentContainer.addAndSegment(sqlSegment);
         }
         return typeThis;

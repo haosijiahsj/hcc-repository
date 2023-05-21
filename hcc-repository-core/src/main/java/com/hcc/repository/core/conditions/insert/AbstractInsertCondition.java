@@ -89,7 +89,7 @@ public abstract class AbstractInsertCondition<T, R, C extends AbstractInsertCond
     public String getExecuteSql() {
         String columnField = StrPool.L_BRACKET + String.join(StrPool.COMMA_SPACE, sqlColumns) + StrPool.R_BRACKET;
         String namedField = StrPool.L_BRACKET
-                + sqlColumns.stream().map(c -> StrPool.COLON + c).collect(Collectors.joining(StrPool.COMMA_SPACE))
+                + sqlColumns.stream().map(StrPool::getPlaceholder).collect(Collectors.joining(StrPool.COMMA_SPACE))
                 + StrPool.R_BRACKET;
 
         return String.join(StrPool.SPACE,

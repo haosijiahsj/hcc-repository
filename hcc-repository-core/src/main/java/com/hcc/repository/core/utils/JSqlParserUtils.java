@@ -17,12 +17,12 @@ import net.sf.jsqlparser.statement.update.Update;
  */
 public class JSqlParserUtils {
 
-    public static SqlTypeEnum getSqlType(String sql) {
+    public static SqlTypeEnum getSqlType1(String sql) {
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(sql);
         } catch (JSQLParserException e) {
-            throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
+            throw new IllegalArgumentException(String.format("sql: %s解析失败", sql), e);
         }
         if (statement instanceof Insert) {
             return SqlTypeEnum.INSERT;
@@ -34,6 +34,19 @@ public class JSqlParserUtils {
             return SqlTypeEnum.SELECT;
         }
 
+        throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
+    }
+
+    public static SqlTypeEnum getSqlType(String sql) {
+        if (sql.toUpperCase().startsWith(SqlTypeEnum.INSERT.name())) {
+            return SqlTypeEnum.INSERT;
+        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.DELETE.name())) {
+            return SqlTypeEnum.DELETE;
+        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.UPDATE.name())) {
+            return SqlTypeEnum.UPDATE;
+        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.SELECT.name())) {
+            return SqlTypeEnum.SELECT;
+        }
         throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
     }
 

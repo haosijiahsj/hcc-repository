@@ -41,7 +41,7 @@ public abstract class AbstractUpdateCondition<T, R, C extends AbstractCondition<
         if (condition) {
             String columnName = this.getColumnName(column);
             String namedColumnName = this.getNamedColumnName(columnName);
-            sqlSets.add(String.format("%s = %s", columnName, ":" + namedColumnName));
+            sqlSets.add(String.format("%s = %s", columnName, StrPool.getPlaceholder(namedColumnName)));
             super.putColumnValue(namedColumnName, val);
         }
 

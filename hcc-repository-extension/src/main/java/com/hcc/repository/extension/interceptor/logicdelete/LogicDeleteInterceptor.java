@@ -8,6 +8,7 @@ import com.hcc.repository.core.conditions.update.AbstractUpdateCondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.constants.SqlTypeEnum;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -82,9 +83,10 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         Object logicDelVal = this.getLogicDelVal(logicDelColumnInfo);
         Object logicNotDelVal = this.getLogicNotDelVal(logicDelColumnInfo);
 
-        String notDelColumnName = logicDeleteColumnName + "_NOT_DEL";
-        String delColumnName = logicDeleteColumnName + "_DEL";
-        String whereSqlSegment = String.format("AND %s = %s", columnName, ":" + notDelColumnName);
+//        String notDelColumnName = logicDeleteColumnName + "_NOT_DEL";
+//        String delColumnName = logicDeleteColumnName + "_DEL";
+        String whereSqlSegment = String.format("AND %s = %s", columnName,
+                logicNotDelVal instanceof String ? String.format("'%s'", logicNotDelVal) : logicNotDelVal);
         // 通过condition判断并加入逻辑删除条件
         MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
         if (methodNameEnum == null) {
@@ -104,23 +106,27 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
             condition.setExecuteSqlType(ExecuteSqlTypeEnum.UPDATE);
             if (condition instanceof AbstractUpdateCondition) {
                 AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
-                abstractUpdateCondition.setSql(String.format("%s = %s", columnName, ":" + delColumnName));
-                abstractUpdateCondition.getColumnValuePairs().put(delColumnName, logicDelVal);
+                if (logicDelVal instanceof String) {
+                    logicDelVal = String.format("'%s'", logicDelVal);
+                }
+                abstractUpdateCondition.setSql(String.format("%s = %s", columnName, logicDelVal));
+//                abstractUpdateCondition.setSql(String.format("%s = %s", columnName, StrPool.getPlaceholder(delColumnName)));
+//                abstractUpdateCondition.getColumnValuePairs().put(delColumnName, logicDelVal);
 
                 abstractUpdateCondition.apply(whereSqlSegment);
-                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
+//                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         } else if (SqlTypeEnum.UPDATE.equals(sqlType)) {
             if (condition instanceof AbstractUpdateCondition) {
                 AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
                 abstractUpdateCondition.apply(whereSqlSegment);
-                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
+//                abstractUpdateCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         } else {
             if (condition instanceof AbstractQueryCondition) {
                 AbstractQueryCondition<?, ?, ?> abstractQueryCondition = (AbstractQueryCondition<?, ?, ?>) condition;
                 abstractQueryCondition.apply(whereSqlSegment);
-                abstractQueryCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
+//                abstractQueryCondition.getColumnValuePairs().put(notDelColumnName, logicNotDelVal);
             }
         }
     }
@@ -134,6 +140,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         String logicDelVal = logicDelColumnInfo.getLogicDelVal();
         if (LogicDelValueType.SPECIFY.equals(logicDelColumnInfo.getLogicDelValueType())) {
             Class<?> fieldType = logicDelColumnInfo.getField().getType();
+
             return this.convertValue(logicDelVal, fieldType);
         }
 
@@ -141,7 +148,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         if (LogicDelValueType.TIMESTAMP.equals(logicDelColumnInfo.getLogicDelValueType())) {
             logicDelVal = String.valueOf(System.nanoTime());
         } else if (LogicDelValueType.UUID.equals(logicDelColumnInfo.getLogicDelValueType())) {
-            logicDelVal = UUID.randomUUID().toString().replaceAll("-", "");
+            logicDelVal = UUID.randomUUID().toString().replace("-", "");
         }
 
         return logicDelVal;
@@ -155,6 +162,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
     private Object getLogicNotDelVal(TableColumnInfo logicDelColumnInfo) {
         String logicNotDelVal = logicDelColumnInfo.getLogicNotDelVal();
         Class<?> fieldType = logicDelColumnInfo.getField().getType();
+
         return this.convertValue(logicNotDelVal, fieldType);
     }
 
@@ -165,10 +173,10 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
             return Byte.valueOf(val);
         } else if (Boolean.class.equals(fieldType) || boolean.class.equals(fieldType)) {
             if (trueValues.contains(val)) {
-                return Boolean.TRUE;
+                return 1;
             }
             else if (falseValues.contains(val)) {
-                return Boolean.FALSE;
+                return 0;
             }
         }
 

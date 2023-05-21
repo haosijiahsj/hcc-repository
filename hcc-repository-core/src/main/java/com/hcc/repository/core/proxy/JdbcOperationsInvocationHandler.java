@@ -77,7 +77,7 @@ public class JdbcOperationsInvocationHandler implements InvocationHandler {
         long total = 0;
         if (result != null) {
             if (result instanceof Collection) {
-                total = ((Collection) result).size();
+                total = ((Collection<?>) result).size();
             } else {
                 total = 1;
             }

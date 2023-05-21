@@ -7,20 +7,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Param
- *
- * @author hushengjun
- * @date 2023/4/28
+ * Created by 胡胜钧 on 8/2 0002.
+ * 条件注解，配合@Condition一起使用
  */
 @Documented
-@Target(ElementType.PARAMETER)
+@Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Param {
-
-    /**
-     * 参数名称
-     * @return
-     */
-    String value();
-
+public @interface Conditions {
+    Condition[] value();
 }

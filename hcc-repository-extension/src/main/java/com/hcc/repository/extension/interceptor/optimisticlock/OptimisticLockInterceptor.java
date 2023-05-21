@@ -3,6 +3,7 @@ package com.hcc.repository.extension.interceptor.optimisticlock;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.update.AbstractUpdateCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
+import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -44,11 +45,11 @@ public class OptimisticLockInterceptor implements Interceptor {
         AbstractUpdateCondition<?, ?, ?> updateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
 
         String changeColumnName = versionColumnName + "_CHANGE";
-        updateCondition.setSql(String.format("%s = %s", versionColumnInfo.getColumnName(), ":" + changeColumnName));
+        updateCondition.setSql(String.format("%s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(changeColumnName)));
         updateCondition.getColumnValuePairs().put(changeColumnName, getChangeVersionVal(originalVersionVal, versionColumnInfo.getField().getType()));
 
         String originalColumnName = versionColumnName + "_ORIGINAL";
-        updateCondition.apply(String.format("AND %s = %s", versionColumnInfo.getColumnName(), ":" + originalColumnName));
+        updateCondition.apply(String.format("AND %s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(originalColumnName)));
         updateCondition.getColumnValuePairs().put(originalColumnName, originalVersionVal);
     }
 

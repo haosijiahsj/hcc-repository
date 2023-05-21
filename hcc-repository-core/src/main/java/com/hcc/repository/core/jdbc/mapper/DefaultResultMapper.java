@@ -22,13 +22,13 @@ import java.util.stream.Collectors;
  * @author hushengjun
  * @date 2023/4/26
  */
-public class PlainEntityResultMapper<T> implements ResultMapper<T> {
+public class DefaultResultMapper<T> implements ResultMapper<T> {
 
     private final Class<T> entityClass;
     private final Map<String, Field> fieldNameMap;
     private final Map<String, Field> fieldUnderlineNameMap;
 
-    public PlainEntityResultMapper(Class<T> entityClass) {
+    public DefaultResultMapper(Class<T> entityClass) {
         this.entityClass = entityClass;
         List<Field> fields = ReflectUtils.getAllDeclaredFields(entityClass);
         fieldNameMap = fields.stream().collect(Collectors.toMap(Field::getName, Function.identity()));
@@ -92,7 +92,7 @@ public class PlainEntityResultMapper<T> implements ResultMapper<T> {
     }
 
     /**
-     * 严格模式，字段与列表必须一致，否则可以转下划线一致即可映射
+     * 严格模式，字段与列名必须一致，否则可以转下划线一致即可映射
      * @return
      */
     protected boolean strictMode() {
