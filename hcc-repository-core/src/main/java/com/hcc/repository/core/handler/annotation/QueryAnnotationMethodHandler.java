@@ -1,7 +1,6 @@
 package com.hcc.repository.core.handler.annotation;
 
 import com.hcc.repository.core.annotation.Condition;
-import com.hcc.repository.core.annotation.Conditions;
 import com.hcc.repository.core.annotation.Param;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.conditions.ICondition;
@@ -17,10 +16,8 @@ import com.hcc.repository.core.utils.ArrayUtils;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ExpressionParseUtils;
-import com.hcc.repository.core.utils.Pair;
-import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.JSqlParserUtils;
-import com.hcc.repository.core.utils.SqlParseUtils;
+import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ResolvableType;
@@ -28,7 +25,6 @@ import org.springframework.core.ResolvableType;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -36,7 +32,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 查询注解处理器
@@ -68,29 +63,33 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 existCondition = (ICondition<?>) arg;
             }
         }
-        Conditions conditions = method.getAnnotation(Conditions.class);
-        if (conditions != null && existCondition != null) {
-            throw new RepositoryException("@Conditions注解存在，不能再使用ICondition参数");
+
+        Condition[] conditions = queryAnnotation.conditions();
+        if (ArrayUtils.isNotEmpty(conditions) && existCondition != null) {
+            throw new RepositoryException("@Condition注解存在，不能再使用ICondition参数");
         }
 
+        // 收集参数
         Map<String, Object> paramMap = this.collectParam();
 
+        // 处理sql
         String sql = queryAnnotation.value();
-        String expressionSql = this.processCondition(sql, paramMap);
+        String placeholderSql = this.processCondition(sql, paramMap);
+        if (StrUtils.isNotEmpty(queryAnnotation.last())) {
+            placeholderSql += StrPool.SPACE + queryAnnotation.last();
+        }
 
-        // 解析表达式sql
-        Pair<String, Object[]> pair = SqlParseUtils.parseExpressionSql(expressionSql, paramMap);
-
+        // 构建信息
         OriginalSqlCondition<?> condition = new OriginalSqlCondition<>();
-        condition.sql(pair.getLeft());
-        condition.addArg(pair.getRight());
+        condition.sql(placeholderSql);
+        condition.putParamMap(paramMap);
 
         // 设置sql参数
         if (existCondition != null) {
             // 需要拼接用户sql
             String sqlAfterWhere = existCondition.getSqlAfterWhere();
             if (StrUtils.isNotEmpty(sqlAfterWhere)) {
-                condition.sql(sql + " " + sqlAfterWhere);
+                condition.sql(sql + StrPool.SPACE + sqlAfterWhere);
                 condition.putParamMap(existCondition.getColumnValuePairs());
             }
         }
@@ -137,17 +136,18 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
      * @return
      */
     private String processCondition(String mainSql, Map<String, Object> paramMap) {
-        Conditions conditions = method.getAnnotation(Conditions.class);
-        if (conditions == null || ArrayUtils.isEmpty(conditions.value())) {
+        Condition[] conditions = queryAnnotation.conditions();
+        if (ArrayUtils.isEmpty(conditions)) {
             return mainSql;
         }
         List<String> conditionSegments = new ArrayList<>();
-        for (Condition c : conditions.value()) {
-            if (StrUtils.isEmpty(c.value())) {
+        for (Condition c : conditions) {
+            String sqlSegment = c.value().trim();
+            if (StrUtils.isEmpty(sqlSegment)) {
                 continue;
             }
             if (StrUtils.isEmpty(c.exp())) {
-                conditionSegments.add(c.value());
+                conditionSegments.add(sqlSegment.trim());
                 continue;
             }
             boolean parseResult = ExpressionParseUtils.assertExpression(c.exp(), paramMap);
@@ -155,7 +155,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 if (log.isDebugEnabled()) {
                     log.debug("表达式：{} 解析为true", c.exp());
                 }
-                conditionSegments.add(c.value());
+                conditionSegments.add(sqlSegment);
             } else {
                 if (log.isDebugEnabled()) {
                     log.debug("表达式：{} 解析为false", c.exp());
@@ -166,7 +166,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
             return mainSql;
         }
 
-        String first = conditionSegments.get(0).toUpperCase();
+        String firstSegment = conditionSegments.get(0).toUpperCase();
 
         // 主sql含有where，直接拼接
         if (mainSql.toUpperCase().contains(SqlKeywordEnum.WHERE.getKeyword())) {
@@ -175,14 +175,11 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                     + String.join(StrPool.SPACE, conditionSegments);
         }
 
-        // 自动生成where的，去掉第一条件的and或or
-        if (first.startsWith(SqlKeywordEnum.AND.getKeyword())
-                || first.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+        // 这里自动生成where，去掉第一条件的and或or
+        if (firstSegment.startsWith(SqlKeywordEnum.AND.getKeyword())
+                || firstSegment.startsWith(SqlKeywordEnum.OR.getKeyword())) {
             // 第一sql含and 或 or，去掉第一个and或or
-            String tempFirst = conditionSegments.get(0).replace(SqlKeywordEnum.AND.getKeyword(), "");
-            tempFirst = tempFirst.replace(SqlKeywordEnum.AND.getKeyword().toLowerCase(), "");
-            tempFirst = tempFirst.replace(SqlKeywordEnum.OR.getKeyword(), "");
-            tempFirst = tempFirst.replace(SqlKeywordEnum.OR.getKeyword().toLowerCase(), "");
+            String tempFirst = conditionSegments.get(0).replaceFirst("(?i)AND|(?i)OR", StrPool.EMPTY);
             conditionSegments.remove(0);
             conditionSegments.add(0, tempFirst.trim());
         }

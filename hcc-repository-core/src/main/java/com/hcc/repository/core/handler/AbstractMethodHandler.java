@@ -123,8 +123,7 @@ public abstract class AbstractMethodHandler {
             pair = Pair.of(condition.getExecuteSql(), ((OriginalSqlCondition<?>) condition).getArgs());
         } else {
             // 真实带有占位符的sql和参数数组
-            pair = SqlParseUtils.parseExpressionSql(condition.getExecuteSql(),
-                    condition.getColumnValuePairs());
+            pair = SqlParseUtils.parsePlaceholderSql(condition.getExecuteSql(), condition.getColumnValuePairs());
         }
 
         return pair;

@@ -21,10 +21,22 @@ import java.lang.annotation.Target;
 public @interface Query {
 
     /**
-     * sql
+     * 主sql
      * @return
      */
     String value();
+
+    /**
+     * 动态条件sql
+     * @return
+     */
+    Condition[] conditions() default {};
+
+    /**
+     * 后缀sql
+     * @return
+     */
+    String last() default "";
 
     /**
      * 映射器

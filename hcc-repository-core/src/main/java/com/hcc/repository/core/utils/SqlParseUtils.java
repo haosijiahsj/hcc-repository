@@ -63,19 +63,20 @@ public class SqlParseUtils {
      * @param paramMap
      * @return
      */
-    public static Pair<String, Object[]> parseExpressionSql(String expressionSql, Map<String, Object> paramMap) {
-        Map<String, Object> finalParamMap = new HashMap<>();
+    public static Pair<String, Object[]> parsePlaceholderSql(String expressionSql, Map<String, Object> paramMap) {
+        Map<String, Object> namedParamMap = new HashMap<>();
         Map<String, String> replacePlaceholderMap = new HashMap<>();
         Map<String, Object> replaceValueMap = new HashMap<>();
+
         Matcher matcher = SQL_PLACEHOLDER_PATTERN.matcher(expressionSql);
         while (matcher.find()) {
             String exp = matcher.group(0);
             String content = matcher.group(1);
             Object result = ExpressionParseUtils.parsePlaceholder(exp, paramMap);
-            if (exp.startsWith("#")) {
-                finalParamMap.put(content, result);
+            if (exp.startsWith(StrPool.HASH)) {
+                namedParamMap.put(content, result);
                 replacePlaceholderMap.put(exp, content);
-            } else if (exp.startsWith("$")) {
+            } else if (exp.startsWith(StrPool.DOLLAR)) {
                 replaceValueMap.put(exp, result);
             }
         }
@@ -94,7 +95,7 @@ public class SqlParseUtils {
             expressionSql = expressionSql.replace(k, getSqlValue(v));
         }
 
-        return parseNamedSql(expressionSql, finalParamMap);
+        return parseNamedSql(expressionSql, namedParamMap);
     }
 
     /**
