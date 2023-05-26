@@ -27,6 +27,12 @@ public @interface Query {
     String value();
 
     /**
+     * join的动态条件，适用于拼接LEFT JOIN, INNER JOIN等
+     * @return
+     */
+    Condition[] joinConditions() default {};
+
+    /**
      * 动态条件sql
      * @return
      */
