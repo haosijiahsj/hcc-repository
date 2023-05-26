@@ -143,7 +143,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
             return mainSql;
         }
 
-        return StrUtils.join(StrPool.SPACE, conditionSegments);
+        return mainSql + StrPool.SPACE + StrUtils.join(StrPool.SPACE, conditionSegments);
     }
 
     /**
@@ -228,7 +228,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
      * @return
      */
     private boolean needConcatWhere(String mainSql, String firstSegment) {
-        // 主sql含where的和第一个Condition sql不拼接where
+        // 主sql含where的和第一个condition sql含where不拼接where
         if (mainSql.matches("(?i)WHERE")
                 || firstSegment.matches("(?i)WHERE")) {
             return false;
