@@ -27,19 +27,14 @@ public @interface Query {
     String value();
 
     /**
-     * join的动态条件，适用于拼接LEFT JOIN, INNER JOIN等
-     * @return
-     */
-    Condition[] joinConditions() default {};
-
-    /**
-     * 动态条件sql
+     * 动态条件sql，注意Condition表达式一旦计算为true则直接拼接sql片段<br/>
+     * 当AND或OR前出现WHERE关键字时，将去除该sql片段首部的AND或OR
      * @return
      */
     Condition[] conditions() default {};
 
     /**
-     * 后缀sql
+     * 后缀sql，建议写LIMIT等无条件拼接的sql片段
      * @return
      */
     String last() default "";

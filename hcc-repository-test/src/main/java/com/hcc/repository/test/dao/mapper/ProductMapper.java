@@ -11,6 +11,7 @@ import com.hcc.repository.test.domain.ProductQueryParam;
 import com.hcc.repository.test.domain.po.ProductPo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * ProductMapper
@@ -44,12 +45,44 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
 //    )
 //    List<ProductPo> selectProducts1(@Param("p") ProductQueryParam p);
 
-    @Query(value = "select * from product p",
+    @Query(
+            value = "select * from product p",
             conditions = {
+                    @Condition("where 1 = 1"),
                     @Condition(exp = "#p.name != null", value = "AND p.name = #{p.name}"),
                     @Condition(exp = "#p.id != null", value = "AND p.id = #{p.id}"),
                     @Condition(exp = "#p.ids != null && #p.ids.size() > 0", value = "AND p.id IN (${p.ids})"),
-                    @Condition(exp = "#p.name != null", value = "AND p.name like ${p.name}")
-            })
+                    @Condition(exp = "#p.name != null", value = "AND p.name like ${p.name}"),
+                    @Condition("ORDER BY p.id DESC")
+            },
+            last = "LIMIT 100"
+    )
     List<ProductPo> selectProducts(@Param("p") ProductQueryParam p);
+
+    @Query(
+            value = "select * from product p",
+            conditions = {
+                    @Condition("where 1 = 1"),
+                    @Condition(exp = "#id != null", value = "AND p.id = #{id}"),
+                    @Condition(exp = "#ids != null && #ids.size() > 0", value = "AND p.id IN (${ids})"),
+                    @Condition(exp = "#names != null && #names.size() > 0", value = "AND p.name IN (${names})"),
+                    @Condition("ORDER BY p.id DESC")
+            },
+            last = "LIMIT 100"
+    )
+    List<ProductPo> selectProducts1(@Param("id") Long id, @Param("ids") List<Long> ids, @Param("names") List<String> names);
+
+    @Query(
+            value = "select * from product p",
+            conditions = {
+                    @Condition("where 1 = 1"),
+                    @Condition(exp = "#ma.id != null", value = "AND p.id = #{ma.id}"),
+                    @Condition(exp = "#ma.ids != null && #ma.ids.size() > 0", value = "AND p.id IN (${ma.ids})"),
+                    @Condition(exp = "#ma.names != null && #ma.names.size() > 0", value = "AND p.name IN (${ma.names})"),
+                    @Condition("ORDER BY p.id DESC")
+            },
+            last = "LIMIT 100"
+    )
+    List<ProductPo> selectProducts2(@Param("ma") Map<String, Object> paramMap);
+
 }

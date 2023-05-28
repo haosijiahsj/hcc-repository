@@ -42,6 +42,7 @@ import java.util.Set;
 @Slf4j
 public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
 
+    private static final String AND_OR_REGEX = "(?i)AND|(?i)OR";
     protected final Query queryAnnotation;
 
     public QueryAnnotationMethodHandler(Query queryAnnotation) {
@@ -74,8 +75,9 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
 
         // 处理sql
         String mainSql = queryAnnotation.value();
-        mainSql = this.processJoinCondition(mainSql, paramMap);
-        String placeholderSql = this.processCondition(mainSql, paramMap) + StrPool.SPACE + queryAnnotation.last();
+        String placeholderSql = this.processCondition(mainSql, paramMap)
+                + StrPool.SPACE
+                + queryAnnotation.last();
 
         // 构建信息
         OriginalSqlCondition<?> condition = new OriginalSqlCondition<>();
@@ -128,25 +130,6 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     }
 
     /**
-     * 处理join的Condition
-     * @param mainSql
-     * @param paramMap
-     * @return
-     */
-    private String processJoinCondition(String mainSql, Map<String, Object> paramMap) {
-        Condition[] joinConditions = queryAnnotation.joinConditions();
-        if (ArrayUtils.isEmpty(joinConditions)) {
-            return mainSql;
-        }
-        List<String> conditionSegments = this.calcConditionExpression(joinConditions, paramMap);
-        if (CollUtils.isEmpty(conditionSegments)) {
-            return mainSql;
-        }
-
-        return mainSql + StrPool.SPACE + StrUtils.join(StrPool.SPACE, conditionSegments);
-    }
-
-    /**
      * 处理condition注解
      * @param mainSql
      * @param paramMap
@@ -158,33 +141,68 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
             return mainSql;
         }
         List<String> conditionSegments = this.calcConditionExpression(conditions, paramMap);
-        if (CollUtils.isEmpty(conditionSegments)) {
+        if (CollUtils.isEmpty(conditionSegments)
+                || (conditionSegments.size() == 1
+                                && SqlKeywordEnum.WHERE.getKeyword().equals(conditionSegments.get(0).toUpperCase()))) {
+            // Condition中的sql为空，或只有一个where的不拼接
             return mainSql;
         }
 
-        // 第一个sql片段
-        String firstUpperCaseSegment = conditionSegments.get(0).toUpperCase();
+        StringBuilder mainSqlBuilder = new StringBuilder(mainSql);
+        for (int i = 0; i < conditionSegments.size(); i++) {
+            String segment = conditionSegments.get(i);
+            if (SqlKeywordEnum.WHERE.getKeyword().equals(segment.toUpperCase())
+                    && i + 1 < conditionSegments.size()) {
+                // 当前Condition的sql是where，且后一个sql不是where中的条件sql，则跳过不拼接where
+                String nextSegment = conditionSegments.get(i + 1).toUpperCase();
+                if (nextSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())
+                        || nextSegment.startsWith(SqlKeywordEnum.ORDER_BY.getKeyword())) {
+                    continue;
+                }
+            }
+            String tempMainSql = mainSqlBuilder.toString().trim().toUpperCase();
+            if (tempMainSql.endsWith(SqlKeywordEnum.WHERE.getKeyword())) {
+                // 每次拼接后都判断是否由WHERE结尾
+                String tempSegment = segment.toUpperCase();
+                if (tempSegment.startsWith(SqlKeywordEnum.AND.getKeyword())
+                        || tempSegment.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+                    // 若当前拼接的sql是AND或OR开头则此sql片段去掉AND或OR
+                    if (log.isDebugEnabled()) {
+                        log.debug("sql片段：{}将去除AND或OR", segment);
+                    }
+                    segment = segment.replaceFirst(AND_OR_REGEX, StrPool.EMPTY).trim();
+                }
+            }
 
-        boolean needConcatWhere = this.needConcatWhere(mainSql, firstUpperCaseSegment);
-        if (!needConcatWhere) {
-            return mainSql.trim()
-                    + StrPool.SPACE
-                    + String.join(StrPool.SPACE, conditionSegments);
+            // 最后拼接此sql片段
+            mainSqlBuilder.append(StrPool.SPACE).append(segment);
         }
 
-        // 这里自动生成where，去掉第一条件的and或or
-        if (firstUpperCaseSegment.startsWith(SqlKeywordEnum.AND.getKeyword())
-                || firstUpperCaseSegment.startsWith(SqlKeywordEnum.OR.getKeyword())) {
-            // 第一sql含and 或 or，去掉第一个and或or
-            String tempFirst = conditionSegments.get(0).replaceFirst("(?i)AND|(?i)OR", StrPool.EMPTY);
-            conditionSegments.remove(0);
-            conditionSegments.add(0, tempFirst.trim());
-        }
-
-        return StrUtils.join(StrPool.SPACE,
-                mainSql.trim(),
-                SqlKeywordEnum.WHERE.getKeyword(),
-                String.join(StrPool.SPACE, conditionSegments));
+        return mainSqlBuilder.toString();
+//
+//        // 第一个sql片段
+//        String firstUpperCaseSegment = conditionSegments.get(0).toUpperCase();
+//
+//        boolean needConcatWhere = this.needConcatWhere(mainSql, firstUpperCaseSegment);
+//        if (!needConcatWhere) {
+//            return mainSql.trim()
+//                    + StrPool.SPACE
+//                    + String.join(StrPool.SPACE, conditionSegments);
+//        }
+//
+//        // 这里自动生成where，去掉第一条件的and或or
+//        if (firstUpperCaseSegment.startsWith(SqlKeywordEnum.AND.getKeyword())
+//                || firstUpperCaseSegment.startsWith(SqlKeywordEnum.OR.getKeyword())) {
+//            // 第一sql含and 或 or，去掉第一个and或or
+//            String tempFirst = conditionSegments.get(0).replaceFirst(AND_OR_REGEX, StrPool.EMPTY);
+//            conditionSegments.remove(0);
+//            conditionSegments.add(0, tempFirst.trim());
+//        }
+//
+//        return StrUtils.join(StrPool.SPACE,
+//                mainSql.trim(),
+//                SqlKeywordEnum.WHERE.getKeyword(),
+//                String.join(StrPool.SPACE, conditionSegments));
     }
 
     /**
@@ -229,8 +247,8 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
      */
     private boolean needConcatWhere(String mainSql, String firstSegment) {
         // 主sql含where的和第一个condition sql含where不拼接where
-        if (mainSql.matches("(?i)WHERE")
-                || firstSegment.matches("(?i)WHERE")) {
+        if (mainSql.toUpperCase().contains(SqlKeywordEnum.WHERE.getKeyword())
+                || firstSegment.contains(SqlKeywordEnum.WHERE.getKeyword())) {
             return false;
         }
         if (firstSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())

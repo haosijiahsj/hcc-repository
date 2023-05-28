@@ -1,9 +1,13 @@
 package com.hcc.repository.core.utils;
 
+import org.springframework.context.expression.MapAccessor;
+import org.springframework.expression.AccessException;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.TypedValue;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
+import org.springframework.util.Assert;
 
 import java.util.Collections;
 import java.util.Map;
@@ -31,7 +35,8 @@ public class ExpressionParseUtils {
      */
     public static Object parse(String expression, Map<String, Object> paramMap, Class<?> clazz) {
         ExpressionParser parser = new SpelExpressionParser();
-        EvaluationContext context = new StandardEvaluationContext();
+        StandardEvaluationContext context = new StandardEvaluationContext();
+        context.addPropertyAccessor(new NullSafeMapAccessor());
         if (CollUtils.isNotEmpty(paramMap)) {
             paramMap.forEach(context::setVariable);
         }
@@ -113,6 +118,19 @@ public class ExpressionParseUtils {
     public static boolean assertExpression(String expression, String paramName, Object variable) {
         Map<String, Object> paramMap = Collections.singletonMap(paramName, variable);
         return (boolean) parse(expression, paramMap, Boolean.class);
+    }
+
+    private static class NullSafeMapAccessor extends MapAccessor {
+        @Override
+        public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
+            Assert.state(target instanceof Map, "Target must be of type Map");
+            Map<?, ?> map = (Map<?, ?>) target;
+            Object value = map.get(name);
+            if (value == null) {
+                return TypedValue.NULL;
+            }
+            return new TypedValue(value);
+        }
     }
 
 }

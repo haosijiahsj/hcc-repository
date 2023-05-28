@@ -9,7 +9,9 @@ import com.hcc.repository.test.domain.po.ProductPo;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * SelectTest
@@ -49,8 +51,16 @@ public class SelectTest extends BaseTest {
         param.setName("hsj");
         param.setId(1L);
         param.setIds(Arrays.asList(1L, 2L, 3L));
-        List<ProductPo> productPos = productMapper.selectProducts(param);
-        System.out.println(productPos);
+//        List<ProductPo> productPos = productMapper.selectProducts(param);
+//        System.out.println(productPos);
+
+//        productMapper.selectProducts1(1L, Arrays.asList(1L, 2L, 3L), Arrays.asList("hsj"));
+
+        Map<String, Object> paramMap = new HashMap<>();
+        paramMap.put("id", 1L);
+        paramMap.put("ids", Arrays.asList(1L, 2L, 3L));
+//        paramMap.put("names", Arrays.asList("abc"));
+        productMapper.selectProducts2(paramMap);
     }
 
 }
