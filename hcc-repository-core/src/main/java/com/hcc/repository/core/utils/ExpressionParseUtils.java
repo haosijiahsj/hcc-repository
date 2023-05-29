@@ -122,6 +122,11 @@ public class ExpressionParseUtils {
 
     private static class NullSafeMapAccessor extends MapAccessor {
         @Override
+        public boolean canRead(EvaluationContext context, Object target, String name) throws AccessException {
+            return target instanceof Map;
+        }
+
+        @Override
         public TypedValue read(EvaluationContext context, Object target, String name) throws AccessException {
             Assert.state(target instanceof Map, "Target must be of type Map");
             Map<?, ?> map = (Map<?, ?>) target;
