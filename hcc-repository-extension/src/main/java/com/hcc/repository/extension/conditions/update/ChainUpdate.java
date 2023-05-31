@@ -19,10 +19,14 @@ public interface ChainUpdate<T, ID extends Serializable> extends ChainCondition<
     }
 
     default boolean update(T entity) {
+        return update(entity, false);
+    }
+
+    default boolean update(T entity, boolean nullSet) {
         if (entity == null) {
             return update();
         }
-        return getBaseMapper().updateEntity(entity, getCondition()) >= 0;
+        return getBaseMapper().updateEntity(entity, getCondition(), nullSet) >= 0;
     }
 
     default boolean remove() {

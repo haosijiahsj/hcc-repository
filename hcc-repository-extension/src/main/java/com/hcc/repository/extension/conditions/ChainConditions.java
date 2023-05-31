@@ -1,7 +1,7 @@
 package com.hcc.repository.extension.conditions;
 
 import com.hcc.repository.core.mapper.BaseMapper;
-import com.hcc.repository.extension.conditions.original.OriginalSqlChainCondition;
+import com.hcc.repository.extension.conditions.original.NativeSqlChainCondition;
 import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
 import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
 import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
@@ -35,8 +35,8 @@ public final class ChainConditions {
         return new LambdaUpdateChainCondition<>(baseMapper);
     }
 
-    public static <T, ID extends Serializable> OriginalSqlChainCondition<T, ID> originalSql(BaseMapper<T, ID> baseMapper) {
-        return new OriginalSqlChainCondition<>(baseMapper);
+    public static <T, ID extends Serializable> NativeSqlChainCondition<T, ID> nativeSql(BaseMapper<T, ID> baseMapper) {
+        return new NativeSqlChainCondition<>(baseMapper);
     }
 
 }

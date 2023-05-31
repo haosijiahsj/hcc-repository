@@ -27,16 +27,27 @@ public class UpdateByIdHandler extends UpdateEntityHandler {
     @Override
     protected ICondition<?> prepareCondition() {
         Object firstArg = getFirstArg();
+        boolean nullSet = getArg(1, Boolean.class);
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
         // 使用对象拼接update sql, 主键、乐观锁字段不set条件
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfos(entityClass, c -> !c.isPrimaryKey() && !c.isVersion());
 
         // set语句
-        columnInfos.forEach(c -> condition.set(c.getColumnName(), super.processTargetValue(firstArg, c)));
+        for (TableColumnInfo c : columnInfos) {
+            Object targetValue = super.processTargetValue(firstArg, c);
+            if (targetValue == null && !nullSet) {
+                continue;
+            }
+            condition.set(c.getColumnName(), targetValue);
+        }
 
         // 条件
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        condition.eq(idColumnInfo.getColumnName(), ReflectUtils.getValue(firstArg, idColumnInfo.getField()));
+        Object idValue = ReflectUtils.getValue(firstArg, idColumnInfo.getField());
+
+        Assert.isNotNull(idValue, String.format("实体：[%s] id值为空", entityClass.getName()));
+
+        condition.eq(idColumnInfo.getColumnName(), idValue);
 
         return condition;
     }

@@ -8,7 +8,7 @@ import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.conditions.ChainConditions;
-import com.hcc.repository.extension.conditions.original.OriginalSqlChainCondition;
+import com.hcc.repository.extension.conditions.original.NativeSqlChainCondition;
 import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
 import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
 import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
@@ -72,8 +72,8 @@ public interface IRepository<T, ID extends Serializable> {
      * 原生的sql操作
      * @return
      */
-    default OriginalSqlChainCondition<T, ID> originalSql() {
-        return ChainConditions.originalSql(getBaseMapper());
+    default NativeSqlChainCondition<T, ID> nativeSql() {
+        return ChainConditions.nativeSql(getBaseMapper());
     }
 
     /**
@@ -101,7 +101,37 @@ public interface IRepository<T, ID extends Serializable> {
      * @return
      */
     default boolean updateById(T entity) {
-        return getBaseMapper().updateById(entity) >= 1;
+        return updateById(entity, false);
+    }
+
+    /**
+     * 通过id更新实体
+     * @param entity
+     * @return
+     */
+    default boolean updateById(T entity, boolean nullSet) {
+        return getBaseMapper().updateById(entity, nullSet) >= 1;
+    }
+
+    /**
+     * 通过条件更新实体
+     * @param entity
+     * @param condition
+     * @return
+     */
+    default int updateEntity(T entity, ICondition<T> condition) {
+        return updateEntity(entity, condition, false);
+    }
+
+    /**
+     * 通过条件更新实体，nullSet为true则会更新为null的字段
+     * @param entity
+     * @param condition
+     * @param nullSet
+     * @return
+     */
+    default int updateEntity(T entity, ICondition<T> condition, boolean nullSet) {
+        return getBaseMapper().updateEntity(entity, condition, nullSet);
     }
 
     /**

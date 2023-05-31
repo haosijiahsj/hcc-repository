@@ -31,13 +31,20 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
     @Override
     protected ICondition<?> prepareCondition() {
         Object entity = getFirstArg();
-        ICondition<?> originalCondition = (ICondition<?>) args[1];
+        ICondition<?> originalCondition = getArg(1, ICondition.class);
+        boolean nullSet = getArg(2, Boolean.class);
 
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
         // 主键、乐观锁字段不set条件
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfos(entityClass, c -> !c.isPrimaryKey() && !c.isVersion());
         // set语句
-        columnInfos.forEach(c -> condition.set(c.getColumnName(), processTargetValue(entity, c)));
+        for (TableColumnInfo c : columnInfos) {
+            Object targetValue = processTargetValue(entity, c);
+            if (targetValue == null && !nullSet) {
+                continue;
+            }
+            condition.set(c.getColumnName(), targetValue);
+        }
         if (originalCondition instanceof AbstractCondition) {
             // 直接赋值segmentContainer
             AbstractCondition<?, ?, ?> abstractCondition = (AbstractCondition<?, ?, ?>) originalCondition;
@@ -54,9 +61,9 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         Object value = ReflectUtils.getValue(entity, c.getField());
         // 转换
         Object targetValue = value;
-        if (c.needConvert()) {
+        if (c.needConvert() && targetValue != null) {
             targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
-        } else if (c.isAssignableFromIEnum()) {
+        } else if (c.isAssignableFromIEnum() && targetValue != null) {
             targetValue = ((IEnum<?>) value).getValue();
         }
         if (c.needAutoFillUpdate() && targetValue == null) {

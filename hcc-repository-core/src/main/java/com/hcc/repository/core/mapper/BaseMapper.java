@@ -2,6 +2,7 @@ package com.hcc.repository.core.mapper;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.exceptions.RepositoryException;
+import com.hcc.repository.core.exceptions.TooManyResultException;
 import com.hcc.repository.core.page.IPage;
 
 import java.io.Serializable;
@@ -81,7 +82,17 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param entity
      * @return
      */
-    int updateById(T entity);
+    default int updateById(T entity) {
+        return updateById(entity, false);
+    }
+
+    /**
+     * 通过id更新，nullSet为true则会更新为null的字段
+     * @param entity
+     * @param nullSet
+     * @return
+     */
+    int updateById(T entity, boolean nullSet);
 
     /**
      * 通过条件更新实体
@@ -89,7 +100,18 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param condition
      * @return
      */
-    int updateEntity(T entity, ICondition<T> condition);
+    default int updateEntity(T entity, ICondition<T> condition) {
+        return updateEntity(entity, condition, false);
+    }
+
+    /**
+     * 通过条件更新实体，nullSet为true则会更新为null的字段
+     * @param entity
+     * @param condition
+     * @param nullSet
+     * @return
+     */
+    int updateEntity(T entity, ICondition<T> condition, boolean nullSet);
 
     /**
      * 根据条件更新
@@ -129,7 +151,7 @@ public interface BaseMapper<T, ID extends Serializable> {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);
@@ -165,7 +187,7 @@ public interface BaseMapper<T, ID extends Serializable> {
         return selectMaps(condition).stream()
                 .map(m -> {
                     if (m.size() > 1) {
-                        throw new RepositoryException(String.format("预期1列数据，实际%s列数据", m.size()));
+                        throw new TooManyResultException(String.format("预期1列数据，实际%s列数据", m.size()));
                     }
                     return m.values().stream().findFirst().orElse(null);
                 })
@@ -197,7 +219,7 @@ public interface BaseMapper<T, ID extends Serializable> {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);

@@ -4,7 +4,7 @@ import com.hcc.repository.core.annotation.Condition;
 import com.hcc.repository.core.annotation.Param;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
 import com.hcc.repository.core.constants.SqlKeywordEnum;
 import com.hcc.repository.core.constants.SqlTypeEnum;
 import com.hcc.repository.core.constants.StrPool;
@@ -80,7 +80,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 + queryAnnotation.last();
 
         // 构建信息
-        OriginalSqlCondition<?> condition = new OriginalSqlCondition<>();
+        NativeSqlCondition<?> condition = new NativeSqlCondition<>();
         condition.sql(placeholderSql.trim());
         condition.putParamMap(paramMap);
 

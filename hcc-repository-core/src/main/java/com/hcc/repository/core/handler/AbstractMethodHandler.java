@@ -1,7 +1,7 @@
 package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
@@ -118,9 +118,9 @@ public abstract class AbstractMethodHandler {
      */
     private Pair<String, Object[]> parseSql(ICondition<?> condition) {
         Pair<String, Object[]> pair;
-        if (condition instanceof OriginalSqlCondition && !((OriginalSqlCondition<?>) condition).maybeNamedSql()) {
+        if (condition instanceof NativeSqlCondition && !((NativeSqlCondition<?>) condition).maybeNamedSql()) {
             // 如果是原生sql的方式传参
-            pair = Pair.of(condition.getExecuteSql(), ((OriginalSqlCondition<?>) condition).getArgs());
+            pair = Pair.of(condition.getExecuteSql(), ((NativeSqlCondition<?>) condition).getArgs());
         } else {
             // 真实带有占位符的sql和参数数组
             pair = SqlParseUtils.parsePlaceholderSql(condition.getExecuteSql(), condition.getColumnValuePairs());
@@ -159,12 +159,26 @@ public abstract class AbstractMethodHandler {
         this.configuration = configuration;
     }
 
+    public Object getArg(int index) {
+        if (args == null) {
+            throw new IllegalArgumentException("BaseMapper方法参数列表为空");
+        }
+        if (args.length - 1 < index) {
+            throw new IllegalArgumentException("BaseMapper方法参数越界");
+        }
+        return args[index];
+    }
+
+    public <T> T getArg(int index, Class<T> clazz) {
+        return clazz.cast(getArg(index));
+    }
+
     public Object getFirstArg() {
-        return args[0];
+        return getArg(0);
     }
 
     public <T> T getFirstArg(Class<T> clazz) {
-        return clazz.cast(args[0]);
+        return getArg(0, clazz);
     }
 
     public boolean firstArgIsNull() {

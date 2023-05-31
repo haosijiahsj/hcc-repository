@@ -1,4 +1,4 @@
-package com.hcc.repository.core.conditions.original;
+package com.hcc.repository.core.conditions.nativesql;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.utils.Assert;
@@ -17,13 +17,13 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/4/4
  */
-public class OriginalSqlCondition<T> extends ICondition<T> {
+public class NativeSqlCondition<T> extends ICondition<T> {
 
     private String sql;
     private Map<String, Object> paramMap;
     private List<Object> args;
 
-    public OriginalSqlCondition() {
+    public NativeSqlCondition() {
         paramMap = new HashMap<>(16);
         args = new ArrayList<>(16);
     }
@@ -68,7 +68,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param sql
      * @return
      */
-    public OriginalSqlCondition<T> sql(String sql) {
+    public NativeSqlCondition<T> sql(String sql) {
         Assert.isNotNull(sql, "sql不能为空");
         this.sql = sql;
         return this;
@@ -80,7 +80,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param val
      * @return
      */
-    public OriginalSqlCondition<T> putParam(String name, Object val) {
+    public NativeSqlCondition<T> putParam(String name, Object val) {
         this.paramMap.put(name, val);
         return this;
     }
@@ -90,7 +90,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param paramMap
      * @return
      */
-    public OriginalSqlCondition<T> putParamMap(Map<String, Object> paramMap) {
+    public NativeSqlCondition<T> putParamMap(Map<String, Object> paramMap) {
         this.paramMap.putAll(paramMap);
         return this;
     }
@@ -100,7 +100,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param val
      * @return
      */
-    public OriginalSqlCondition<T> addArg(Object val) {
+    public NativeSqlCondition<T> addArg(Object val) {
         args.add(val);
         return this;
     }
@@ -110,7 +110,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param vals
      * @return
      */
-    public OriginalSqlCondition<T> addArg(Object... vals) {
+    public NativeSqlCondition<T> addArg(Object... vals) {
         args.addAll(Arrays.asList(vals));
         return this;
     }
@@ -120,7 +120,7 @@ public class OriginalSqlCondition<T> extends ICondition<T> {
      * @param args
      * @return
      */
-    public OriginalSqlCondition<T> addArgs(List<Object> args) {
+    public NativeSqlCondition<T> addArgs(List<Object> args) {
         this.args.addAll(args);
         return this;
     }

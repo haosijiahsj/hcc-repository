@@ -1,6 +1,6 @@
 package com.hcc.repository.core.conditions;
 
-import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
@@ -48,8 +48,8 @@ public final class Conditions {
         return new LambdaUpdateCondition<>(clazz);
     }
 
-    public static <T> OriginalSqlCondition<T> originalSql() {
-        return new OriginalSqlCondition<>();
+    public static <T> NativeSqlCondition<T> nativeSql() {
+        return new NativeSqlCondition<>();
     }
 
 }

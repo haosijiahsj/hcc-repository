@@ -1,7 +1,7 @@
 package com.hcc.repository.extension.conditions.original;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.original.OriginalSqlCondition;
+import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.extension.conditions.query.ChainQuery;
 import com.hcc.repository.extension.conditions.update.ChainUpdate;
@@ -16,14 +16,14 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/4/6
  */
-public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICondition<T> implements ChainUpdate<T, ID>, ChainQuery<T, ID> {
+public class NativeSqlChainCondition<T, ID extends Serializable> extends ICondition<T> implements ChainUpdate<T, ID>, ChainQuery<T, ID> {
 
-    private final OriginalSqlCondition<T> condition;
+    private final NativeSqlCondition<T> condition;
     private final BaseMapper<T, ID> baseMapper;
 
-    public OriginalSqlChainCondition(BaseMapper<T, ID> baseMapper) {
+    public NativeSqlChainCondition(BaseMapper<T, ID> baseMapper) {
         this.baseMapper = baseMapper;
-        this.condition = new OriginalSqlCondition<>();
+        this.condition = new NativeSqlCondition<>();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param sql
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> sql(String sql) {
+    public NativeSqlChainCondition<T, ID> sql(String sql) {
         condition.sql(sql);
         return this;
     }
@@ -62,7 +62,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param val
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> putParam(String name, Object val) {
+    public NativeSqlChainCondition<T, ID> putParam(String name, Object val) {
         condition.putParam(name, val);
         return this;
     }
@@ -72,7 +72,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param paramMap
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> putParamMap(Map<String, Object> paramMap) {
+    public NativeSqlChainCondition<T, ID> putParamMap(Map<String, Object> paramMap) {
         condition.putParamMap(paramMap);
         return this;
     }
@@ -82,7 +82,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param val
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> addArg(Object val) {
+    public NativeSqlChainCondition<T, ID> addArg(Object val) {
         condition.addArg(val);
         return this;
     }
@@ -92,7 +92,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param vals
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> addArg(Object... vals) {
+    public NativeSqlChainCondition<T, ID> addArg(Object... vals) {
         condition.addArg(vals);
         return this;
     }
@@ -102,7 +102,7 @@ public class OriginalSqlChainCondition<T, ID extends Serializable> extends ICond
      * @param args
      * @return
      */
-    public OriginalSqlChainCondition<T, ID> addArgs(List<Object> args) {
+    public NativeSqlChainCondition<T, ID> addArgs(List<Object> args) {
         condition.addArgs(args);
         return this;
     }
