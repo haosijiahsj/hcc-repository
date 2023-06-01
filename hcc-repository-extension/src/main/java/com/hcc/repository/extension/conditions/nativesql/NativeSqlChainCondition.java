@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.conditions.original;
+package com.hcc.repository.extension.conditions.nativesql;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;

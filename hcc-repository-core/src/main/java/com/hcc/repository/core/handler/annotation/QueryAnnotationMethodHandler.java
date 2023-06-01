@@ -142,8 +142,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         }
         List<String> conditionSegments = this.calcConditionExpression(conditions, paramMap);
         if (CollUtils.isEmpty(conditionSegments)
-                || (conditionSegments.size() == 1
-                                && SqlKeywordEnum.WHERE.getKeyword().equals(conditionSegments.get(0).toUpperCase()))) {
+                || (conditionSegments.size() == 1 && SqlKeywordEnum.WHERE.getKeyword().equalsIgnoreCase(conditionSegments.get(0)))) {
             // Condition中的sql为空，或只有一个where的不拼接
             return mainSql;
         }
@@ -151,15 +150,15 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         StringBuilder mainSqlBuilder = new StringBuilder(mainSql);
         for (int i = 0; i < conditionSegments.size(); i++) {
             String segment = conditionSegments.get(i);
-            if (SqlKeywordEnum.WHERE.getKeyword().equals(segment.toUpperCase())
-                    && i + 1 < conditionSegments.size()) {
-                // 当前Condition的sql是where，且后一个sql不是where中的条件sql，则跳过不拼接where
-                String nextSegment = conditionSegments.get(i + 1).toUpperCase();
-                if (nextSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())
-                        || nextSegment.startsWith(SqlKeywordEnum.ORDER_BY.getKeyword())) {
-                    continue;
-                }
-            }
+//            if (SqlKeywordEnum.WHERE.getKeyword().equals(segment.toUpperCase())
+//                    && i + 1 < conditionSegments.size()) {
+//                // 当前Condition的sql是where，且后一个sql不是where中的条件sql，则跳过不拼接where
+//                String nextSegment = conditionSegments.get(i + 1).toUpperCase();
+//                if (nextSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())
+//                        || nextSegment.startsWith(SqlKeywordEnum.ORDER_BY.getKeyword())) {
+//                    continue;
+//                }
+//            }
             String tempMainSql = mainSqlBuilder.toString().trim().toUpperCase();
             if (tempMainSql.endsWith(SqlKeywordEnum.WHERE.getKeyword())) {
                 // 每次拼接后都判断是否由WHERE结尾
@@ -179,30 +178,6 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         }
 
         return mainSqlBuilder.toString();
-//
-//        // 第一个sql片段
-//        String firstUpperCaseSegment = conditionSegments.get(0).toUpperCase();
-//
-//        boolean needConcatWhere = this.needConcatWhere(mainSql, firstUpperCaseSegment);
-//        if (!needConcatWhere) {
-//            return mainSql.trim()
-//                    + StrPool.SPACE
-//                    + String.join(StrPool.SPACE, conditionSegments);
-//        }
-//
-//        // 这里自动生成where，去掉第一条件的and或or
-//        if (firstUpperCaseSegment.startsWith(SqlKeywordEnum.AND.getKeyword())
-//                || firstUpperCaseSegment.startsWith(SqlKeywordEnum.OR.getKeyword())) {
-//            // 第一sql含and 或 or，去掉第一个and或or
-//            String tempFirst = conditionSegments.get(0).replaceFirst(AND_OR_REGEX, StrPool.EMPTY);
-//            conditionSegments.remove(0);
-//            conditionSegments.add(0, tempFirst.trim());
-//        }
-//
-//        return StrUtils.join(StrPool.SPACE,
-//                mainSql.trim(),
-//                SqlKeywordEnum.WHERE.getKeyword(),
-//                String.join(StrPool.SPACE, conditionSegments));
     }
 
     /**

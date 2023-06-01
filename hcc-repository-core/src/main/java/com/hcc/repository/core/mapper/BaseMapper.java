@@ -1,7 +1,6 @@
 package com.hcc.repository.core.mapper;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.exceptions.TooManyResultException;
 import com.hcc.repository.core.page.IPage;
 
@@ -41,17 +40,11 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @return
      */
     default int[] batchInsert(Collection<T> entities) {
-        Integer[] rs = Optional.ofNullable(entities)
+        return Optional.ofNullable(entities)
                 .orElse(Collections.emptyList())
                 .stream()
-                .map(this::insert)
-                .toArray(Integer[]::new);
-        int[] r = new int[rs.length];
-        for (int i = 0; i < rs.length; i++) {
-            r[i] = rs[i] == null ? 0 : rs[i];
-        }
-
-        return r;
+                .mapToInt(this::insert)
+                .toArray();
     }
 
     /**
@@ -147,14 +140,13 @@ public interface BaseMapper<T, ID extends Serializable> {
      */
     default T selectOne(ICondition<T> condition) {
         List<T> results = selectList(condition);
-        if (results.isEmpty()) {
-            return null;
-        }
         if (results.size() > 1) {
             throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
-        return results.get(0);
+        return results.stream()
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -189,7 +181,9 @@ public interface BaseMapper<T, ID extends Serializable> {
                     if (m.size() > 1) {
                         throw new TooManyResultException(String.format("预期1列数据，实际%s列数据", m.size()));
                     }
-                    return m.values().stream().findFirst().orElse(null);
+                    return m.values().stream()
+                            .findFirst()
+                            .orElse(null);
                 })
                 .collect(Collectors.toList());
     }
@@ -215,14 +209,13 @@ public interface BaseMapper<T, ID extends Serializable> {
      */
     default T selectOneByMap(Map<String, Object> paramMap) {
         List<T> results = selectListByMap(paramMap);
-        if (results.isEmpty()) {
-            return null;
-        }
         if (results.size() > 1) {
             throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
-        return results.get(0);
+        return results.stream()
+                .findFirst()
+                .orElse(null);
     }
 
     /**

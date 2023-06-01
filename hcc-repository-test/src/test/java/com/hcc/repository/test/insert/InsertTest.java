@@ -22,6 +22,7 @@ public class InsertTest extends BaseTest {
     public void insertTest() {
         for (int i = 0; i < 10; i++) {
             ProductPo productPo = JMockData.mock(ProductPo.class);
+            productPo.setName("hsj");
             productPo.setCreateTime(null);
             productService.save(productPo);
             System.out.println("插入的id: " + productPo.getId());
@@ -36,7 +37,7 @@ public class InsertTest extends BaseTest {
                     .value(ProductPo::getName, "hsj")
                     .value(ProductPo::getPrice, new BigDecimal("1.1"))
                     .value(ProductPo::getProductStatus, ProductStatusEnum.SHELF.getValue());
-            productService.getBaseMapper().insertByCondition(condition);
+            int row = productService.getBaseMapper().insertByCondition(condition);
             System.out.println("插入的id: " + productPo.getId());
         }
     }

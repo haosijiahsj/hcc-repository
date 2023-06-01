@@ -1,7 +1,7 @@
 package com.hcc.repository.extension.conditions;
 
 import com.hcc.repository.core.mapper.BaseMapper;
-import com.hcc.repository.extension.conditions.original.NativeSqlChainCondition;
+import com.hcc.repository.extension.conditions.nativesql.NativeSqlChainCondition;
 import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
 import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
 import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;

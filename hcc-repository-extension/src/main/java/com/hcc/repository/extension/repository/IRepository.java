@@ -8,7 +8,7 @@ import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.conditions.ChainConditions;
-import com.hcc.repository.extension.conditions.original.NativeSqlChainCondition;
+import com.hcc.repository.extension.conditions.nativesql.NativeSqlChainCondition;
 import com.hcc.repository.extension.conditions.query.DefaultQueryChainCondition;
 import com.hcc.repository.extension.conditions.query.LambdaQueryChainCondition;
 import com.hcc.repository.extension.conditions.update.DefaultUpdateChainCondition;
