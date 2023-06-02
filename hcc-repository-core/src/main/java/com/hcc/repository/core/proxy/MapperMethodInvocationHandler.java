@@ -48,7 +48,7 @@ public class MapperMethodInvocationHandler implements InvocationHandler {
         AbstractMethodHandler handler = MethodHandlerFactory.create(method);
         handler.setMethod(method);
         handler.setJdbcOperations(jdbcOperations);
-        handler.setArgs(args);
+        handler.setArgs(args == null ? new Object[] {} : args);
         handler.setConfiguration(configuration);
 
         // 解析出BaseMapper上的泛型

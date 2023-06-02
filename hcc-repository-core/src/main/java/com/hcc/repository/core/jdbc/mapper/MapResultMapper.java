@@ -15,7 +15,7 @@ import java.util.Map;
  * @author hushengjun
  * @date 2023/4/26
  */
-public class HashMapResultMapper implements ResultMapper<Map<String, Object>> {
+public class MapResultMapper implements ResultMapper<Map<String, Object>> {
 
     @Override
     public Map<String, Object> resultMap(ResultSet rs, int rowNum) throws SQLException {

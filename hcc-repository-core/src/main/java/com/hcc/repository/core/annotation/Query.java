@@ -1,7 +1,7 @@
 package com.hcc.repository.core.annotation;
 
 import com.hcc.repository.core.jdbc.ResultMapper;
-import com.hcc.repository.core.jdbc.mapper.GeneralResultMapper;
+import com.hcc.repository.core.jdbc.mapper.DefaultResultMapper;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -43,6 +43,6 @@ public @interface Query {
      * 映射器
      * @return
      */
-    Class<? extends ResultMapper> resultMapper() default GeneralResultMapper.class;
+    Class<? extends ResultMapper> resultMapper() default DefaultResultMapper.class;
 
 }

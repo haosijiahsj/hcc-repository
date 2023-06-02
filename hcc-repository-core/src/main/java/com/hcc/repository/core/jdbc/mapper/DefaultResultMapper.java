@@ -1,102 +1,71 @@
 package com.hcc.repository.core.jdbc.mapper;
 
-import com.hcc.repository.core.convert.ConverterFactory;
-import com.hcc.repository.core.convert.ValueConverter;
 import com.hcc.repository.core.jdbc.ResultMapper;
-import com.hcc.repository.core.utils.ReflectUtils;
-import com.hcc.repository.core.utils.StrUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
-import java.lang.reflect.Field;
+import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
- * 普通对象RowMapper，使用字段名称作为映射
+ * 默认的结果映射器，通过targetClass类型选择合适的映射器
  *
  * @author hushengjun
- * @date 2023/4/26
+ * @date 2023/6/2
  */
-public class DefaultResultMapper<T> implements ResultMapper<T> {
+public class DefaultResultMapper implements ResultMapper<Object> {
 
-    private final Class<T> entityClass;
-    private final Map<String, Field> fieldNameMap;
-    private final Map<String, Field> fieldUnderlineNameMap;
+    private static final List<Class<?>> SUPPORT_OBJ_CLASSES;
+    private static final List<Class<?>> SUPPORT_JAVA8_TIME_CLASSES;
 
-    public DefaultResultMapper(Class<T> entityClass) {
-        this.entityClass = entityClass;
-        List<Field> fields = ReflectUtils.getAllDeclaredFields(entityClass);
-        fieldNameMap = fields.stream().collect(Collectors.toMap(Field::getName, Function.identity()));
-        fieldUnderlineNameMap = fields.stream().collect(Collectors.toMap(f -> StrUtils.humpToUnderline(f.getName()), Function.identity()));
+    private final Class<?> targetClass;
+    private final ResultMapper<?> resultMapper;
+
+    static {
+        SUPPORT_OBJ_CLASSES = Arrays.asList(
+                boolean.class, byte.class, short.class, int.class, long.class, float.class, double.class, char.class,
+                Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class,
+                Number.class, BigDecimal.class,
+                Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
+                byte[].class, Blob.class, Clob.class,
+                String.class
+        );
+        SUPPORT_JAVA8_TIME_CLASSES = Arrays.asList(
+                LocalTime.class, LocalDate.class, LocalDateTime.class
+        );
     }
 
+    public DefaultResultMapper(Class<?> targetClass) {
+        this.targetClass = targetClass;
+        this.resultMapper = this.matchResultMapper();
+    }
+
+    /**
+     * 匹配映射器
+     * @return
+     */
+    private ResultMapper<?> matchResultMapper() {
+        if (Map.class.isAssignableFrom(targetClass)) {
+            return new MapResultMapper();
+        } else if (SUPPORT_OBJ_CLASSES.contains(targetClass)) {
+            return new ObjectResultMapper(targetClass);
+        } else if (SUPPORT_JAVA8_TIME_CLASSES.contains(targetClass)) {
+            return new Java8TimeResultMapper(targetClass);
+        }
+
+        return new EntityResultMapper<>(targetClass);
+    }
     @Override
-    public T resultMap(ResultSet rs, int rowNum) throws SQLException {
-        T instance = ReflectUtils.newInstance(entityClass);
-
-        ResultSetMetaData rsMetaData = rs.getMetaData();
-        int columnCount = rsMetaData.getColumnCount();
-        for (int index = 1; index <= columnCount; index++) {
-            String columnName = this.getColumnName(rsMetaData, index);
-
-            Object columnValue = JdbcUtils.getResultSetValue(rs, index);
-            if (columnValue == null) {
-                continue;
-            }
-
-            Field field = fieldNameMap.get(columnName);
-            if (field == null && !strictMode()) {
-                field = fieldUnderlineNameMap.get(columnName);
-            }
-            if (field == null) {
-                continue;
-            }
-
-            // 反射赋值
-            ReflectUtils.setValue(instance, field, this.getColumnValue(rs, columnName, index, field.getType()));
-        }
-
-        return instance;
-    }
-
-    /**
-     * 获取列值
-     * @param rs
-     * @param columnName
-     * @param index
-     * @param fieldClass
-     * @return
-     * @throws SQLException
-     */
-    protected Object getColumnValue(ResultSet rs, String columnName, int index, Class<?> fieldClass) throws SQLException {
-        Object columnValue = JdbcUtils.getResultSetValue(rs, index);
-        if (columnValue == null) {
-            return null;
-        }
-        Object targetValue;
-        ValueConverter<?> converter = ConverterFactory.getConverter(fieldClass);
-        if (converter != null) {
-            // 可以获取到转换器，则使用转换器转换
-            targetValue = converter.convert(columnValue, fieldClass);
-        } else {
-            // 否则使用的是ResultSet提供的方法获取值
-            targetValue = JdbcUtils.getResultSetValue(rs, index, fieldClass);
-        }
-
-        return targetValue;
-    }
-
-    /**
-     * 严格模式，字段与列名必须一致，否则可以转下划线一致即可映射
-     * @return
-     */
-    protected boolean strictMode() {
-        return false;
+    public Object resultMap(ResultSet rs, int rowNum) throws SQLException {
+        return resultMapper.resultMap(rs, rowNum);
     }
 
 }

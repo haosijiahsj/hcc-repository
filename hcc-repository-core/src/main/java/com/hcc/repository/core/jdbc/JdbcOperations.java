@@ -2,7 +2,7 @@ package com.hcc.repository.core.jdbc;
 
 import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.jdbc.batch.PreparedStatementObjectSetter;
-import com.hcc.repository.core.jdbc.mapper.GeneralResultMapper;
+import com.hcc.repository.core.jdbc.mapper.RepoEntityResultMapper;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -91,7 +91,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> List<T> namedQueryForEntityList(String sql, Map<String, Object> paramMap, Class<T> entityClass) {
-        return getNamedParameterJdbcTemplate().query(sql, paramMap, new GeneralResultMapper<>(entityClass));
+        return getNamedParameterJdbcTemplate().query(sql, paramMap, new RepoEntityResultMapper<>(entityClass));
     }
 
     /**
@@ -199,7 +199,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> List<T> queryForEntityList(String sql, Object[] args, Class<T> entityClass) {
-        return getJdbcTemplate().query(sql, args, new GeneralResultMapper<>(entityClass));
+        return getJdbcTemplate().query(sql, args, new RepoEntityResultMapper<>(entityClass));
     }
 
     /**

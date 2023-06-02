@@ -21,16 +21,16 @@ import java.util.Map;
 import java.util.Objects;
 
 /**
- * 通用的ResultMapper转换器
+ * 隐射实体的ResultMapper转换器
  *
  * @author hushengjun
  * @date 2023/3/17
  */
-public class GeneralResultMapper<T> implements ResultMapper<T> {
+public class RepoEntityResultMapper<T> implements ResultMapper<T> {
 
     private final Class<T> entityClass;
 
-    public GeneralResultMapper(Class<T> entityClass) {
+    public RepoEntityResultMapper(Class<T> entityClass) {
         this.entityClass = entityClass;
     }
 

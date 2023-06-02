@@ -85,4 +85,7 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
     )
     List<ProductPo> selectProducts2(@Param("ma") Map<String, Object> paramMap);
 
+    @Query("select id from product")
+    List<Long> selectIds();
+
 }
