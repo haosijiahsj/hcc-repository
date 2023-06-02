@@ -24,7 +24,6 @@ import java.util.Map;
 public class DefaultResultMapper implements ResultMapper<Object> {
 
     private static final List<Class<?>> SUPPORT_OBJ_CLASSES;
-    private static final List<Class<?>> SUPPORT_JAVA8_TIME_CLASSES;
 
     private final Class<?> targetClass;
     private final ResultMapper<?> resultMapper;
@@ -35,11 +34,9 @@ public class DefaultResultMapper implements ResultMapper<Object> {
                 Boolean.class, Byte.class, Short.class, Integer.class, Long.class, Float.class, Double.class, Character.class,
                 Number.class, BigDecimal.class,
                 Date.class, java.sql.Date.class, java.sql.Time.class, java.sql.Timestamp.class,
+                LocalTime.class, LocalDate.class, LocalDateTime.class,
                 byte[].class, Blob.class, Clob.class,
                 String.class
-        );
-        SUPPORT_JAVA8_TIME_CLASSES = Arrays.asList(
-                LocalTime.class, LocalDate.class, LocalDateTime.class
         );
     }
 
@@ -57,8 +54,6 @@ public class DefaultResultMapper implements ResultMapper<Object> {
             return new MapResultMapper();
         } else if (SUPPORT_OBJ_CLASSES.contains(targetClass)) {
             return new ObjectResultMapper(targetClass);
-        } else if (SUPPORT_JAVA8_TIME_CLASSES.contains(targetClass)) {
-            return new Java8TimeResultMapper(targetClass);
         }
 
         return new EntityResultMapper<>(targetClass);

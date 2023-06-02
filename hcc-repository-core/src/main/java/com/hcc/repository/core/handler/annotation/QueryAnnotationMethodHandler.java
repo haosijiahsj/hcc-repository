@@ -43,6 +43,8 @@ import java.util.Set;
 public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
 
     private static final String AND_OR_REGEX = "(?i)AND|(?i)OR";
+    private static final String SET_VAL_REGEX_COMMA = ".+=.+,";
+    private static final String SET_VAL_REGEX = ".+=.+";
     protected final Query queryAnnotation;
 
     public QueryAnnotationMethodHandler(Query queryAnnotation) {
@@ -170,6 +172,24 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                         log.debug("sql片段：{}将去除AND或OR", segment);
                     }
                     segment = segment.replaceFirst(AND_OR_REGEX, StrPool.EMPTY).trim();
+                }
+            }
+
+            // 如果当前sql含SET关键字，且当前语句以逗号结尾
+            if (tempMainSql.contains(SqlKeywordEnum.SET.getKeyword()) && segment.endsWith(StrPool.COMMA)
+                    && segment.matches(SET_VAL_REGEX_COMMA)) {
+                if (i == conditionSegments.size() - 1) {
+                    // 当前语句为最后一个，则去掉末尾的逗号
+                    segment = segment.substring(0, segment.length() - 1);
+                } else if (i < conditionSegments.size() - 1) {
+                    String nextSegment = conditionSegments.get(i + 1);
+                    if (!nextSegment.endsWith(StrPool.COMMA) && !nextSegment.matches(SET_VAL_REGEX)) {
+                        // 后一个语句不是逗号结尾，且不是赋值语句，则当前语句去掉末尾逗号
+                        segment = segment.substring(0, segment.length() - 1);
+                        if (log.isDebugEnabled()) {
+                            log.debug("sql片段：{}将去除(,)", segment);
+                        }
+                    }
                 }
             }
 

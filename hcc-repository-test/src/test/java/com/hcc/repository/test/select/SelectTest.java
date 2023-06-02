@@ -67,6 +67,9 @@ public class SelectTest extends BaseTest {
     public void queryAnnotationTest1() {
         List<Long> ids = productMapper.selectIds();
         System.out.println(ids);
+
+        long id = productMapper.selectId();
+        System.out.println(id);
     }
 
 }

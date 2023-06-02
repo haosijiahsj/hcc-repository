@@ -1,6 +1,7 @@
 package com.hcc.repository.core.jdbc;
 
 import com.hcc.repository.core.exceptions.RepositoryException;
+import com.hcc.repository.core.exceptions.TooManyResultException;
 import com.hcc.repository.core.jdbc.batch.PreparedStatementObjectSetter;
 import com.hcc.repository.core.jdbc.mapper.RepoEntityResultMapper;
 import com.hcc.repository.core.utils.CollUtils;
@@ -216,7 +217,7 @@ public interface JdbcOperations {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);
@@ -248,7 +249,7 @@ public interface JdbcOperations {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
         }
 
         return results.get(0);

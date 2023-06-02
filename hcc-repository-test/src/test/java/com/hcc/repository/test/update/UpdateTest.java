@@ -40,4 +40,11 @@ public class UpdateTest extends BaseTest {
         productService.updateById(productPo);
     }
 
+    @Test
+    public void updateByAnnotation() {
+        ProductPo productPo = productService.getById(375700039445909504L);
+        productPo.setName("hcc_1");
+        productMapper.updateDynamic(productPo);
+    }
+
 }

@@ -10,6 +10,7 @@ import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.test.domain.ProductQueryParam;
 import com.hcc.repository.test.domain.po.ProductPo;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -88,4 +89,19 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
     @Query("select id from product")
     List<Long> selectIds();
 
+    @Query("select id from product limit 1")
+    long selectId();
+
+    @Modifying
+    @Query(
+            value = "update product p set",
+            conditions = {
+                    @Condition("p.name = #{po.name},"),
+                    @Condition("p.price = #{po.price},"),
+                    @Condition("p.product_status = #{po.productStatus.value},"),
+                    @Condition("where"),
+                    @Condition("p.id = #{po.id}")
+            }
+    )
+    void updateDynamic(@Param("po") ProductPo productPo);
 }
