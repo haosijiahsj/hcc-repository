@@ -27,7 +27,7 @@ public class BatchInsertHandler extends InsertHandler {
         List<Map<String, Object>> paramMaps = new ArrayList<>();
         String sql = "";
         for (Object entity : entities) {
-            DefaultInsertCondition<?> condition = (DefaultInsertCondition<?>) super.assembleCondition(entity);
+            DefaultInsertCondition<?> condition = (DefaultInsertCondition<?>) super.buildCondition(entity);
             condition.setEntityClass(entityClass);
             paramMaps.add(condition.getColumnValuePairs());
             sql = condition.getExecuteSql();

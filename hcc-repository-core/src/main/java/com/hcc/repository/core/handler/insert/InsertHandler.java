@@ -38,7 +38,7 @@ public class InsertHandler extends AbstractMethodHandler {
 
     @Override
     protected ICondition<?> prepareCondition() {
-        return assembleCondition(getFirstArg());
+        return buildCondition(getFirstArg());
     }
 
     /**
@@ -46,7 +46,7 @@ public class InsertHandler extends AbstractMethodHandler {
      * @param entity
      * @return
      */
-    protected ICondition<?> assembleCondition(Object entity) {
+    protected ICondition<?> buildCondition(Object entity) {
         DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(entity);
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
         columnInfos.forEach(c -> {

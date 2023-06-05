@@ -87,7 +87,7 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         context.setTableName(tableInfo.getTableName());
         context.setEntityClass(tableInfo.getClazz());
 
-        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstanceForCache(columnInfo.getInsertStrategy());
+        AutoFillStrategy autoFillStrategy = ReflectUtils.newInstanceForCache(columnInfo.getUpdateStrategy());
         if (!autoFillStrategy.autoFill(context)) {
             return null;
         }

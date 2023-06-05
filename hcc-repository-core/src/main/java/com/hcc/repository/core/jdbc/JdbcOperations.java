@@ -217,7 +217,7 @@ public interface JdbcOperations {
             return null;
         }
         if (results.size() > 1) {
-            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(1, results.size());
         }
 
         return results.get(0);
@@ -249,7 +249,7 @@ public interface JdbcOperations {
             return null;
         }
         if (results.size() > 1) {
-            throw new TooManyResultException(String.format("预期1条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(1, results.size());
         }
 
         return results.get(0);
