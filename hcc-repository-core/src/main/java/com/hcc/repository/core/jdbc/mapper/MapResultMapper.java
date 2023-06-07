@@ -1,7 +1,7 @@
 package com.hcc.repository.core.jdbc.mapper;
 
 import com.hcc.repository.core.jdbc.ResultMapper;
-import org.springframework.jdbc.support.JdbcUtils;
+import com.hcc.repository.core.utils.JdbcUtils;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;

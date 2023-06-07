@@ -1,14 +1,12 @@
 package com.hcc.repository.core.jdbc.mapper;
 
 import com.hcc.repository.annotation.IEnum;
-import com.hcc.repository.core.convert.ConverterFactory;
-import com.hcc.repository.core.convert.ValueConverter;
 import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
@@ -68,14 +66,7 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
                 // 枚举处理
                 targetValue = this.convertToEnum(columnValue, fieldTypeClass);
             } else {
-                ValueConverter<?> converter = ConverterFactory.getConverter(fieldTypeClass);
-                if (converter != null) {
-                    // 可以获取到转换器，则使用转换器转换
-                    targetValue = converter.convert(columnValue, fieldTypeClass);
-                } else {
-                    // 否则使用的是ResultSet提供的方法获取值
-                    targetValue = JdbcUtils.getResultSetValue(rs, index, fieldTypeClass);
-                }
+                targetValue = JdbcUtils.getResultSetValue(rs, index, fieldTypeClass);
             }
 
             // 执行监听器

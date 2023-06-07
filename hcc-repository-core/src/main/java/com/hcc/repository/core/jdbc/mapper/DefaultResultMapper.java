@@ -49,15 +49,16 @@ public class DefaultResultMapper implements ResultMapper<Object> {
      * 匹配映射器
      * @return
      */
-    private ResultMapper<?> matchResultMapper() {
+    protected ResultMapper<?> matchResultMapper() {
         if (Map.class.isAssignableFrom(targetClass)) {
             return new MapResultMapper();
         } else if (SUPPORT_OBJ_CLASSES.contains(targetClass)) {
             return new ObjectResultMapper(targetClass);
         }
 
-        return new EntityResultMapper<>(targetClass);
+        return new RepoEntityResultMapper<>(targetClass);
     }
+
     @Override
     public Object resultMap(ResultSet rs, int rowNum) throws SQLException {
         return resultMapper.resultMap(rs, rowNum);

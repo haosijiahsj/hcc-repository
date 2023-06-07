@@ -1,5 +1,6 @@
 package com.hcc.repository.core.jdbc;
 
+import com.hcc.repository.core.utils.JdbcUtils;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -29,11 +30,7 @@ public interface ResultMapper<T> extends RowMapper<T> {
      */
     default String getColumnName(ResultSetMetaData rsMetaData, int columnIndex) {
         try {
-            String name = rsMetaData.getColumnLabel(columnIndex);
-            if (name == null || name.length() < 1) {
-                name = rsMetaData.getColumnName(columnIndex);
-            }
-            return name;
+            return JdbcUtils.lookupColumnName(rsMetaData, columnIndex);
         } catch (SQLException e) {
             throw new IllegalStateException(String.format("第%s列获取列名失败！", columnIndex));
         }

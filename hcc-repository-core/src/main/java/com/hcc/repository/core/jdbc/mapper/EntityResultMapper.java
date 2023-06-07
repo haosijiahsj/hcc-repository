@@ -1,11 +1,9 @@
 package com.hcc.repository.core.jdbc.mapper;
 
-import com.hcc.repository.core.convert.ConverterFactory;
-import com.hcc.repository.core.convert.ValueConverter;
 import com.hcc.repository.core.jdbc.ResultMapper;
+import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
-import org.springframework.jdbc.support.JdbcUtils;
 
 import java.lang.reflect.Field;
 import java.sql.ResultSet;
@@ -78,17 +76,8 @@ public class EntityResultMapper<T> implements ResultMapper<T> {
         if (columnValue == null) {
             return null;
         }
-        Object targetValue;
-        ValueConverter<?> converter = ConverterFactory.getConverter(fieldClass);
-        if (converter != null) {
-            // 可以获取到转换器，则使用转换器转换
-            targetValue = converter.convert(columnValue, fieldClass);
-        } else {
-            // 否则使用的是ResultSet提供的方法获取值
-            targetValue = JdbcUtils.getResultSetValue(rs, index, fieldClass);
-        }
 
-        return targetValue;
+        return JdbcUtils.getResultSetValue(rs, index, fieldClass);
     }
 
     /**
