@@ -14,16 +14,16 @@ import java.sql.SQLException;
  * @author hushengjun
  * @date 2023/6/2
  */
-public class ObjectResultMapper implements ResultMapper<Object> {
+public class ObjectResultMapper<T> implements ResultMapper<T> {
 
-    private final Class<?> targetClass;
+    private final Class<T> targetClass;
 
-    public ObjectResultMapper(Class<?> targetClass) {
+    public ObjectResultMapper(Class<T> targetClass) {
         this.targetClass = targetClass;
     }
 
     @Override
-    public Object resultMap(ResultSet rs, int rowNum) throws SQLException {
+    public T resultMap(ResultSet rs, int rowNum) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         if (metaData.getColumnCount() != 1) {
             throw new RepositoryException("列不唯一");
@@ -33,7 +33,7 @@ public class ObjectResultMapper implements ResultMapper<Object> {
             return null;
         }
 
-        return JdbcUtils.getResultSetValue(rs, 1, targetClass);
+        return (T) JdbcUtils.getResultSetValue(rs, 1, targetClass);
     }
 
 }

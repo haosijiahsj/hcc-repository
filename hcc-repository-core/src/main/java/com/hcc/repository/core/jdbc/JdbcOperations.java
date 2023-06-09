@@ -3,6 +3,8 @@ package com.hcc.repository.core.jdbc;
 import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.exceptions.TooManyResultException;
 import com.hcc.repository.core.jdbc.batch.PreparedStatementObjectSetter;
+import com.hcc.repository.core.jdbc.mapper.MapResultMapper;
+import com.hcc.repository.core.jdbc.mapper.ObjectResultMapper;
 import com.hcc.repository.core.jdbc.mapper.RepoEntityResultMapper;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
@@ -80,7 +82,7 @@ public interface JdbcOperations {
      * @return
      */
     default List<Map<String, Object>> namedQueryForList(String sql, Map<String, Object> paramMap) {
-        return getNamedParameterJdbcTemplate().queryForList(sql, paramMap);
+        return getNamedParameterJdbcTemplate().query(sql, paramMap, RowMapperWrapper.create(new MapResultMapper()));
     }
 
     /**
@@ -92,7 +94,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> List<T> namedQueryForEntityList(String sql, Map<String, Object> paramMap, Class<T> entityClass) {
-        return getNamedParameterJdbcTemplate().query(sql, paramMap, new RepoEntityResultMapper<>(entityClass));
+        return getNamedParameterJdbcTemplate().query(sql, paramMap, RowMapperWrapper.create(new RepoEntityResultMapper<>(entityClass)));
     }
 
     /**
@@ -188,7 +190,7 @@ public interface JdbcOperations {
      * @param <T>
      */
     default <T> List<T> queryForList(String sql, Object[] args, ResultMapper<T> rowMapper) {
-        return getJdbcTemplate().query(sql, args, rowMapper);
+        return getJdbcTemplate().query(sql, args, RowMapperWrapper.create(rowMapper));
     }
 
     /**
@@ -200,7 +202,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> List<T> queryForEntityList(String sql, Object[] args, Class<T> entityClass) {
-        return getJdbcTemplate().query(sql, args, new RepoEntityResultMapper<>(entityClass));
+        return getJdbcTemplate().query(sql, args, RowMapperWrapper.create(new RepoEntityResultMapper<>(entityClass)));
     }
 
     /**
@@ -232,7 +234,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> T queryForObject(String sql, Object[] args, Class<T> requiredType) {
-        return getJdbcTemplate().queryForObject(sql, args, requiredType);
+        return getJdbcTemplate().queryForObject(sql, args, RowMapperWrapper.create(new ObjectResultMapper<>(requiredType)));
     }
 
     /**

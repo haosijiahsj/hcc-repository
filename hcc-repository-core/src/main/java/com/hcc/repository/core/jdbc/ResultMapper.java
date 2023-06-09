@@ -1,25 +1,19 @@
 package com.hcc.repository.core.jdbc;
 
 import com.hcc.repository.core.utils.JdbcUtils;
-import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
 /**
- * 包装jdbc的RowMapper
+ * 结果映射器
  *
  * @author hushengjun
  * @date 2023/4/26
  */
 @FunctionalInterface
-public interface ResultMapper<T> extends RowMapper<T> {
-
-    @Override
-    default T mapRow(ResultSet rs, int rowNum) throws SQLException {
-        return resultMap(rs, rowNum);
-    }
+public interface ResultMapper<T> {
 
     /**
      * 获取列名，优先获取别名
