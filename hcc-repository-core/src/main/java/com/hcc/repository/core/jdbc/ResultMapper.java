@@ -20,7 +20,6 @@ public interface ResultMapper<T> {
      * @param rsMetaData
      * @param columnIndex
      * @return
-     * @throws SQLException
      */
     default String getColumnName(ResultSetMetaData rsMetaData, int columnIndex) {
         try {

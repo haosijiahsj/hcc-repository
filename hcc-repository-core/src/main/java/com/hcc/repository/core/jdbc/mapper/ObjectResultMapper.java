@@ -1,6 +1,6 @@
 package com.hcc.repository.core.jdbc.mapper;
 
-import com.hcc.repository.core.exceptions.RepositoryException;
+import com.hcc.repository.core.exceptions.IncorrectColumnCountException;
 import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.utils.JdbcUtils;
 
@@ -26,7 +26,7 @@ public class ObjectResultMapper<T> implements ResultMapper<T> {
     public T resultMap(ResultSet rs, int rowNum) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         if (metaData.getColumnCount() != 1) {
-            throw new RepositoryException("列不唯一");
+            throw new IncorrectColumnCountException("列不唯一");
         }
         Object value = rs.getObject(1);
         if (value == null) {

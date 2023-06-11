@@ -53,9 +53,10 @@ public class DefaultResultMapper implements ResultMapper<Object> {
         if (Map.class.isAssignableFrom(targetClass)) {
             return new MapResultMapper();
         } else if (SUPPORT_OBJ_CLASSES.contains(targetClass)) {
-            return new ObjectResultMapper(targetClass);
+            return new ObjectResultMapper<>(targetClass);
         }
 
+        // 默认使用数据库实体映射器
         return new RepoEntityResultMapper<>(targetClass);
     }
 

@@ -44,7 +44,7 @@ public abstract class AbstractMethodHandler {
     public Object handle() throws Exception {
         List<Interceptor> interceptors = Optional.ofNullable(configuration.getInterceptors())
                 .orElse(Collections.emptyList());
-        // 拦截器准备前方法
+        // 拦截器Condition准备前方法
         interceptors.forEach(interceptor -> interceptor.beforePrepareCondition(method, args));
 
         // prepare
@@ -55,7 +55,7 @@ public abstract class AbstractMethodHandler {
         Assert.isNotNull(condition, "condition不能为空");
         condition.setEntityClass(entityClass);
 
-        // 拦截器准备后方法
+        // 拦截器Condition准备后方法
         interceptors.forEach(interceptor -> interceptor.afterPrepareCondition(method, args, condition));
 
         // 解析sql
