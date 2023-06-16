@@ -138,7 +138,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 if (Param.class.equals(argAnnotation.annotationType())) {
                     String paramName = ((Param) argAnnotation).value();
                     if (StrUtils.isEmpty(paramName)) {
-                        throw new IllegalArgumentException(String.format("方法：%s，参数列表第%s个参数@Param注解在需要指定value",
+                        throw new IllegalArgumentException(String.format("方法：%s，参数列表第%s个参数@Param注解需要设置value",
                                 method.getDeclaringClass().getName() + "." + method.getName(), i + 1));
                     }
                     paramMap.put(paramName, args[i]);
