@@ -1,5 +1,6 @@
 package com.hcc.repository.test.select;
 
+import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
@@ -69,6 +70,19 @@ public class SelectTest extends BaseTest {
         System.out.println(ids);
 
         long id = productMapper.selectId();
+        System.out.println(id);
+    }
+
+    @Test
+    public void queryAnnotationTest2() {
+        List<Long> ids = productMapper.selectIds();
+        System.out.println(ids);
+
+//        LambdaQueryCondition<ProductPo> condition = new LambdaQueryCondition<>();
+//        condition.eq(ProductPo::getId, 1L);
+        DefaultQueryCondition<ProductPo> condition = new DefaultQueryCondition<>();
+        condition.eq("p.id", 1L);
+        long id = productMapper.selectByAnnotationAndCondition(condition, "h");
         System.out.println(id);
     }
 

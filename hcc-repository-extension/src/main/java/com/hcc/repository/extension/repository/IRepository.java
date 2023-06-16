@@ -236,7 +236,7 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
-     * 通过条件获取一条数据，当数据多条时返回第一条
+     * 通过条件获取一条数据，当数据多条时返回第一条，此方式不会抛出异常
      * @param condition
      * @return
      */
@@ -250,7 +250,7 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
-     * 跳过条件查询列表
+     * 通过条件查询列表
      * @param condition
      * @return
      */

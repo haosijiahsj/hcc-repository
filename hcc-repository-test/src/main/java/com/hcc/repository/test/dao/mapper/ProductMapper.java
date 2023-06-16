@@ -5,6 +5,7 @@ import com.hcc.repository.core.annotation.Modifying;
 import com.hcc.repository.core.annotation.Param;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.query.LambdaQueryCondition;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.test.domain.ProductQueryParam;
@@ -104,4 +105,7 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
             }
     )
     void updateDynamic(@Param("po") ProductPo productPo);
+
+    @Query("select COUNT(*) from product p where p.name = #{name}")
+    long selectByAnnotationAndCondition(ICondition<ProductPo> condition, @Param("name") String name);
 }

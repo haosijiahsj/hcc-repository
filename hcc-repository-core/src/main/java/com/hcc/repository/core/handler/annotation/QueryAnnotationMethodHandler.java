@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ResolvableType;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -61,15 +62,21 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     @Override
     protected ICondition<?> prepareCondition() {
         ICondition<?> existCondition = null;
+        int conditionParamCount = 0;
         for (Object arg : args) {
             if (arg instanceof ICondition) {
                 existCondition = (ICondition<?>) arg;
+                conditionParamCount++;
             }
         }
+        if (existCondition != null && conditionParamCount > 1) {
+            throw new RepositoryException("ICondition参数只能存在一次");
+        }
 
+        // Condition注解和ICondition参数不能共存
         Condition[] conditions = queryAnnotation.conditions();
         if (ArrayUtils.isNotEmpty(conditions) && existCondition != null) {
-            throw new RepositoryException("@Condition注解存在，不能再使用ICondition参数");
+            throw new RepositoryException("Condition注解存在，不能再使用ICondition参数");
         }
 
         // 收集参数
@@ -81,17 +88,27 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 + StrPool.SPACE
                 + queryAnnotation.last();
 
-        // 构建信息
+        // 构建Condition
         NativeSqlCondition<?> condition = new NativeSqlCondition<>();
         condition.sql(placeholderSql.trim());
         condition.putParamMap(paramMap);
 
-        // 设置sql参数
+        // 拼接Condition中的条件
         if (existCondition != null) {
             // 需要拼接用户sql
             String sqlAfterWhere = existCondition.getSqlAfterWhere();
             if (StrUtils.isNotEmpty(sqlAfterWhere)) {
-                condition.sql(mainSql + StrPool.SPACE + sqlAfterWhere);
+                String tempMainSql = mainSql.toUpperCase().trim();
+                if (tempMainSql.contains(SqlKeywordEnum.WHERE.getKeyword())) {
+                    // 主sql含有where则去掉Condition中的where
+                    sqlAfterWhere = sqlAfterWhere.replace(SqlKeywordEnum.WHERE.getKeyword(), StrPool.EMPTY).trim();
+                    if (!tempMainSql.endsWith(SqlKeywordEnum.WHERE.getKeyword())) {
+                        // 不是where结尾的拼接and关键字
+                        sqlAfterWhere = SqlKeywordEnum.AND.getKeyword() + StrPool.SPACE + sqlAfterWhere;
+                    }
+                }
+                String finalSql = mainSql + StrPool.SPACE + sqlAfterWhere + StrPool.SPACE + queryAnnotation.last();
+                condition.sql(finalSql.trim());
                 condition.putParamMap(existCondition.getColumnValuePairs());
             }
         }
@@ -113,6 +130,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         Map<String, Object> paramMap = new HashMap<>();
         for (int i = 0; i < args.length; i++) {
             if (args[i] instanceof ICondition || args[i] instanceof IPage) {
+                // 这两个类型不添加到参数中
                 continue;
             }
             Annotation[] argAnnotations = methodParaAnnotations[i];
@@ -144,7 +162,8 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         }
         List<String> conditionSegments = this.calcConditionExpression(conditions, paramMap);
         if (CollUtils.isEmpty(conditionSegments)
-                || (conditionSegments.size() == 1 && SqlKeywordEnum.WHERE.getKeyword().equalsIgnoreCase(conditionSegments.get(0)))) {
+                || (conditionSegments.size() == 1
+                && SqlKeywordEnum.WHERE.getKeyword().equalsIgnoreCase(conditionSegments.get(0)))) {
             // Condition中的sql为空，或只有一个where的不拼接
             return mainSql;
         }
@@ -152,15 +171,6 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         StringBuilder mainSqlBuilder = new StringBuilder(mainSql);
         for (int i = 0; i < conditionSegments.size(); i++) {
             String segment = conditionSegments.get(i);
-//            if (SqlKeywordEnum.WHERE.getKeyword().equals(segment.toUpperCase())
-//                    && i + 1 < conditionSegments.size()) {
-//                // 当前Condition的sql是where，且后一个sql不是where中的条件sql，则跳过不拼接where
-//                String nextSegment = conditionSegments.get(i + 1).toUpperCase();
-//                if (nextSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())
-//                        || nextSegment.startsWith(SqlKeywordEnum.ORDER_BY.getKeyword())) {
-//                    continue;
-//                }
-//            }
             String tempMainSql = mainSqlBuilder.toString().trim().toUpperCase();
             if (tempMainSql.endsWith(SqlKeywordEnum.WHERE.getKeyword())) {
                 // 每次拼接后都判断是否由WHERE结尾
@@ -234,26 +244,6 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         return conditionSegments;
     }
 
-    /**
-     * 是否要拼接where
-     * @param mainSql
-     * @param firstSegment
-     * @return
-     */
-    private boolean needConcatWhere(String mainSql, String firstSegment) {
-        // 主sql含where的和第一个condition sql含where不拼接where
-        if (mainSql.toUpperCase().contains(SqlKeywordEnum.WHERE.getKeyword())
-                || firstSegment.contains(SqlKeywordEnum.WHERE.getKeyword())) {
-            return false;
-        }
-        if (firstSegment.startsWith(SqlKeywordEnum.GROUP_BY.getKeyword())
-                || firstSegment.startsWith(SqlKeywordEnum.ORDER_BY.getKeyword())) {
-            return false;
-        }
-
-        return true;
-    }
-
     @Override
     protected Object executeSql(String sql, Object[] args) {
         Class<?> genericClass = method.getReturnType();
@@ -282,29 +272,17 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
      * @param rowMapperClass
      * @return
      */
+    @SuppressWarnings("unchecked")
     private ResultMapper<?> newInstanceRowMapper(Class<? extends ResultMapper> rowMapperClass, Class<?> targetClass) {
-        Constructor<?>[] constructors = rowMapperClass.getDeclaredConstructors();
-        Assert.isTrue(constructors.length >= 1, String.format("%s 无构造方法", rowMapperClass.getName()));
-
-        ResultMapper<?> resultMapper = null;
-        for (Constructor<?> constructor : constructors) {
-            int parameterCount = constructor.getParameterCount();
-            if (parameterCount == 1) {
-                try {
-                    resultMapper = (ResultMapper<?>) constructor.newInstance(targetClass);
-                    break;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        // 默认返回无参的
-        if (resultMapper == null) {
-            resultMapper = ReflectUtils.newInstance(rowMapperClass);
-        }
-
-        return resultMapper;
+        return Optional.ofNullable(ReflectUtils.matchConstruct(rowMapperClass, Class.class))
+                .map(c -> {
+                    try {
+                        return (ResultMapper<?>) c.newInstance(targetClass);
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElseGet(() -> ReflectUtils.newInstance(rowMapperClass));
     }
 
 }

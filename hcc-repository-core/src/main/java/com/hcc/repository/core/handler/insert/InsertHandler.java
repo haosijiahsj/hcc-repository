@@ -11,14 +11,15 @@ import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
-import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.util.NumberUtils;
 
-import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -103,7 +104,7 @@ public class InsertHandler extends AbstractMethodHandler {
             // 用户指定值
             idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
         } else if (IdType.GENERATE.equals(idType)) {
-            idValue = newInstance(idColumnInfo.getGenerator(), idColumnInfo.isUseSingletonIdGenerator()).nextId();
+            idValue = newInstanceGenerator(idColumnInfo.getGenerator(), idColumnInfo.isUseSingletonIdGenerator()).nextId();
         }
         if (idValue != null) {
             // 回填id到实体中
@@ -141,33 +142,23 @@ public class InsertHandler extends AbstractMethodHandler {
      * @param useSingletonIdGenerator
      * @return
      */
-    private IdGenerator<?> newInstance(Class<? extends IdGenerator> generatorClass, boolean useSingletonIdGenerator) {
+    private IdGenerator<?> newInstanceGenerator(Class<? extends IdGenerator> generatorClass, boolean useSingletonIdGenerator) {
         if (useSingletonIdGenerator) {
             IdGenerator<?> idGeneratorCache = ID_GENERATOR_CACHE.get(generatorClass);
             if (idGeneratorCache != null) {
                 return idGeneratorCache;
             }
         }
-        Constructor<?>[] constructors = generatorClass.getDeclaredConstructors();
-        Assert.isTrue(constructors.length >= 1, String.format("%s 无构造方法", generatorClass.getName()));
 
-        IdGenerator<?> idGenerator = null;
-        for (Constructor<?> constructor : constructors) {
-            int parameterCount = constructor.getParameterCount();
-            if (parameterCount == 1) {
-                try {
-                    idGenerator = (IdGenerator<?>) constructor.newInstance(configuration);
-                    break;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-
-        // 默认返回无参的
-        if (idGenerator == null) {
-            idGenerator = ReflectUtils.newInstance(generatorClass);
-        }
+        IdGenerator<?> idGenerator = Optional.ofNullable(ReflectUtils.matchConstruct(generatorClass, RepositoryConfiguration.class))
+                .map(c -> {
+                    try {
+                        return (IdGenerator<?>) c.newInstance(configuration);
+                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
+                .orElseGet(() -> ReflectUtils.newInstance(generatorClass));
         if (useSingletonIdGenerator) {
             ID_GENERATOR_CACHE.put(generatorClass, idGenerator);
         }

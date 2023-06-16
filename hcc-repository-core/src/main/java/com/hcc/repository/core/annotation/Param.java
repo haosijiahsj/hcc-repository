@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Param
+ * 参数注解，指定参数名称
  *
  * @author hushengjun
  * @date 2023/4/28

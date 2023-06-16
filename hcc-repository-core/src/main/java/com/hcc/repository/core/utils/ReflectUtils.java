@@ -1,7 +1,10 @@
 package com.hcc.repository.core.utils;
 
 
+import com.hcc.repository.core.jdbc.ResultMapper;
+
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -15,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -269,6 +273,34 @@ public class ReflectUtils {
         }
 
         return fields;
+    }
+
+    public static Constructor<?> matchConstruct(Class<?> clazz, Class<?>...paramTypes) {
+        Constructor<?>[] constructors = clazz.getDeclaredConstructors();
+        Assert.isTrue(constructors.length >= 1, String.format("%s 无构造方法", clazz.getName()));
+
+        int exceptParamCount = Optional.ofNullable(paramTypes).map(p -> p.length).orElse(0);
+        for (Constructor<?> constructor : constructors) {
+            int parameterCount = constructor.getParameterCount();
+            Class<?>[] parameterTypes = constructor.getParameterTypes();
+            if (exceptParamCount == 0 && parameterCount == 0) {
+                return constructor;
+            }
+            if (parameterCount == exceptParamCount) {
+                boolean match = true;
+                for (int i = 0; i < parameterTypes.length; i++) {
+                    if (!parameterTypes[i].equals(paramTypes[i])) {
+                        match = false;
+                        break;
+                    }
+                }
+                if (match) {
+                    return constructor;
+                }
+            }
+        }
+
+        return null;
     }
 
 }

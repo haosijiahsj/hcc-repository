@@ -2,6 +2,7 @@ package com.hcc.repository.extension.repository;
 
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.mapper.BaseMapper;
+import com.hcc.repository.core.utils.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.Serializable;
@@ -14,14 +15,22 @@ import java.io.Serializable;
  */
 public class IRepositoryImpl<M extends BaseMapper<T, ID>, T, ID extends Serializable> implements IRepository<T, ID> {
 
-    @Autowired
+    @Autowired(required = false)
     protected M mapper;
 
-    @Autowired
+    @Autowired(required = false)
     protected JdbcOperations jdbcOperations;
+
+    protected IRepositoryImpl() {}
+
+    protected IRepositoryImpl(M mapper, JdbcOperations jdbcOperations) {
+        this.mapper = mapper;
+        this.jdbcOperations = jdbcOperations;
+    }
 
     @Override
     public M getBaseMapper() {
+        Assert.isNotNull(mapper, "未成功注入该mapper，请通过带参构造方法注入");
         return mapper;
     }
 

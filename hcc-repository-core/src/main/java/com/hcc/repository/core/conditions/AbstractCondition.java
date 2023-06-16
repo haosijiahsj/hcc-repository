@@ -110,6 +110,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     protected String getNamedColumnName(String originalColumnName) {
+        if (originalColumnName.contains(StrPool.POINT)) {
+            // 含有.的替换为_不然参数替换会有问题
+            originalColumnName = originalColumnName.replace(StrPool.POINT, StrPool.UNDERLINE);
+        }
         return originalColumnName + "_HCC_REPO_NAMED_POS_" + pos.incrementAndGet();
     }
 
