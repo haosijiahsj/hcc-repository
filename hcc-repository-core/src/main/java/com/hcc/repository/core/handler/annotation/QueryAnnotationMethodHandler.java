@@ -260,7 +260,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         }
         // 返回值为集合
         List<?> results = jdbcOperations.queryForList(sql, args, rowMapper);
-        if (Set.class.isAssignableFrom(method.getReturnType())) {
+        if (Set.class.equals(method.getReturnType())) {
             return new HashSet<>(results);
         }
 

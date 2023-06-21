@@ -1,8 +1,6 @@
 package com.hcc.repository.core.utils;
 
 
-import com.hcc.repository.core.jdbc.ResultMapper;
-
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -182,7 +180,7 @@ public class ReflectUtils {
     }
 
     /**
-     * 获取interface上的反向类型
+     * 获取interface上的泛型类型
      * @param clazz
      * @return
      */
