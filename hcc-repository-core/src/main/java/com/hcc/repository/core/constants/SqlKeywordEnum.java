@@ -42,7 +42,7 @@ public enum SqlKeywordEnum {
     FROM("FROM"),
     SET("SET"),
     COUNT("COUNT(*)"),
-    ;
+    DISTINCT("DISTINCT");
 
     private final String keyword;
 

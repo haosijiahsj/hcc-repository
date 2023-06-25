@@ -24,11 +24,13 @@ import java.util.stream.Collectors;
 public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
 
     private List<String> selectColumns;
+    private boolean selectDistinct = false;
 
     @Override
     protected void init() {
         super.init();
         selectColumns = new ArrayList<>(32);
+        selectDistinct = false;
         // 默认是select语句
         super.executeSqlType = ExecuteSqlTypeEnum.SELECT;
     }
@@ -36,6 +38,7 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
     @Override
     public void reset() {
         super.reset();
+        selectDistinct = false;
         selectColumns = new ArrayList<>(32);
         super.executeSqlType = ExecuteSqlTypeEnum.SELECT;
     }
@@ -49,6 +52,15 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
     public final C select(R...columns) {
         selectColumns.addAll(Arrays.stream(columns).map(this::getColumnName).collect(Collectors.toList()));
         return typeThis;
+    }
+
+    @Override
+    @SafeVarargs
+    public final C selectDistinct(R...columns) {
+        if (!selectDistinct) {
+            selectDistinct = true;
+        }
+        return select(columns);
     }
 
     @Override
@@ -73,7 +85,10 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
             sqlSelect = String.join(StrPool.COMMA_SPACE, selectColumns);
         }
 
-        return SqlKeywordEnum.SELECT.getKeyword() + StrPool.SPACE + sqlSelect;
+        return SqlKeywordEnum.SELECT.getKeyword()
+                + (selectDistinct ? StrPool.SPACE + SqlKeywordEnum.DISTINCT.getKeyword() : StrPool.EMPTY)
+                + StrPool.SPACE
+                + sqlSelect;
     }
 
     /**

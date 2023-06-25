@@ -30,7 +30,12 @@ public class SelectTest extends BaseTest {
 
     @Test
     public void complexListTest() {
-        productService.lambdaQuery().or(c -> c.like(ProductPo::getName, "a")).or().eq(ProductPo::getId, 1).list();
+        productService.lambdaQuery()
+                .selectDistinct(ProductPo::getId)
+                .or(c -> c.like(ProductPo::getName, "a"))
+                .or()
+                .eq(ProductPo::getId, 1)
+                .list();
         productService.nativeSql().sql("select * from product limit 1").one();
     }
 

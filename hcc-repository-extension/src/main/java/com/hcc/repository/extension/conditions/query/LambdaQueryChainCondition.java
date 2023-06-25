@@ -39,6 +39,13 @@ public class LambdaQueryChainCondition<T, ID extends Serializable>
         return typeThis;
     }
 
+    @SafeVarargs
+    @Override
+    public final LambdaQueryChainCondition<T, ID> selectDistinct(SFunction<T, ?>... columns) {
+        ch.selectDistinct(columns);
+        return typeThis;
+    }
+
     @Override
     public LambdaQueryChainCondition<T, ID> select(Class<T> entityClass, Predicate<TableColumnInfo> predicate) {
         ch.select(entityClass, predicate);

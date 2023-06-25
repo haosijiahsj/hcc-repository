@@ -14,6 +14,8 @@ public interface SelectClause<C, T, R> {
 
     C select(R...columns);
 
+    C selectDistinct(R...columns);
+
     C select(Class<T> entityClass, Predicate<TableColumnInfo> predicate);
 
     default C select(Predicate<TableColumnInfo> predicate) {

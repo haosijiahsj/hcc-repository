@@ -38,6 +38,12 @@ public class DefaultQueryChainCondition<T, ID extends Serializable>
     }
 
     @Override
+    public DefaultQueryChainCondition<T, ID> selectDistinct(String... columns) {
+        ch.selectDistinct(columns);
+        return typeThis;
+    }
+
+    @Override
     public DefaultQueryChainCondition<T, ID> select(Class<T> entityClass, Predicate<TableColumnInfo> predicate) {
         ch.select(entityClass, predicate);
         return typeThis;
