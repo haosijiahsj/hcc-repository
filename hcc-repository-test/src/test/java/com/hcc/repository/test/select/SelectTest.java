@@ -86,4 +86,10 @@ public class SelectTest extends BaseTest {
         System.out.println(id);
     }
 
+    @Test
+    public void queryAnnotationTest3() {
+        long id = productMapper.selectByAnnotationForArgIndex("h");
+        System.out.println(id);
+    }
+
 }

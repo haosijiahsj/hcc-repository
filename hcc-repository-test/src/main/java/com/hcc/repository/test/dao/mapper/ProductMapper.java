@@ -107,5 +107,9 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
     void updateDynamic(@Param("po") ProductPo productPo);
 
     @Query("select COUNT(*) from product p where p.name = #{name}")
-    long selectByAnnotationAndCondition(ICondition<ProductPo> condition, @Param("name") String name);
+    long selectByAnnotationAndCondition(ICondition<ProductPo> condition, @Param("") String name);
+
+    @Query("select COUNT(*) from product p where p.name = #{arg0}")
+    long selectByAnnotationForArgIndex(String name);
+
 }

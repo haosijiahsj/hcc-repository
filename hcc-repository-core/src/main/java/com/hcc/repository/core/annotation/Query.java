@@ -27,7 +27,7 @@ public @interface Query {
     String value();
 
     /**
-     * 动态条件sql，注意Condition表达式一旦计算为true则直接拼接sql片段<br/>
+     * 动态条件sql，注意Condition表达式为空或计算为true则直接拼接sql片段<br/>
      * 当AND或OR前出现WHERE关键字时，将去除该sql片段首部的AND或OR<br/>
      * 当Update的SET子句最后一个为逗号结尾则会去掉逗号<br/>
      * 其它情况直接拼接

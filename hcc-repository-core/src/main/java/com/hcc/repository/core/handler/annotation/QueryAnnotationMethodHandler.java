@@ -17,6 +17,7 @@ import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.ExpressionParseUtils;
 import com.hcc.repository.core.utils.JSqlParserUtils;
+import com.hcc.repository.core.utils.MethodParamNameUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -124,13 +125,17 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
         if (ArrayUtils.isEmpty(args)) {
             return Collections.emptyMap();
         }
+        // 尝试获取方法参数名称
+        String[] methodParamNames = MethodParamNameUtils.getMethodParamNames(method);
         // 参数上的注解
         Annotation[][] methodParaAnnotations = method.getParameterAnnotations();
 
         Map<String, Object> paramMap = new HashMap<>();
         for (int i = 0; i < args.length; i++) {
+            // 支持通过位置来使用参数无需标注Param注解，但实际开发不建议
+            paramMap.put("arg" + i, args[i]);
             if (args[i] instanceof ICondition || args[i] instanceof IPage) {
-                // 这两个类型不添加到参数中
+                // 这两个类型参与Param解析
                 continue;
             }
             Annotation[] argAnnotations = methodParaAnnotations[i];
@@ -138,9 +143,13 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
                 if (Param.class.equals(argAnnotation.annotationType())) {
                     String paramName = ((Param) argAnnotation).value();
                     if (StrUtils.isEmpty(paramName)) {
-                        throw new IllegalArgumentException(String.format("方法：%s，参数列表第%s个参数@Param注解需要设置value",
-                                method.getDeclaringClass().getName() + "." + method.getName(), i + 1));
+                        if (ArrayUtils.isEmpty(methodParamNames)) {
+                            throw new IllegalArgumentException(String.format("编译时未使用-parameters参数，方法：%s，参数列表第%s个参数@Param注解需要设置value",
+                                    method.getDeclaringClass().getName() + "." + method.getName(), i + 1));
+                        }
+                        paramName = methodParamNames[i];
                     }
+
                     paramMap.put(paramName, args[i]);
                 }
             }
