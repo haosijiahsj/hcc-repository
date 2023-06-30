@@ -9,6 +9,8 @@ import com.hcc.repository.test.domain.po.ProductPo;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * InsertTest
@@ -40,6 +42,16 @@ public class InsertTest extends BaseTest {
             int row = productService.getBaseMapper().insertByCondition(condition);
             System.out.println("插入的id: " + productPo.getId());
         }
+    }
+
+    @Test
+    public void insertTest2() {
+        List<ProductPo> productPos = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ProductPo productPo = JMockData.mock(ProductPo.class);
+            productPos.add(productPo);
+        }
+        productService.batchSaveSplice(productPos);
     }
 
 }

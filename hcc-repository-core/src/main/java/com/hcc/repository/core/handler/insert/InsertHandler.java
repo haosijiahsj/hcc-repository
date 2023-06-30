@@ -68,7 +68,7 @@ public class InsertHandler extends AbstractMethodHandler {
         });
 
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
-        if (idColumnInfo != null && IdType.GENERATE.equals(idColumnInfo.getIdType())) {
+        if (idColumnInfo != null && (IdType.GENERATE.equals(idColumnInfo.getIdType()) || IdType.SPECIFY.equals(idColumnInfo.getIdType()))) {
             condition.value(idColumnInfo.getColumnName(), getIdValue(idColumnInfo, entity));
         }
 
@@ -120,7 +120,7 @@ public class InsertHandler extends AbstractMethodHandler {
      * @param columnInfo
      * @return
      */
-    private Object getInsertAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo) {
+    protected Object getInsertAutoFillValue(TableInfo tableInfo, TableColumnInfo columnInfo) {
         AutoFillContext context = new AutoFillContext();
         context.setFieldName(columnInfo.getFieldName());
         context.setColumnName(columnInfo.getColumnName());

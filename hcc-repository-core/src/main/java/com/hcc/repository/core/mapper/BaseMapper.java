@@ -49,6 +49,13 @@ public interface BaseMapper<T, ID extends Serializable> {
     }
 
     /**
+     * 拼接式批量插入
+     * @param entities
+     * @return
+     */
+    int batchInsertSplice(Collection<T> entities);
+
+    /**
      * 根据id删除
      * @param id
      * @return

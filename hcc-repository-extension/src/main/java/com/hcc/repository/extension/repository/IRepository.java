@@ -96,6 +96,16 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
+     * 拼接式批量保存实体数据
+     * @param entities
+     * @return
+     */
+    default boolean batchSaveSplice(Collection<T> entities) {
+        getBaseMapper().batchInsertSplice(entities);
+        return true;
+    }
+
+    /**
      * 通过id更新实体
      * @param entity
      * @return
