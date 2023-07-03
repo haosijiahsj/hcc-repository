@@ -101,8 +101,7 @@ public interface IRepository<T, ID extends Serializable> {
      * @return
      */
     default boolean batchSaveSplice(Collection<T> entities) {
-        getBaseMapper().batchInsertSplice(entities);
-        return true;
+        return getBaseMapper().batchInsertSplice(entities) > 0;
     }
 
     /**

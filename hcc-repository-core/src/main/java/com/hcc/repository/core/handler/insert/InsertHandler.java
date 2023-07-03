@@ -50,22 +50,7 @@ public class InsertHandler extends AbstractMethodHandler {
     protected ICondition<?> buildCondition(Object entity) {
         DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(entity);
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
-        columnInfos.forEach(c -> {
-            Object value = ReflectUtils.getValue(entity, c.getField());
-            // 转换
-            Object targetValue = value;
-            if (c.needConvert()) {
-                targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
-            } else if (c.isAssignableFromIEnum()) {
-                targetValue = ((IEnum<?>) value).getValue();
-            }
-            // 自动填充处理
-            if (c.needAutoFillInsert() && targetValue == null) {
-                targetValue = this.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c);
-            }
-
-            condition.value(c.getColumnName(), targetValue);
-        });
+        columnInfos.forEach(c -> condition.value(c.getColumnName(), this.getColumnValue(c, entity)));
 
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         if (idColumnInfo != null && (IdType.GENERATE.equals(idColumnInfo.getIdType()) || IdType.SPECIFY.equals(idColumnInfo.getIdType()))) {
@@ -112,6 +97,29 @@ public class InsertHandler extends AbstractMethodHandler {
         }
 
         return idValue;
+    }
+
+    /**
+     * 获取列值
+     * @param columnInfo
+     * @param entity
+     * @return
+     */
+    protected Object getColumnValue(TableColumnInfo columnInfo, Object entity) {
+        Object value = ReflectUtils.getValue(entity, columnInfo.getField());
+        // 转换
+        Object targetValue = value;
+        if (columnInfo.needConvert()) {
+            targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
+        } else if (columnInfo.isAssignableFromIEnum()) {
+            targetValue = ((IEnum<?>) value).getValue();
+        }
+        // 自动填充处理
+        if (columnInfo.needAutoFillInsert() && targetValue == null) {
+            targetValue = this.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), columnInfo);
+        }
+
+        return targetValue;
     }
 
     /**

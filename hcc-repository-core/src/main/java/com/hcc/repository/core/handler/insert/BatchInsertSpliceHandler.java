@@ -1,6 +1,5 @@
 package com.hcc.repository.core.handler.insert;
 
-import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdType;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
@@ -10,7 +9,6 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
-import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.ArrayList;
@@ -42,13 +40,14 @@ public class BatchInsertSpliceHandler extends InsertHandler {
         // 获取除id外的列名
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
 
-        // INSERT INTO table_name(column1, column2, ...) VALUES
+        // 插入的列
         List<String> insertColumnNames = columnInfos.stream().map(TableColumnInfo::getColumnName).collect(Collectors.toList());
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         if (idColumnInfo != null && (IdType.GENERATE.equals(idColumnInfo.getIdType()) || IdType.SPECIFY.equals(idColumnInfo.getIdType()))) {
             insertColumnNames.add(idColumnInfo.getColumnName());
         }
 
+        // INSERT INTO table_name(column1, column2, ...) VALUES
         sql.append(StrPool.L_BRACKET)
                 .append(StrUtils.join(StrPool.COMMA_SPACE, insertColumnNames))
                 .append(StrPool.R_BRACKET)
@@ -62,22 +61,10 @@ public class BatchInsertSpliceHandler extends InsertHandler {
             index++;
             List<String> columnNames = new ArrayList<>();
             for (TableColumnInfo c : columnInfos) {
-                Object value = ReflectUtils.getValue(entity, c.getField());
-                // 转换
-                Object targetValue = value;
-                if (c.needConvert()) {
-                    targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
-                } else if (c.isAssignableFromIEnum()) {
-                    targetValue = ((IEnum<?>) value).getValue();
-                }
-                // 自动填充处理
-                if (c.needAutoFillInsert() && targetValue == null) {
-                    targetValue = super.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c);
-                }
                 String columnNamePl = c.getColumnName() + StrPool.UNDERLINE + index;
 
                 columnNames.add(StrPool.getPlaceholder(columnNamePl));
-                condition.putParam(columnNamePl, targetValue);
+                condition.putParam(columnNamePl, super.getColumnValue(c, entity));
             }
 
             // id单独处理一下
