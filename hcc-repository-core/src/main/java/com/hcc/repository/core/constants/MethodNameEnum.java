@@ -3,6 +3,7 @@ package com.hcc.repository.core.constants;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.delete.DeleteByIdsHandler;
 import com.hcc.repository.core.handler.delete.DeleteHandler;
+import com.hcc.repository.core.handler.insert.BatchInsertHandler;
 import com.hcc.repository.core.handler.insert.BatchInsertSpliceHandler;
 import com.hcc.repository.core.handler.insert.InsertByConditionHandler;
 import com.hcc.repository.core.handler.insert.InsertHandler;
@@ -32,7 +33,7 @@ public enum MethodNameEnum {
     // 增
     INSERT("insert", "插入数据", InsertHandler.class),
     INSERT_BY_CONDITION("insertByCondition", "插入数据", InsertByConditionHandler.class),
-    BATCH_INSERT("batchInsert", "批量插入数据", null),
+    BATCH_INSERT("batchInsert", "批量插入数据", BatchInsertHandler.class),
     BATCH_INSERT_SPLICE("batchInsertSplice", "拼接式批量插入数据", BatchInsertSpliceHandler.class),
 
     // 删

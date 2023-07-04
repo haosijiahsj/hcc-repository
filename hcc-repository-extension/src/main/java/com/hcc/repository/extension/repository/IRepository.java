@@ -86,12 +86,22 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
+     * 循环批量保存实体数据
+     * @param entities
+     * @return
+     */
+    default boolean batchSaveLoop(Collection<T> entities) {
+        entities.forEach(this::save);
+        return true;
+    }
+
+    /**
      * 批量保存实体数据
      * @param entities
      * @return
      */
     default boolean batchSave(Collection<T> entities) {
-        entities.forEach(this::save);
+        getBaseMapper().batchInsert(entities);
         return true;
     }
 

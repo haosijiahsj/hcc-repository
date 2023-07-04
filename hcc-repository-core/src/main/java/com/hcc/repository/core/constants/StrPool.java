@@ -21,6 +21,7 @@ public class StrPool {
     public static final String PLACEHOLDER_SUFFIX = "}";
     public static final String HASH = "#";
     public static final String DOLLAR = "$";
+    public static final String QU_MASK = "?";
 
     public static String getPlaceholder(String name) {
         return String.format("%s%s%s", PLACEHOLDER_PREFIX, name, PLACEHOLDER_SUFFIX);

@@ -1,6 +1,7 @@
 package com.hcc.repository.core.jdbc.batch;
 
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 /**
  * 设置对象值
@@ -16,6 +17,6 @@ public interface PreparedStatementObjectSetter<T> {
      * @param ps
      * @param object
      */
-    void setValues(PreparedStatement ps, T object);
+    void setValues(PreparedStatement ps, T object) throws SQLException;
 
 }

@@ -54,4 +54,16 @@ public class InsertTest extends BaseTest {
         productService.batchSaveSplice(productPos);
     }
 
+    @Test
+    public void insertTest3() {
+        List<ProductPo> productPos = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            ProductPo productPo = JMockData.mock(ProductPo.class);
+            productPo.setCreateTime(null);
+            productPo.setUpdateTime(null);
+            productPos.add(productPo);
+        }
+        productService.batchSave(productPos);
+    }
+
 }

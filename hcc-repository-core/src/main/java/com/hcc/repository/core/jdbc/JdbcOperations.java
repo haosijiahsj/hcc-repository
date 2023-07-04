@@ -140,9 +140,10 @@ public interface JdbcOperations {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 T object = batchArgs.get(i);
-                if (object != null) {
-                    setter.setValues(ps, object);
+                if (object == null) {
+                    return;
                 }
+                setter.setValues(ps, object);
             }
 
             @Override

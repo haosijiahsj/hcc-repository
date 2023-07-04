@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * InsertSpliceConditionHandler
+ * 拼接式批量插入
  *
  * @author hushengjun
  * @date 2023/6/29
@@ -26,10 +26,14 @@ import java.util.stream.Collectors;
 public class BatchInsertSpliceHandler extends InsertHandler {
 
     @Override
-    protected ICondition<?> prepareCondition() {
+    protected void prepare() {
         Collection<?> firstArg = super.getFirstArg(Collection.class);
         Assert.isTrue(CollUtils.isNotEmpty(firstArg), "插入参数不能为空");
+    }
 
+    @Override
+    protected ICondition<?> prepareCondition() {
+        Collection<?> entities = super.getFirstArg(Collection.class);
         NativeSqlCondition<?> condition = new NativeSqlCondition<>();
         String tableName = TableInfoHelper.getTableName(entityClass);
 
@@ -57,7 +61,7 @@ public class BatchInsertSpliceHandler extends InsertHandler {
 
         List<String> allColumnNames = new ArrayList<>();
         int index = 0;
-        for (Object entity : firstArg) {
+        for (Object entity : entities) {
             index++;
             List<String> columnNames = new ArrayList<>();
             for (TableColumnInfo c : columnInfos) {

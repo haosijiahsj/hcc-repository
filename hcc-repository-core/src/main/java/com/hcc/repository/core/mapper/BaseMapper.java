@@ -40,7 +40,14 @@ public interface BaseMapper<T, ID extends Serializable> {
      * @param entities
      * @return
      */
-    default int[] batchInsert(Collection<T> entities) {
+    int[] batchInsert(Collection<T> entities);
+
+    /**
+     * 循环式批量插入
+     * @param entities
+     * @return
+     */
+    default int[] batchInsertLoop(Collection<T> entities) {
         return Optional.ofNullable(entities)
                 .orElse(Collections.emptyList())
                 .stream()
