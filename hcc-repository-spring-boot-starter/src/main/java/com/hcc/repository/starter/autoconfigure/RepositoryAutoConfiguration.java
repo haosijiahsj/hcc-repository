@@ -53,6 +53,7 @@ public class RepositoryAutoConfiguration {
         RepositoryInterceptor repositoryInterceptor = repositoryInterceptorObjectProvider.getIfAvailable(RepositoryInterceptor::new);
         RepositoryConfiguration configuration = new RepositoryConfiguration();
         configuration.setInterceptors(repositoryInterceptor.getInterceptors());
+        configuration.setBatchInsertLimitSize(properties.getBatchInsertLimitSize());
         configuration.setPrintSqlLog(properties.isPrintSqlLog());
         configuration.setProperties(properties.getProperties());
 

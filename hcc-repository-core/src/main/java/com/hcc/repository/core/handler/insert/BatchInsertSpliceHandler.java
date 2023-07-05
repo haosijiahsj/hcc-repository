@@ -29,6 +29,8 @@ public class BatchInsertSpliceHandler extends InsertHandler {
     protected void prepare() {
         Collection<?> firstArg = super.getFirstArg(Collection.class);
         Assert.isTrue(CollUtils.isNotEmpty(firstArg), "插入参数不能为空");
+        int batchInsertLimitSize = configuration.getBatchInsertLimitSize();
+        Assert.isTrue(firstArg.size() <= batchInsertLimitSize, String.format("批量插入数量：%s，超出限制：%s", firstArg.size(), batchInsertLimitSize));
     }
 
     @Override

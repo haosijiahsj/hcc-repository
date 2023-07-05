@@ -57,7 +57,7 @@ public class InsertTest extends BaseTest {
     @Test
     public void insertTest3() {
         List<ProductPo> productPos = new ArrayList<>();
-        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 100; i++) {
             ProductPo productPo = JMockData.mock(ProductPo.class);
             productPo.setCreateTime(null);
             productPo.setUpdateTime(null);

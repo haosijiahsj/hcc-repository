@@ -20,6 +20,10 @@ public class RepositoryConfiguration {
      */
     private List<Interceptor> interceptors;
     /**
+     * 批量插入限制数量
+     */
+    private int batchInsertLimitSize = 500;
+    /**
      * 是否打印sql日志
      */
     private boolean printSqlLog;

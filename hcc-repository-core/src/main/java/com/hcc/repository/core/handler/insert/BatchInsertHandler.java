@@ -34,6 +34,8 @@ public class BatchInsertHandler extends InsertHandler {
     protected void prepare() {
         Collection<?> firstArg = super.getFirstArg(Collection.class);
         Assert.isTrue(CollUtils.isNotEmpty(firstArg), "插入参数不能为空");
+        int batchInsertLimitSize = configuration.getBatchInsertLimitSize();
+        Assert.isTrue(firstArg.size() <= batchInsertLimitSize, String.format("批量插入数量：%s，超出限制：%s", firstArg.size(), batchInsertLimitSize));
     }
 
     @Override
@@ -72,6 +74,10 @@ public class BatchInsertHandler extends InsertHandler {
         return condition;
     }
 
+    /**
+     * 构建插入语句
+     * @return
+     */
     private Pair<String, Map<Integer, String>> buildInsertSql() {
         Map<Integer, String> indexColumnNameMap = new HashMap<>();
         List<String> sqlColumns = new ArrayList<>();
@@ -107,6 +113,7 @@ public class BatchInsertHandler extends InsertHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     protected Object executeSql(String sql, Object[] args) {
         List<Map<String, Object>> paramMaps = Arrays.stream(args).map(a -> (Map<String, Object>)a).collect(Collectors.toList());
         return jdbcOperations.batchUpdate(sql, paramMaps, new MapPreparedStatementObjectSetter(this.indexColumnNameMap));
