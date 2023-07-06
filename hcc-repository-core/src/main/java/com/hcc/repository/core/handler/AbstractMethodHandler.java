@@ -119,7 +119,7 @@ public abstract class AbstractMethodHandler {
     private Pair<String, Object[]> parseSql(ICondition<?> condition) {
         Pair<String, Object[]> pair;
         if (condition instanceof NativeSqlCondition && !((NativeSqlCondition<?>) condition).maybeNamedSql()) {
-            // 如果是原生sql的方式传参
+            // 如果是原生sql的方式传参，无需解析sql和参数
             pair = Pair.of(condition.getExecuteSql(), ((NativeSqlCondition<?>) condition).getArgs());
         } else {
             // 真实带有占位符的sql和参数数组

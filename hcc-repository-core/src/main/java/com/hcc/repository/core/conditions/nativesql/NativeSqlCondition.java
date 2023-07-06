@@ -74,6 +74,14 @@ public class NativeSqlCondition<T> extends ICondition<T> {
         return this;
     }
 
+    private void checkParamMap() {
+        Assert.isTrue(CollUtils.isEmpty(args), "添加paramMap参数时，args已存在值");
+    }
+
+    private void checkArgs() {
+        Assert.isTrue(CollUtils.isEmpty(paramMap), "添加args参数时，paramMap已存在值");
+    }
+
     /**
      * 添加参数
      * @param name
@@ -81,6 +89,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * @return
      */
     public NativeSqlCondition<T> putParam(String name, Object val) {
+        this.checkParamMap();
         this.paramMap.put(name, val);
         return this;
     }
@@ -91,6 +100,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * @return
      */
     public NativeSqlCondition<T> putParamMap(Map<String, Object> paramMap) {
+        this.checkParamMap();
         this.paramMap.putAll(paramMap);
         return this;
     }
@@ -101,6 +111,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * @return
      */
     public NativeSqlCondition<T> addArg(Object val) {
+        this.checkArgs();
         args.add(val);
         return this;
     }
@@ -111,6 +122,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * @return
      */
     public NativeSqlCondition<T> addArg(Object... vals) {
+        this.checkArgs();
         args.addAll(Arrays.asList(vals));
         return this;
     }
@@ -121,6 +133,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * @return
      */
     public NativeSqlCondition<T> addArgs(List<Object> args) {
+        this.checkArgs();
         this.args.addAll(args);
         return this;
     }

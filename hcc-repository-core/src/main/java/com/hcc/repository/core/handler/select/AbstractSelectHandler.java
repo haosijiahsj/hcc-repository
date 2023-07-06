@@ -1,14 +1,13 @@
 package com.hcc.repository.core.handler.select;
 
 import com.hcc.repository.core.conditions.ICondition;
-import com.hcc.repository.core.conditions.query.AbstractQueryCondition;
 import com.hcc.repository.core.conditions.query.DefaultQueryCondition;
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
 import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 
 /**
- * AbstractSelectHandler
+ * 抽象的select方法处理器
  *
  * @author hushengjun
  * @date 2023/3/23
