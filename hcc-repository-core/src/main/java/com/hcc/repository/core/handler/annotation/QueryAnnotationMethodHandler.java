@@ -56,7 +56,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     @Override
     protected void prepare() {
         Assert.isTrue(StrUtils.isNotEmpty(queryAnnotation.value()), "sql不能为空");
-        SqlTypeEnum sqlType = JSqlParserUtils.getSqlType(queryAnnotation.value());
+        SqlTypeEnum sqlType = JSqlParserUtils.getSqlTypeFromPrefix(queryAnnotation.value());
         Assert.isTrue(SqlTypeEnum.SELECT.equals(sqlType), "非select语句");
     }
 

@@ -19,7 +19,7 @@ import com.hcc.repository.core.handler.update.UpdateByIdHandler;
 import com.hcc.repository.core.handler.update.UpdateEntityHandler;
 import com.hcc.repository.core.handler.update.UpdateHandler;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -60,17 +60,23 @@ public enum MethodNameEnum {
 
     ;
 
-    private static final List<MethodNameEnum> INSERT_METHODS;
-    private static final List<MethodNameEnum> DELETE_METHODS;
-    private static final List<MethodNameEnum> UPDATE_METHODS;
-    private static final List<MethodNameEnum> SELECT_METHODS;
+    private static final List<MethodNameEnum> INSERT_METHODS = new ArrayList<>();
+    private static final List<MethodNameEnum> DELETE_METHODS = new ArrayList<>();
+    private static final List<MethodNameEnum> UPDATE_METHODS = new ArrayList<>();
+    private static final List<MethodNameEnum> SELECT_METHODS = new ArrayList<>();
 
     static {
-        INSERT_METHODS = Arrays.asList(INSERT, INSERT_BY_CONDITION, BATCH_INSERT);
-        DELETE_METHODS = Arrays.asList(DELETE, DELETE_BY_ID, DELETE_BY_IDS);
-        UPDATE_METHODS = Arrays.asList(UPDATE, UPDATE_BY_ID, UPDATE_ENTITY);
-        SELECT_METHODS = Arrays.asList(SELECT_BY_ID, SELECT_BY_IDS, SELECT_COUNT, SELECT_IDS, SELECT_LIST, SELECT_MAPS,
-                SELECT_ONE, SELECT_LIST_BY_MAP, SELECT_PAGE, SELECT_MAPS_PAGE);
+        for (MethodNameEnum value : MethodNameEnum.values()) {
+            if (value.name().contains(SqlTypeEnum.INSERT.name())) {
+                INSERT_METHODS.add(value);
+            } else if (value.name().contains(SqlTypeEnum.DELETE.name())) {
+                DELETE_METHODS.add(value);
+            } else if (value.name().contains(SqlTypeEnum.UPDATE.name())) {
+                UPDATE_METHODS.add(value);
+            } else if (value.name().contains(SqlTypeEnum.SELECT.name())) {
+                SELECT_METHODS.add(value);
+            }
+        }
     }
     private String methodName;
     private String desc;

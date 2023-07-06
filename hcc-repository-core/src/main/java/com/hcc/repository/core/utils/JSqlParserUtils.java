@@ -17,7 +17,7 @@ import net.sf.jsqlparser.statement.update.Update;
  */
 public class JSqlParserUtils {
 
-    public static SqlTypeEnum getSqlType1(String sql) {
+    public static SqlTypeEnum getSqlType(String sql) {
         Statement statement;
         try {
             statement = CCJSqlParserUtil.parse(sql);
@@ -37,7 +37,7 @@ public class JSqlParserUtils {
         throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
     }
 
-    public static SqlTypeEnum getSqlType(String sql) {
+    public static SqlTypeEnum getSqlTypeFromPrefix(String sql) {
         if (sql.toUpperCase().startsWith(SqlTypeEnum.INSERT.name())) {
             return SqlTypeEnum.INSERT;
         } else if (sql.toUpperCase().startsWith(SqlTypeEnum.DELETE.name())) {
@@ -47,6 +47,7 @@ public class JSqlParserUtils {
         } else if (sql.toUpperCase().startsWith(SqlTypeEnum.SELECT.name())) {
             return SqlTypeEnum.SELECT;
         }
+
         throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
     }
 

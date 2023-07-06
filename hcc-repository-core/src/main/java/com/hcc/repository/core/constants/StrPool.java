@@ -12,6 +12,7 @@ public class StrPool {
     public static final String SPACE = " ";
     public static final String POINT = ".";
     public static final String UNDERLINE = "_";
+    public static final String SHORT_LINE = "-";
     public static final String COMMA = ",";
     public static final String COMMA_SPACE = ", ";
     public static final String COLON = ":";
