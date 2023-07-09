@@ -14,7 +14,7 @@
         <module>hcc-repository-extension</module>
         <module>hcc-repository-spring-boot-starter</module>
         <module>hcc-repository-test</module>
-        <module>hcc-repository-generate</module>
+        <module>hcc-repository-gen</module>
     </modules>
 
     <properties>

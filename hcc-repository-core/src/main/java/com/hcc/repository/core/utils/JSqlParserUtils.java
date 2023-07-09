@@ -38,17 +38,21 @@ public class JSqlParserUtils {
     }
 
     public static SqlTypeEnum getSqlTypeFromPrefix(String sql) {
-        if (sql.toUpperCase().startsWith(SqlTypeEnum.INSERT.name())) {
+        if (StrUtils.isEmpty(sql)) {
+            throw new IllegalArgumentException("sql不能为空");
+        }
+        sql = sql.trim().toUpperCase();
+        if (sql.startsWith(SqlTypeEnum.INSERT.name())) {
             return SqlTypeEnum.INSERT;
-        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.DELETE.name())) {
+        } else if (sql.startsWith(SqlTypeEnum.DELETE.name())) {
             return SqlTypeEnum.DELETE;
-        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.UPDATE.name())) {
+        } else if (sql.startsWith(SqlTypeEnum.UPDATE.name())) {
             return SqlTypeEnum.UPDATE;
-        } else if (sql.toUpperCase().startsWith(SqlTypeEnum.SELECT.name())) {
+        } else if (sql.startsWith(SqlTypeEnum.SELECT.name())) {
             return SqlTypeEnum.SELECT;
         }
 
-        throw new IllegalArgumentException(String.format("sql: %s解析失败", sql));
+        throw new IllegalArgumentException(String.format("sql: %s非法", sql));
     }
 
 }
