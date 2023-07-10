@@ -109,11 +109,17 @@ public class PaginationInterceptor implements ExtInterceptor {
         if (!IPage.class.isAssignableFrom(method.getReturnType())) {
             return result;
         }
-        IPage<?> pageResult = HOLDER.get();
-        if (pageResult == null) {
-            return result;
+
+        IPage<?> pageResult;
+        try {
+            pageResult = HOLDER.get();
+            if (pageResult == null) {
+                return result;
+            }
+            pageResult.setRecords((List) result);
+        } finally {
+            HOLDER.remove();
         }
-        pageResult.setRecords((List) result);
 
         return pageResult;
     }

@@ -28,11 +28,11 @@ public class DynamicTableNameInterceptor implements Interceptor {
     @Override
     public void beforeExecute(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
         if (log.isDebugEnabled()) {
-            log.debug("original sql: {}", context.getSql());
+            log.debug("原始sql: {}", context.getSql());
         }
         String newSql = this.changeTableName(context.getSql());
         if (log.isDebugEnabled()) {
-            log.debug("change table name sql: {}", context.getSql());
+            log.debug("修改表名后的sql: {}", context.getSql());
         }
         context.setSql(newSql);
     }

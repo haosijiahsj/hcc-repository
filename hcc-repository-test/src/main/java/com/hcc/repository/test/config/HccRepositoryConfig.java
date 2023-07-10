@@ -6,8 +6,10 @@ import com.hcc.repository.extension.interceptor.logicdelete.LogicDeleteIntercept
 import com.hcc.repository.extension.interceptor.pagination.DbType;
 import com.hcc.repository.extension.interceptor.pagination.PaginationInterceptor;
 import com.hcc.repository.extension.interceptor.optimisticlock.OptimisticLockInterceptor;
+import com.hcc.repository.extension.interceptor.tenant.TenantInterceptor;
 import com.hcc.repository.starter.autoconfigure.RepositoryInterceptor;
 import com.hcc.repository.test.dao.interceptor.TestInterceptor;
+import net.sf.jsqlparser.expression.LongValue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -28,6 +30,7 @@ public class HccRepositoryConfig {
         interceptor.addInterceptor(new LogicDeleteInterceptor());
         interceptor.addInterceptor(new OptimisticLockInterceptor());
         interceptor.addInterceptor(new DynamicTableNameInterceptor(((originalTableName, curSql) -> originalTableName)));
+        interceptor.addInterceptor(new TenantInterceptor(() -> new LongValue("1")));
 //        interceptor.addInterceptor(new LogInterceptor());
         interceptor.addInterceptor(new PaginationInterceptor(DbType.MYSQL));
 

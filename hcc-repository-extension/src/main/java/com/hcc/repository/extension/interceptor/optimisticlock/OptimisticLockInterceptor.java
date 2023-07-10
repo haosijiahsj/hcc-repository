@@ -8,6 +8,7 @@ import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.ReflectUtils;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.sql.Timestamp;
@@ -20,6 +21,7 @@ import java.util.Date;
  * @author hushengjun
  * @date 2023/5/3
  */
+@Slf4j
 public class OptimisticLockInterceptor implements Interceptor {
 
     private static final String versionColumnName = "HCC_OPT_LOCK_VERSION_COLUMN";
@@ -29,6 +31,9 @@ public class OptimisticLockInterceptor implements Interceptor {
         MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
         if (!MethodNameEnum.UPDATE_BY_ID.equals(methodNameEnum)
                 && !MethodNameEnum.UPDATE_ENTITY.equals(methodNameEnum)) {
+            if (log.isDebugEnabled()) {
+                log.debug("当前方法：{}不支持乐观锁处理", method.getName());
+            }
             return;
         }
         if (!(condition instanceof AbstractUpdateCondition)) {
@@ -36,10 +41,14 @@ public class OptimisticLockInterceptor implements Interceptor {
         }
         TableColumnInfo versionColumnInfo = TableInfoHelper.getVersionColumnInfo(condition.getEntityClass());
         if (versionColumnInfo == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("当前class：{}无乐观锁字段", condition.getEntityClass().getName());
+            }
             return;
         }
         Object originalVersionVal = getOriginalVersionVal(parameters[0], versionColumnInfo);
         if (originalVersionVal == null) {
+            log.warn("要使用乐观锁，必须在传入的实体中赋值乐观锁字段：{}原始值", versionColumnInfo.getFieldName());
             return;
         }
         AbstractUpdateCondition<?, ?, ?> updateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;

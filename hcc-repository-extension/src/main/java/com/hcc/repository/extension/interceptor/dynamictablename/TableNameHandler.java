@@ -9,6 +9,12 @@ package com.hcc.repository.extension.interceptor.dynamictablename;
 @FunctionalInterface
 public interface TableNameHandler {
 
+    /**
+     * 修改表名的方法
+     * @param originalTableName
+     * @param curSql
+     * @return
+     */
     String tableName(String originalTableName, String curSql);
 
 }

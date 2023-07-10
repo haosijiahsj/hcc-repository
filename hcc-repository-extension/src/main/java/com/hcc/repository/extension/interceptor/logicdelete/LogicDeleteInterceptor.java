@@ -67,12 +67,17 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         }
         TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
         if (!predicate.test(tableInfo)) {
-            log.debug("table name: {}忽略逻辑删除拦截器", tableInfo.getTableName());
+            if (log.isDebugEnabled()) {
+                log.debug("table name: {}忽略逻辑删除拦截器", tableInfo.getTableName());
+            }
             return;
         }
 
         boolean hasLogicDeleteColumn = TableInfoHelper.hasLogicDeleteColumn(entityClass);
         if (!hasLogicDeleteColumn) {
+            if (log.isDebugEnabled()) {
+                log.debug("当前class：{}无逻辑删除字段", condition.getEntityClass().getName());
+            }
             return;
         }
 
@@ -87,9 +92,14 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         // 通过condition判断并加入逻辑删除条件
         MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
         if (methodNameEnum == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("当前方法：{}不支持逻辑删除处理", method.getName());
+            }
             return;
         }
         SqlTypeEnum sqlType = methodNameEnum.getSqlType();
+
+        // 插入语句
         if (SqlTypeEnum.INSERT.equals(sqlType)) {
             if (condition instanceof AbstractInsertCondition) {
                 // 插入语句覆盖掉逻辑未删除值
@@ -99,7 +109,10 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
                 }
                 insertCondition.getColumnValuePairs().put(columnName, logicNotDelVal);
             }
-        } else if (SqlTypeEnum.DELETE.equals(sqlType)) {
+        }
+
+        // 更新语句
+        else if (SqlTypeEnum.DELETE.equals(sqlType)) {
             condition.setExecuteSqlType(ExecuteSqlTypeEnum.UPDATE);
             if (condition instanceof AbstractUpdateCondition) {
                 AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
@@ -109,12 +122,18 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
                 abstractUpdateCondition.setSql(String.format("%s = %s", columnName, logicDelVal));
                 abstractUpdateCondition.apply(whereSqlSegment);
             }
-        } else if (SqlTypeEnum.UPDATE.equals(sqlType)) {
+        }
+
+        // 删除语句
+        else if (SqlTypeEnum.UPDATE.equals(sqlType)) {
             if (condition instanceof AbstractUpdateCondition) {
                 AbstractUpdateCondition<?, ?, ?> abstractUpdateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
                 abstractUpdateCondition.apply(whereSqlSegment);
             }
-        } else {
+        }
+
+        // 查询语句
+        else {
             if (condition instanceof AbstractQueryCondition) {
                 AbstractQueryCondition<?, ?, ?> abstractQueryCondition = (AbstractQueryCondition<?, ?, ?>) condition;
                 abstractQueryCondition.apply(whereSqlSegment);
