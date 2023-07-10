@@ -106,8 +106,8 @@ public class TenantInterceptor extends JsqlParserSupport implements ExtIntercept
             // 针对不给列名的insert 不处理
             return;
         }
-        String tenantIdColumn = tenantHandler.tenantColumnName();
-        if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(tenantIdColumn))) {
+        String tenantColumnName = tenantHandler.tenantColumnName();
+        if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(tenantColumnName))) {
             // 针对已给出租户列的insert 不处理
             return;
         }
@@ -119,9 +119,9 @@ public class TenantInterceptor extends JsqlParserSupport implements ExtIntercept
             // fixed github pull/295
             ItemsList itemsList = insert.getItemsList();
             if (itemsList instanceof MultiExpressionList) {
-                ((MultiExpressionList) itemsList).getExprList().forEach(el -> el.getExpressions().add(tenantHandler.getTenantId()));
+                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(tenantHandler.tenantColumnValue()));
             } else {
-                ((ExpressionList) itemsList).getExpressions().add(tenantHandler.getTenantId());
+                ((ExpressionList) itemsList).getExpressions().add(tenantHandler.tenantColumnValue());
             }
         } else {
             throw new RuntimeException("Failed to process multiple-table update, please exclude the tableName or statementId");
@@ -160,7 +160,7 @@ public class TenantInterceptor extends JsqlParserSupport implements ExtIntercept
         //获得where条件表达式
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.getTenantId());
+        equalsTo.setRightExpression(tenantHandler.tenantColumnValue());
         if (null != where) {
             if (where instanceof OrExpression) {
                 return new AndExpression(equalsTo, new Parenthesis(where));
@@ -339,7 +339,7 @@ public class TenantInterceptor extends JsqlParserSupport implements ExtIntercept
     protected Expression builderExpression(Expression currentExpression, Table table) {
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.getTenantId());
+        equalsTo.setRightExpression(tenantHandler.tenantColumnValue());
         if (currentExpression == null) {
             return equalsTo;
         }

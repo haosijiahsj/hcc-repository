@@ -22,7 +22,7 @@ public interface TenantHandler {
      * 租户值
      * @return
      */
-    Expression getTenantId();
+    Expression tenantColumnValue();
 
     /**
      * 该表是否忽略多租户处理
