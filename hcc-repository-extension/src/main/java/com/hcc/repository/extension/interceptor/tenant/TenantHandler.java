@@ -8,6 +8,7 @@ import net.sf.jsqlparser.expression.Expression;
  * @author hushengjun
  * @date 2023/5/1
  */
+@FunctionalInterface
 public interface TenantHandler {
 
     /**

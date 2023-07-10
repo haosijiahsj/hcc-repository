@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.interceptor.tenant;
+package com.hcc.repository.extension.interceptor.logicdelete;
 
 import com.hcc.repository.core.constants.StrPool;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
@@ -7,6 +7,7 @@ import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import com.hcc.repository.extension.interceptor.JSqlParserSupport;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.BinaryExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.NotExpression;
@@ -19,8 +20,11 @@ import net.sf.jsqlparser.expression.operators.relational.ExpressionList;
 import net.sf.jsqlparser.expression.operators.relational.InExpression;
 import net.sf.jsqlparser.expression.operators.relational.ItemsList;
 import net.sf.jsqlparser.expression.operators.relational.MultiExpressionList;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.schema.Table;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.Statements;
 import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.insert.Insert;
 import net.sf.jsqlparser.statement.select.AllColumns;
@@ -41,21 +45,22 @@ import net.sf.jsqlparser.statement.select.WithItem;
 import net.sf.jsqlparser.statement.update.Update;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 /**
- * 多租户拦截器，从mybatis-plus复制过来，支持原始sql
+ * 增强版逻辑删除拦截器
  *
  * @author hushengjun
- * @date 2023/5/1
+ * @date 2023/7/10
  */
 @Slf4j
-public class TenantInterceptor extends JSqlParserSupport implements ExtInterceptor {
+public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements ExtInterceptor {
 
-    private final TenantHandler tenantHandler;
+    private final LogicDeleteHandler logicDeleteHandler;
 
-    public TenantInterceptor(TenantHandler tenantHandler) {
-        this.tenantHandler = tenantHandler;
+    public EnhanceLogicDeleteInterceptor(LogicDeleteHandler logicDeleteHandler) {
+        this.logicDeleteHandler = logicDeleteHandler;
     }
 
     @Override
@@ -68,6 +73,54 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         context.setSql(this.parserSingle(context.getSql(), null));
     }
 
+    @Override
+    public String parserMulti(String sql, Object obj) {
+        if (log.isDebugEnabled()) {
+            log.debug("original SQL: " + sql);
+        }
+        try {
+            // fixed github pull/295
+            StringBuilder sb = new StringBuilder();
+            Statements statements = CCJSqlParserUtil.parseStatements(sql);
+            int i = 0;
+            for (Statement statement : statements.getStatements()) {
+                if (i > 0) {
+                    sb.append(StrPool.SEMICOLON);
+                }
+                // 改写sql
+                if (statement instanceof Delete) {
+                    statement = this.convertDelete2Update(statement);
+                }
+                sb.append(processParser(statement, i, sql, obj));
+                i++;
+            }
+            return sb.toString();
+        } catch (JSQLParserException e) {
+            throw new IllegalArgumentException(String.format("Failed to process, Error SQL: %s", sql), e);
+        }
+    }
+
+    /**
+     * 转换delete到update
+     * @param statement
+     * @return
+     */
+    private Statement convertDelete2Update(Statement statement) {
+        Delete delete = (Delete) statement;
+
+        Update update = new Update();
+        update.setColumns(Collections.singletonList(new Column(logicDeleteHandler.logicDelColumnName())));
+        update.setExpressions(Collections.singletonList(logicDeleteHandler.logicDelColumnValue()));
+        update.setTable(delete.getTable());
+        update.setLimit(delete.getLimit());
+        update.setWhere(delete.getWhere());
+
+        if (log.isDebugEnabled()) {
+            log.debug("转换delete语句：{}到update语句：{}", delete, update);
+        }
+
+        return update;
+    }
 
     @Override
     protected void processSelect(Select select, int index, String sql, Object obj) {
@@ -97,7 +150,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
 
     @Override
     protected void processInsert(Insert insert, int index, String sql, Object obj) {
-        if (tenantHandler.ignoreTable(insert.getTable().getName())) {
+        if (logicDeleteHandler.ignoreTable(insert.getTable().getName())) {
             // 过滤退出执行
             return;
         }
@@ -106,12 +159,12 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             // 针对不给列名的insert 不处理
             return;
         }
-        String tenantIdColumn = tenantHandler.tenantColumnName();
-        if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(tenantIdColumn))) {
+        String logicDelColumnName = logicDeleteHandler.logicDelColumnName();
+        if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(logicDelColumnName))) {
             // 针对已给出租户列的insert 不处理
             return;
         }
-        columns.add(new Column(tenantHandler.tenantColumnName()));
+        columns.add(new Column(logicDeleteHandler.logicDelColumnName()));
         Select select = insert.getSelect();
         if (select != null) {
             this.processInsertSelect(select.getSelectBody());
@@ -119,9 +172,9 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             // fixed github pull/295
             ItemsList itemsList = insert.getItemsList();
             if (itemsList instanceof MultiExpressionList) {
-                ((MultiExpressionList) itemsList).getExprList().forEach(el -> el.getExpressions().add(tenantHandler.getTenantId()));
+                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(logicDeleteHandler.logicNotDelColumnValue()));
             } else {
-                ((ExpressionList) itemsList).getExpressions().add(tenantHandler.getTenantId());
+                ((ExpressionList) itemsList).getExpressions().add(logicDeleteHandler.logicNotDelColumnValue());
             }
         } else {
             throw new RuntimeException("Failed to process multiple-table update, please exclude the tableName or statementId");
@@ -134,23 +187,11 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
     @Override
     protected void processUpdate(Update update, int index, String sql, Object obj) {
         final Table table = update.getTable();
-        if (tenantHandler.ignoreTable(table.getName())) {
+        if (logicDeleteHandler.ignoreTable(table.getName())) {
             // 过滤退出执行
             return;
         }
         update.setWhere(this.andExpression(table, update.getWhere()));
-    }
-
-    /**
-     * delete 语句处理
-     */
-    @Override
-    protected void processDelete(Delete delete, int index, String sql, Object obj) {
-        if (tenantHandler.ignoreTable(delete.getTable().getName())) {
-            // 过滤退出执行
-            return;
-        }
-        delete.setWhere(this.andExpression(delete.getTable(), delete.getWhere()));
     }
 
     /**
@@ -160,7 +201,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         //获得where条件表达式
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.getTenantId());
+        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelColumnValue());
         if (null != where) {
             if (where instanceof OrExpression) {
                 return new AndExpression(equalsTo, new Parenthesis(where));
@@ -204,7 +245,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             SelectItem item = selectItems.get(0);
             if (item instanceof AllColumns || item instanceof AllTableColumns) return;
         }
-        selectItems.add(new SelectExpressionItem(new Column(tenantHandler.tenantColumnName())));
+        selectItems.add(new SelectExpressionItem(new Column(logicDeleteHandler.logicDelColumnName())));
     }
 
     /**
@@ -216,7 +257,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         processWhereSubSelect(where);
         if (fromItem instanceof Table) {
             Table fromTable = (Table) fromItem;
-            if (!tenantHandler.ignoreTable(fromTable.getName())) {
+            if (!logicDeleteHandler.ignoreTable(fromTable.getName())) {
                 //#1186 github
                 plainSelect.setWhere(builderExpression(where, fromTable));
             }
@@ -325,7 +366,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
     protected void processJoin(Join join) {
         if (join.getRightItem() instanceof Table) {
             Table fromTable = (Table) join.getRightItem();
-            if (tenantHandler.ignoreTable(fromTable.getName())) {
+            if (logicDeleteHandler.ignoreTable(fromTable.getName())) {
                 // 过滤退出执行
                 return;
             }
@@ -339,7 +380,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
     protected Expression builderExpression(Expression currentExpression, Table table) {
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.getTenantId());
+        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelColumnValue());
         if (currentExpression == null) {
             return equalsTo;
         }
@@ -362,7 +403,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         if (table.getAlias() != null) {
             column.append(table.getAlias().getName()).append(StrPool.DOT);
         }
-        column.append(tenantHandler.tenantColumnName());
+        column.append(logicDeleteHandler.logicDelColumnName());
         return new Column(column.toString());
     }
 
