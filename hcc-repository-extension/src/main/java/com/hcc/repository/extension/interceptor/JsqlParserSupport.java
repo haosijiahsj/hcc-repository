@@ -35,19 +35,19 @@ import net.sf.jsqlparser.statement.update.Update;
 @Slf4j
 public abstract class JsqlParserSupport {
 
-    public String parserSingle(String sql, Object obj) {
+    public String parseSingle(String sql, Object obj) {
         if (log.isDebugEnabled()) {
             log.debug("original SQL: " + sql);
         }
         try {
             Statement statement = CCJSqlParserUtil.parse(sql);
-            return processParser(statement, 0, sql, obj);
+            return processParse(statement, 0, sql, obj);
         } catch (JSQLParserException e) {
             throw new IllegalArgumentException(String.format("Failed to process, Error SQL: %s", sql), e);
         }
     }
 
-    public String parserMulti(String sql, Object obj) {
+    public String parseMulti(String sql, Object obj) {
         if (log.isDebugEnabled()) {
             log.debug("original SQL: " + sql);
         }
@@ -60,7 +60,7 @@ public abstract class JsqlParserSupport {
                 if (i > 0) {
                     sb.append(StrPool.SEMICOLON);
                 }
-                sb.append(processParser(statement, i, sql, obj));
+                sb.append(processParse(statement, i, sql, obj));
                 i++;
             }
             return sb.toString();
@@ -75,7 +75,7 @@ public abstract class JsqlParserSupport {
      * @param statement JsqlParser Statement
      * @return sql
      */
-    protected String processParser(Statement statement, int index, String sql, Object obj) {
+    protected String processParse(Statement statement, int index, String sql, Object obj) {
         if (log.isDebugEnabled()) {
             log.debug("SQL to parse, SQL: " + sql);
         }

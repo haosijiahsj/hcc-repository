@@ -15,6 +15,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 
+import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -41,6 +42,12 @@ public interface JdbcOperations {
      * @return
      */
     NamedParameterJdbcTemplate getNamedParameterJdbcTemplate();
+
+    /**
+     * 获取数据源
+     * @return
+     */
+    DataSource getDataSource();
 
     /**
      * 具名更新

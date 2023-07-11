@@ -13,10 +13,12 @@ import javax.sql.DataSource;
  */
 public class JdbcOperationsImpl implements JdbcOperations {
 
+    private final DataSource dataSource;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     public JdbcOperationsImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
         this.jdbcTemplate = new JdbcTemplate(dataSource);
         this.namedParameterJdbcTemplate = new NamedParameterJdbcTemplate(dataSource);
     }
@@ -29,6 +31,11 @@ public class JdbcOperationsImpl implements JdbcOperations {
     @Override
     public NamedParameterJdbcTemplate getNamedParameterJdbcTemplate() {
         return namedParameterJdbcTemplate;
+    }
+
+    @Override
+    public DataSource getDataSource() {
+        return dataSource;
     }
 
 }

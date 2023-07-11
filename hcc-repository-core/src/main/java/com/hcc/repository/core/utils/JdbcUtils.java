@@ -1,5 +1,6 @@
 package com.hcc.repository.core.utils;
 
+import com.hcc.repository.core.constants.DbType;
 import com.hcc.repository.core.convert.ConverterFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.NumberUtils;
@@ -180,6 +181,24 @@ public class JdbcUtils {
             }
         }
         return obj;
+    }
+
+    /**
+     * 从url中获取数据库类型
+     * @param jdbcUrl
+     * @return
+     */
+    public static DbType getDbType(String jdbcUrl) {
+        Assert.isFalse(StrUtils.isEmpty(jdbcUrl), "Error: The jdbcUrl is Null, Cannot read database type");
+        String url = jdbcUrl.toLowerCase();
+        if (url.contains(":mysql:") || url.contains(":cobar:")) {
+            return DbType.MYSQL;
+        } else if (url.contains(":postgresql:")) {
+            return DbType.POSTGRE_SQL;
+        } else {
+            log.warn("The jdbcUrl is " + jdbcUrl + ", Cannot Read Database type or The Database's Not Supported!");
+            return DbType.UNKNOWN;
+        }
     }
 
 }

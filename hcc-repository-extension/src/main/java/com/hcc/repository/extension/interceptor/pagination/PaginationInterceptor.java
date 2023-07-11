@@ -1,14 +1,19 @@
 package com.hcc.repository.extension.interceptor.pagination;
 
+import com.hcc.repository.core.constants.DbType;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
+import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
+import com.hcc.repository.extension.interceptor.pagination.dialect.DialectConstants;
 import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
 
 import java.lang.reflect.Method;
+import java.sql.SQLException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -28,7 +33,7 @@ public class PaginationInterceptor implements ExtInterceptor {
 
     public PaginationInterceptor(DbType dbType) {
         this.dbType = dbType;
-        this.iDialect = dbType.getDialectHandler();
+        this.iDialect = DialectConstants.getDialect(dbType);
     }
 
     public PaginationInterceptor(IDialect iDialect) {
@@ -37,6 +42,14 @@ public class PaginationInterceptor implements ExtInterceptor {
 
     @Override
     public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
+        if (iDialect == null) {
+            try {
+                iDialect = DialectConstants.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
         IPage<?> pageParam = null;
         for (Object parameter : parameters) {
             if (parameter instanceof IPage) {
@@ -46,16 +59,13 @@ public class PaginationInterceptor implements ExtInterceptor {
         if (pageParam == null) {
             return;
         }
+        Assert.isNotNull(iDialect, String.format("db type: %s 没有方言处理器", dbType.getName()));
 
         // 分页上下文
         PaginationContext paginationContext = new PaginationContext();
         paginationContext.setPageParam(pageParam);
         paginationContext.setOriginalSql(context.getSql());
         paginationContext.setOriginalSqlParameters(context.getSqlParameters());
-
-        if (iDialect == null) {
-            throw new IllegalArgumentException("没有方言处理器");
-        }
 
         // 执行sql调整
         iDialect.handle(paginationContext);

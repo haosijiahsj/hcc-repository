@@ -3,7 +3,7 @@ package com.hcc.repository.test.config;
 import com.hcc.repository.core.spring.EnableRepository;
 import com.hcc.repository.extension.interceptor.dynamictablename.DynamicTableNameInterceptor;
 import com.hcc.repository.extension.interceptor.logicdelete.LogicDeleteInterceptor;
-import com.hcc.repository.extension.interceptor.pagination.DbType;
+import com.hcc.repository.core.constants.DbType;
 import com.hcc.repository.extension.interceptor.pagination.PaginationInterceptor;
 import com.hcc.repository.extension.interceptor.optimisticlock.OptimisticLockInterceptor;
 import com.hcc.repository.extension.interceptor.tenant.TenantInterceptor;

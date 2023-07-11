@@ -60,12 +60,12 @@ public class TenantInterceptor extends JsqlParserSupport implements ExtIntercept
 
     @Override
     public void beforeExecuteUpdate(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        context.setSql(this.parserMulti(context.getSql(), null));
+        context.setSql(this.parseMulti(context.getSql(), null));
     }
 
     @Override
     public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        context.setSql(this.parserSingle(context.getSql(), null));
+        context.setSql(this.parseSingle(context.getSql(), null));
     }
 
 
