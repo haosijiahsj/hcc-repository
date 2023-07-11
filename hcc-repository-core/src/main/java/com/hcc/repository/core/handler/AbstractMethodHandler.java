@@ -8,9 +8,9 @@ import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.SqlParseUtils;
-import com.hcc.repository.core.utils.JSqlParserUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -73,23 +73,16 @@ public abstract class AbstractMethodHandler {
         context.setSqlParameters(sqlParameters);
 
         // sql执行前拦截方法
-        Object aheadResult = null;
-        boolean existAbortExecute = false;
         for (Interceptor interceptor : interceptors) {
             interceptor.beforeExecute(method, args, jdbcOperations, context);
+            // 注意后续方法，拦截器都不会执行
             if (context.isAbortExecute()) {
-                aheadResult = context.getReturnValueSupplier().get();
-                existAbortExecute = true;
+                return context.getReturnValueSupplier().get();
             }
         }
 
         // 执行sql
-        Object result;
-        if (existAbortExecute) {
-            result = aheadResult;
-        } else {
-            result = this.executeSql(context.getSql(), context.getSqlParameters());
-        }
+        Object result = this.executeSql(context.getSql(), context.getSqlParameters());
 
         // sql执行后拦截方法
         for (Interceptor interceptor : interceptors) {

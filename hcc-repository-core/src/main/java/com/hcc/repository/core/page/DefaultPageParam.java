@@ -1,20 +1,17 @@
 package com.hcc.repository.core.page;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
- * DefaultPage
+ * DefaultPageParam
  *
  * @author hushengjun
- * @date 2023/3/25
+ * @date 2023/7/11
  */
-public class DefaultPage<T> implements IPage<T> {
-
+public class DefaultPageParam implements IPage<Object> {
     private long curPage = 1L;
     private long pageSize = 20L;
-    private long totalRows;
-    private List<T> records = new ArrayList<>();
+    private long totalRows = 0L;
 
     @Override
     public long getCurPage() {
@@ -32,32 +29,29 @@ public class DefaultPage<T> implements IPage<T> {
     }
 
     @Override
-    public List<T> getRecords() {
-        return records;
+    public List<Object> getRecords() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public IPage<T> setRecords(List<T> records) {
-        if (records != null) {
-            this.records = records;
-        }
-        return this;
+    public IPage<Object> setRecords(List<Object> records) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public IPage<T> setTotalRows(long totalRows) {
+    public IPage<Object> setTotalRows(long totalRows) {
         this.totalRows = totalRows;
         return this;
     }
 
     @Override
-    public IPage<T> setCurPage(long curPage) {
+    public IPage<Object> setCurPage(long curPage) {
         this.curPage = curPage;
         return this;
     }
 
     @Override
-    public IPage<T> setPageSize(long pageSize) {
+    public IPage<Object> setPageSize(long pageSize) {
         this.pageSize = pageSize;
         return this;
     }

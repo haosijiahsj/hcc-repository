@@ -124,7 +124,7 @@ public class PaginationInterceptor implements ExtInterceptor {
 
     @Override
     public Object beforeReturn(Method method, Object[] parameters, SqlExecuteContext context, Object result) {
-        if (!IPage.class.isAssignableFrom(method.getReturnType())) {
+        if (!IPage.class.isAssignableFrom(method.getReturnType()) || result instanceof IPage) {
             return result;
         }
 
