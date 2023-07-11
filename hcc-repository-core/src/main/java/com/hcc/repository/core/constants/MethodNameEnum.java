@@ -109,27 +109,17 @@ public enum MethodNameEnum {
         return null;
     }
 
-    public static boolean isC(MethodNameEnum methodNameEnum) {
-        return INSERT_METHODS.contains(methodNameEnum);
-    }
-    public static boolean isR(MethodNameEnum methodNameEnum) {
-        return SELECT_METHODS.contains(methodNameEnum);
-    }
-    public static boolean isU(MethodNameEnum methodNameEnum) {
-        return UPDATE_METHODS.contains(methodNameEnum);
-    }
-    public static boolean isD(MethodNameEnum methodNameEnum) {
-        return DELETE_METHODS.contains(methodNameEnum);
-    }
-
     public SqlTypeEnum getSqlType() {
-        if (MethodNameEnum.isC(this)) {
+        if (INSERT_METHODS.contains(this)) {
             return SqlTypeEnum.INSERT;
-        } else if (MethodNameEnum.isR(this)) {
+        }
+        else if (SELECT_METHODS.contains(this)) {
             return SqlTypeEnum.SELECT;
-        } else if (MethodNameEnum.isU(this)) {
+        } 
+        else if (UPDATE_METHODS.contains(this)) {
             return SqlTypeEnum.UPDATE;
-        } else if (MethodNameEnum.isD(this)) {
+        }
+        else if (DELETE_METHODS.contains(this)) {
             return SqlTypeEnum.DELETE;
         }
 
