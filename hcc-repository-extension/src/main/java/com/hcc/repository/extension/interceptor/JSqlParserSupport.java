@@ -33,7 +33,7 @@ import net.sf.jsqlparser.statement.update.Update;
  * @since 2020-06-22
  */
 @Slf4j
-public abstract class JsqlParserSupport {
+public abstract class JSqlParserSupport {
 
     public String parseSingle(String sql, Object obj) {
         if (log.isDebugEnabled()) {
