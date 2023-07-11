@@ -86,6 +86,13 @@ public interface BaseMapper<T, ID extends Serializable> {
     int delete(ICondition<T> condition);
 
     /**
+     * 通过map删除
+     * @param paramMap
+     * @return
+     */
+    int deleteByMap(Map<String, Object> paramMap);
+
+    /**
      * 根据实体更新，必须有id字段
      * @param entity
      * @return

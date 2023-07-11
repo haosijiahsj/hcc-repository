@@ -2,6 +2,7 @@ package com.hcc.repository.core.constants;
 
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.handler.delete.DeleteByIdsHandler;
+import com.hcc.repository.core.handler.delete.DeleteByMapHandler;
 import com.hcc.repository.core.handler.delete.DeleteHandler;
 import com.hcc.repository.core.handler.insert.BatchInsertHandler;
 import com.hcc.repository.core.handler.insert.BatchInsertSpliceHandler;
@@ -40,6 +41,7 @@ public enum MethodNameEnum {
     DELETE_BY_ID("deleteById", "通过id删除数据", null),
     DELETE_BY_IDS("deleteByIds", "通过批量id删除数据", DeleteByIdsHandler.class),
     DELETE("delete", "根据条件删除数据", DeleteHandler.class),
+    DELETE_BY_MAP("deleteByMap", "根据map删除数据", DeleteByMapHandler.class),
 
     // 改
     UPDATE_BY_ID("updateById", "通过id更新", UpdateByIdHandler.class),
