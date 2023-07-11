@@ -28,7 +28,7 @@ public abstract class AbstractDialect implements IDialect {
      * 分页语句
      * @param context
      */
-    abstract void handlePageSql(PaginationContext context);
+    protected abstract void handlePageSql(PaginationContext context);
 
     /**
      * 默认的生成分页sql参数
@@ -52,6 +52,14 @@ public abstract class AbstractDialect implements IDialect {
 
         return pageSqlParameters;
     }
+
+//    /**
+//     * count语句，先搞个简单的
+//     * @param context
+//     */
+//    protected void handleCountSql(PaginationContext context) {
+//        context.setCountSql("SELECT COUNT(*) FROM (" + context.getOriginalSql() + ") TOTAL");
+//    }
 
     /**
      * count语句
@@ -77,7 +85,7 @@ public abstract class AbstractDialect implements IDialect {
         Matcher groupByMatcher = GROUP_BY_PATTERN.matcher(originalSql);
         originalSql = countSql + originalSql;
         if (groupByMatcher.find()) {
-            originalSql = "SELECT COUNT(*) FROM (" + originalSql + ") AS t";
+            originalSql = "SELECT COUNT(*) FROM (" + originalSql + ") AS TOTAL";
         }
 
         context.setCountSql(originalSql);

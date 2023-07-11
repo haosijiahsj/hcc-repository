@@ -31,7 +31,7 @@ public class SqlExecuteContext {
      */
     private boolean abortExecute = false;
     /**
-     * abortExecute=true时的返回值
+     * 中间值提供者
      */
     private Supplier<Object> returnValueSupplier = () -> null;
 

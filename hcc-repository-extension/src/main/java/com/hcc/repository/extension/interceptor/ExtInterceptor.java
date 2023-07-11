@@ -42,5 +42,4 @@ public interface ExtInterceptor extends Interceptor {
      */
     default void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {}
 
-
 }

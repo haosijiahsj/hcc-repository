@@ -1,7 +1,8 @@
-package com.hcc.repository.extension.interceptor.pagination.dialect;
+package com.hcc.repository.extension.interceptor.pagination.dialect.handler;
 
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
+import com.hcc.repository.extension.interceptor.pagination.dialect.AbstractDialect;
 
 /**
  * Postgre分页
@@ -15,7 +16,7 @@ public class PostgreDialect extends AbstractDialect {
     private static final String OFFSET = " OFFSET ?";
 
     @Override
-    void handlePageSql(PaginationContext context) {
+    protected void handlePageSql(PaginationContext context) {
         IPage<?> pageParam = context.getPageParam();
         Object[] sqlParameters = context.getOriginalSqlParameters();
 

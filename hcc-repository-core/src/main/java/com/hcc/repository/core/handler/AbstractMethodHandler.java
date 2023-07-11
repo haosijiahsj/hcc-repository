@@ -45,7 +45,10 @@ public abstract class AbstractMethodHandler {
         List<Interceptor> interceptors = Optional.ofNullable(configuration.getInterceptors())
                 .orElse(Collections.emptyList());
         // 拦截器Condition准备前方法
-        interceptors.forEach(interceptor -> interceptor.beforePrepareCondition(method, args));
+        interceptors.forEach(interceptor -> {
+            interceptor.customizeConfiguration(configuration);
+            interceptor.beforePrepareCondition(method, args);
+        });
 
         // prepare
         this.prepare();
@@ -70,15 +73,23 @@ public abstract class AbstractMethodHandler {
         context.setSqlParameters(sqlParameters);
 
         // sql执行前拦截方法
+        Object aheadResult = null;
+        boolean existAbortExecute = false;
         for (Interceptor interceptor : interceptors) {
             interceptor.beforeExecute(method, args, jdbcOperations, context);
             if (context.isAbortExecute()) {
-                return context.getReturnValueSupplier().get();
+                aheadResult = context.getReturnValueSupplier().get();
+                existAbortExecute = true;
             }
         }
 
         // 执行sql
-        Object result = this.executeSql(context.getSql(), context.getSqlParameters());
+        Object result;
+        if (existAbortExecute) {
+            result = aheadResult;
+        } else {
+            result = this.executeSql(context.getSql(), context.getSqlParameters());
+        }
 
         // sql执行后拦截方法
         for (Interceptor interceptor : interceptors) {

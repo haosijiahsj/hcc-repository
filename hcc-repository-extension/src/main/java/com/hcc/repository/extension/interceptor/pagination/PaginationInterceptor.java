@@ -9,7 +9,7 @@ import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
-import com.hcc.repository.extension.interceptor.pagination.dialect.DialectConstants;
+import com.hcc.repository.extension.interceptor.pagination.dialect.DialectFactory;
 import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
 
 import java.lang.reflect.Method;
@@ -26,14 +26,20 @@ import java.util.Optional;
  */
 public class PaginationInterceptor implements ExtInterceptor {
 
-    private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
+//    private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
 
     private DbType dbType;
+    private String customerDbType;
     private IDialect iDialect;
 
     public PaginationInterceptor(DbType dbType) {
         this.dbType = dbType;
-        this.iDialect = DialectConstants.getDialect(dbType);
+        this.iDialect = DialectFactory.getDialect(dbType);
+    }
+
+    public PaginationInterceptor(String customerDbType) {
+        this.customerDbType = customerDbType;
+        this.iDialect = DialectFactory.getCustomerDialect(customerDbType);
     }
 
     public PaginationInterceptor(IDialect iDialect) {
@@ -44,7 +50,7 @@ public class PaginationInterceptor implements ExtInterceptor {
     public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
         if (iDialect == null) {
             try {
-                iDialect = DialectConstants.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
+                iDialect = DialectFactory.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
@@ -54,12 +60,13 @@ public class PaginationInterceptor implements ExtInterceptor {
         for (Object parameter : parameters) {
             if (parameter instanceof IPage) {
                 pageParam = (IPage<?>) parameter;
+                break;
             }
         }
         if (pageParam == null) {
             return;
         }
-        Assert.isNotNull(iDialect, String.format("db type: %s 没有方言处理器", dbType.getName()));
+        Assert.isNotNull(iDialect, "没有方言处理器");
 
         // 分页上下文
         PaginationContext paginationContext = new PaginationContext();
@@ -111,7 +118,8 @@ public class PaginationInterceptor implements ExtInterceptor {
         context.setSql(paginationContext.getPageSql());
         context.setSqlParameters(paginationContext.getPageSqlParameters());
 
-        HOLDER.set(pageResult);
+//        HOLDER.set(pageResult);
+        context.setReturnValueSupplier(() -> pageResult);
     }
 
     @Override
@@ -120,16 +128,16 @@ public class PaginationInterceptor implements ExtInterceptor {
             return result;
         }
 
-        IPage<?> pageResult;
-        try {
-            pageResult = HOLDER.get();
-            if (pageResult == null) {
-                return result;
-            }
-            pageResult.setRecords((List) result);
-        } finally {
-            HOLDER.remove();
+        IPage<?> pageResult = (IPage<?>) context.getReturnValueSupplier().get();
+        if (pageResult == null) {
+            return result;
         }
+        pageResult.setRecords((List) result);
+//        try {
+//            pageResult = HOLDER.get();
+//        } finally {
+//            HOLDER.remove();
+//        }
 
         return pageResult;
     }

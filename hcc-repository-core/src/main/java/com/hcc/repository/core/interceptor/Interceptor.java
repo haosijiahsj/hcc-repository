@@ -2,6 +2,7 @@ package com.hcc.repository.core.interceptor;
 
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.jdbc.JdbcOperations;
+import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 
 import java.lang.reflect.Method;
 
@@ -61,5 +62,11 @@ public interface Interceptor {
     default Object beforeReturn(Method method, Object[] parameters, SqlExecuteContext context, Object result) {
         return result;
     }
+
+    /**
+     * 自定配置或获取配置
+     * @param configuration
+     */
+    default void customizeConfiguration(RepositoryConfiguration configuration) {}
 
 }

@@ -1,7 +1,8 @@
-package com.hcc.repository.extension.interceptor.pagination.dialect;
+package com.hcc.repository.extension.interceptor.pagination.dialect.handler;
 
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
+import com.hcc.repository.extension.interceptor.pagination.dialect.AbstractDialect;
 
 /**
  * mysql分页
@@ -17,7 +18,7 @@ public class MysqlDialect extends AbstractDialect {
      * 生成分页sql
      * @param context
      */
-    public void handlePageSql(PaginationContext context) {
+    protected void handlePageSql(PaginationContext context) {
         IPage<?> pageParam = context.getPageParam();
         Object[] sqlParameters = context.getOriginalSqlParameters();
 
