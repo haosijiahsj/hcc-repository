@@ -65,16 +65,16 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
 
     @Override
     public void beforeExecuteUpdate(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        context.setSql(this.parserMulti(context.getSql(), null));
+        context.setSql(this.parseMulti(context.getSql(), null));
     }
 
     @Override
     public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        context.setSql(this.parserSingle(context.getSql(), null));
+        context.setSql(this.parseSingle(context.getSql(), null));
     }
 
     @Override
-    public String parserMulti(String sql, Object obj) {
+    public String parseMulti(String sql, Object obj) {
         if (log.isDebugEnabled()) {
             log.debug("original SQL: " + sql);
         }
@@ -91,7 +91,7 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
                 if (statement instanceof Delete) {
                     statement = this.convertDelete2Update(statement);
                 }
-                sb.append(processParser(statement, i, sql, obj));
+                sb.append(processParse(statement, i, sql, obj));
                 i++;
             }
             return sb.toString();
@@ -109,8 +109,8 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
         Delete delete = (Delete) statement;
 
         Update update = new Update();
-        update.setColumns(Collections.singletonList(new Column(logicDeleteHandler.logicDelColumnName())));
-        update.setExpressions(Collections.singletonList(logicDeleteHandler.logicDelColumnValue()));
+        update.setColumns(Collections.singletonList(new Column(logicDeleteHandler.logicDelColumn())));
+        update.setExpressions(Collections.singletonList(logicDeleteHandler.logicDelValue()));
         update.setTable(delete.getTable());
         update.setLimit(delete.getLimit());
         update.setWhere(delete.getWhere());
@@ -159,12 +159,12 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
             // 针对不给列名的insert 不处理
             return;
         }
-        String logicDelColumnName = logicDeleteHandler.logicDelColumnName();
+        String logicDelColumnName = logicDeleteHandler.logicDelColumn();
         if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(logicDelColumnName))) {
             // 针对已给出租户列的insert 不处理
             return;
         }
-        columns.add(new Column(logicDeleteHandler.logicDelColumnName()));
+        columns.add(new Column(logicDelColumnName));
         Select select = insert.getSelect();
         if (select != null) {
             this.processInsertSelect(select.getSelectBody());
@@ -172,9 +172,9 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
             // fixed github pull/295
             ItemsList itemsList = insert.getItemsList();
             if (itemsList instanceof MultiExpressionList) {
-                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(logicDeleteHandler.logicNotDelColumnValue()));
+                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(logicDeleteHandler.logicNotDelValue()));
             } else {
-                ((ExpressionList) itemsList).getExpressions().add(logicDeleteHandler.logicNotDelColumnValue());
+                ((ExpressionList) itemsList).getExpressions().add(logicDeleteHandler.logicNotDelValue());
             }
         } else {
             throw new RuntimeException("Failed to process multiple-table update, please exclude the tableName or statementId");
@@ -201,7 +201,7 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
         //获得where条件表达式
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelColumnValue());
+        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelValue());
         if (null != where) {
             if (where instanceof OrExpression) {
                 return new AndExpression(equalsTo, new Parenthesis(where));
@@ -245,7 +245,7 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
             SelectItem item = selectItems.get(0);
             if (item instanceof AllColumns || item instanceof AllTableColumns) return;
         }
-        selectItems.add(new SelectExpressionItem(new Column(logicDeleteHandler.logicDelColumnName())));
+        selectItems.add(new SelectExpressionItem(new Column(logicDeleteHandler.logicDelColumn())));
     }
 
     /**
@@ -380,7 +380,7 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
     protected Expression builderExpression(Expression currentExpression, Table table) {
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelColumnValue());
+        equalsTo.setRightExpression(logicDeleteHandler.logicNotDelValue());
         if (currentExpression == null) {
             return equalsTo;
         }
@@ -403,7 +403,7 @@ public class EnhanceLogicDeleteInterceptor extends JSqlParserSupport implements 
         if (table.getAlias() != null) {
             column.append(table.getAlias().getName()).append(StrPool.DOT);
         }
-        column.append(logicDeleteHandler.logicDelColumnName());
+        column.append(logicDeleteHandler.logicDelColumn());
         return new Column(column.toString());
     }
 

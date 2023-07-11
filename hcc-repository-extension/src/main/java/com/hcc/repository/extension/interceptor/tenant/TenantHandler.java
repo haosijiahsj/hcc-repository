@@ -15,7 +15,7 @@ public interface TenantHandler {
      * 租户字段
      * @return
      */
-    default String tenantColumnName() {
+    default String tenantColumn() {
         return "tenant_id";
     }
 
@@ -23,7 +23,7 @@ public interface TenantHandler {
      * 租户值
      * @return
      */
-    Expression tenantColumnValue();
+    Expression tenantValue();
 
     /**
      * 该表是否忽略多租户处理

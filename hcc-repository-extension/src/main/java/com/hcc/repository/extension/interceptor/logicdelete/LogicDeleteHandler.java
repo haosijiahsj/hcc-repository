@@ -1,6 +1,5 @@
 package com.hcc.repository.extension.interceptor.logicdelete;
 
-import javafx.beans.binding.IntegerExpression;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.LongValue;
 
@@ -16,7 +15,7 @@ public interface LogicDeleteHandler {
      * 逻辑删除字段
      * @return
      */
-    default String logicDelColumnName() {
+    default String logicDelColumn() {
         return "deleted";
     }
 
@@ -24,13 +23,17 @@ public interface LogicDeleteHandler {
      * 逻辑删除值
      * @return
      */
-    Expression logicDelColumnValue();
+    default Expression logicDelValue() {
+        return new LongValue(1L);
+    }
 
     /**
      * 逻辑未删除值
      * @return
      */
-    Expression logicNotDelColumnValue();
+    default Expression logicNotDelValue() {
+        return new LongValue(0L);
+    }
 
     /**
      * 该表是否忽略逻辑删除处理

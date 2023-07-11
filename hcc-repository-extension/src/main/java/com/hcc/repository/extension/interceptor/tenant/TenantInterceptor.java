@@ -106,12 +106,12 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             // 针对不给列名的insert 不处理
             return;
         }
-        String tenantColumnName = tenantHandler.tenantColumnName();
+        String tenantColumnName = tenantHandler.tenantColumn();
         if (columns.stream().map(Column::getColumnName).anyMatch(i -> i.equals(tenantColumnName))) {
             // 针对已给出租户列的insert 不处理
             return;
         }
-        columns.add(new Column(tenantHandler.tenantColumnName()));
+        columns.add(new Column(tenantHandler.tenantColumn()));
         Select select = insert.getSelect();
         if (select != null) {
             this.processInsertSelect(select.getSelectBody());
@@ -119,9 +119,9 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             // fixed github pull/295
             ItemsList itemsList = insert.getItemsList();
             if (itemsList instanceof MultiExpressionList) {
-                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(tenantHandler.tenantColumnValue()));
+                ((MultiExpressionList) itemsList).getExpressionLists().forEach(el -> el.getExpressions().add(tenantHandler.tenantValue()));
             } else {
-                ((ExpressionList) itemsList).getExpressions().add(tenantHandler.tenantColumnValue());
+                ((ExpressionList) itemsList).getExpressions().add(tenantHandler.tenantValue());
             }
         } else {
             throw new RuntimeException("Failed to process multiple-table update, please exclude the tableName or statementId");
@@ -160,7 +160,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         //获得where条件表达式
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.tenantColumnValue());
+        equalsTo.setRightExpression(tenantHandler.tenantValue());
         if (null != where) {
             if (where instanceof OrExpression) {
                 return new AndExpression(equalsTo, new Parenthesis(where));
@@ -204,7 +204,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
             SelectItem item = selectItems.get(0);
             if (item instanceof AllColumns || item instanceof AllTableColumns) return;
         }
-        selectItems.add(new SelectExpressionItem(new Column(tenantHandler.tenantColumnName())));
+        selectItems.add(new SelectExpressionItem(new Column(tenantHandler.tenantColumn())));
     }
 
     /**
@@ -339,7 +339,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
     protected Expression builderExpression(Expression currentExpression, Table table) {
         EqualsTo equalsTo = new EqualsTo();
         equalsTo.setLeftExpression(this.getAliasColumn(table));
-        equalsTo.setRightExpression(tenantHandler.tenantColumnValue());
+        equalsTo.setRightExpression(tenantHandler.tenantValue());
         if (currentExpression == null) {
             return equalsTo;
         }
@@ -362,7 +362,7 @@ public class TenantInterceptor extends JSqlParserSupport implements ExtIntercept
         if (table.getAlias() != null) {
             column.append(table.getAlias().getName()).append(StrPool.DOT);
         }
-        column.append(tenantHandler.tenantColumnName());
+        column.append(tenantHandler.tenantColumn());
         return new Column(column.toString());
     }
 
