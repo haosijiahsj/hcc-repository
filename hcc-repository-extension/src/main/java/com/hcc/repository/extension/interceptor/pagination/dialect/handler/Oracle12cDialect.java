@@ -5,26 +5,22 @@ import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
 import com.hcc.repository.extension.interceptor.pagination.dialect.AbstractDialect;
 
 /**
- * mysql分页
+ * Oracle12c分页
  *
  * @author hushengjun
- * @date 2023/4/29
+ * @date 2023/7/12
  */
-public class MysqlDialect extends AbstractDialect {
+public class Oracle12cDialect extends AbstractDialect {
 
+    @Override
     protected void handlePageSql(PaginationContext context) {
         IPage<?> pageParam = context.getPageParam();
-        String originalSql = context.getOriginalSql();
-        long offset = pageParam.offset();
 
-        // 设置上下文中的参数
-        if (offset == 0L) {
-            context.setPageSql(originalSql + " LIMIT ?");
-            context.addPageSqlParameter(pageParam.getPageSize());
-        } else {
-            context.setPageSql(originalSql + " LIMIT ?, ?");
-            context.addPageSqlParameter(offset, pageParam.getPageSize());
-        }
+        String originalSql = context.getOriginalSql();
+        String sql = originalSql + " OFFSET ? ROWS FETCH NEXT ? ROWS ONLY";
+
+        context.setPageSql(sql);
+        context.addPageSqlParameter(pageParam.offset(), pageParam.getPageSize());
     }
 
 }

@@ -115,7 +115,7 @@ public enum MethodNameEnum {
         }
         else if (SELECT_METHODS.contains(this)) {
             return SqlTypeEnum.SELECT;
-        } 
+        }
         else if (UPDATE_METHODS.contains(this)) {
             return SqlTypeEnum.UPDATE;
         }

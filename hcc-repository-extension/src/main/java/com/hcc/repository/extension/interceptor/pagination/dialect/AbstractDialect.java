@@ -30,31 +30,8 @@ public abstract class AbstractDialect implements IDialect {
      */
     protected abstract void handlePageSql(PaginationContext context);
 
-    /**
-     * 默认的生成分页sql参数
-     * @param sqlParameters
-     * @param first
-     * @param second
-     * @return
-     */
-    protected Object[] generatePageSqlParameter(Object[] sqlParameters, long first, long second) {
-        if (sqlParameters == null) {
-            sqlParameters = new Object[] {};
-        }
-        // 分页参数
-        Object[] pageSqlParameters = new Object[sqlParameters.length + 2];
-        // 原参数列表大于0才进行复制
-        if (sqlParameters.length > 0) {
-            System.arraycopy(sqlParameters, 0, pageSqlParameters, 0, sqlParameters.length);
-        }
-        pageSqlParameters[pageSqlParameters.length - 2] = first;
-        pageSqlParameters[pageSqlParameters.length - 1] = second;
-
-        return pageSqlParameters;
-    }
-
 //    /**
-//     * count语句，先搞个简单的
+//     * count语句，简单的子查询
 //     * @param context
 //     */
 //    protected void handleCountSql(PaginationContext context) {

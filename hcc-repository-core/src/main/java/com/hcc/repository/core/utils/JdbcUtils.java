@@ -195,6 +195,10 @@ public class JdbcUtils {
             return DbType.MYSQL;
         } else if (url.contains(":postgresql:")) {
             return DbType.POSTGRE_SQL;
+        } else if (url.contains(":oracle:")) {
+            return DbType.ORACLE;
+        } else if (url.contains(":sqlserver2012:")) {
+            return DbType.SQL_SERVER;
         } else {
             log.warn("The jdbcUrl is " + jdbcUrl + ", Cannot Read Database type or The Database's Not Supported!");
             return DbType.UNKNOWN;
