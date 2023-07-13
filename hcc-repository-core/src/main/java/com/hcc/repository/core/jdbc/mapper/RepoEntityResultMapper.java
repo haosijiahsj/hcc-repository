@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * 隐射实体的ResultMapper转换器
@@ -39,13 +40,15 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
 
         TableInfo tableInfo = TableInfoHelper.getTableInfo(entityClass);
         Map<String, TableColumnInfo> columnNameColumnInfoMap = TableInfoHelper.getColumnNameColumnInfoMap(entityClass);
+        Map<String, TableColumnInfo> fieldNameColumnInfoMap = TableInfoHelper.getFieldNameColumnInfoMap(entityClass);
         ResultSetMetaData rsMetaData = rs.getMetaData();
 
         int columnCount = rsMetaData.getColumnCount();
         for (int index = 1; index <= columnCount; index++) {
             String columnName = this.getColumnName(rsMetaData, index);
-            // 对应实体元数据
-            TableColumnInfo tableColumnInfo = columnNameColumnInfoMap.get(columnName);
+            // 对应实体元数据，先用列名获取，再用字段名获取
+            TableColumnInfo tableColumnInfo = Optional.ofNullable(columnNameColumnInfoMap.get(columnName))
+                    .orElse(fieldNameColumnInfoMap.get(columnName));
             if (tableColumnInfo == null) {
                 continue;
             }
