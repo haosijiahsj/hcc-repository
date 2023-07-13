@@ -31,6 +31,10 @@ public class PaginationContext {
      */
     private Object[] originalSqlParameters;
     /**
+     * 是否需要执行count语句
+     */
+    private boolean needCount;
+    /**
      * 总数sql,方言处理器设置
      */
     private String countSql;

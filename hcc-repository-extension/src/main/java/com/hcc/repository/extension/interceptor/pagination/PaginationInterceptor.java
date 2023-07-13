@@ -11,9 +11,11 @@ import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import com.hcc.repository.extension.interceptor.pagination.dialect.DialectFactory;
 import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
+import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -24,23 +26,20 @@ import java.util.Optional;
  * @author hushengjun
  * @date 2023/4/8
  */
+@Slf4j
 public class PaginationInterceptor implements ExtInterceptor {
 
 //    private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
 
-    private DbType dbType;
-    private String customerDbType;
     private IDialect iDialect;
 
     public PaginationInterceptor() {}
 
     public PaginationInterceptor(DbType dbType) {
-        this.dbType = dbType;
         this.iDialect = DialectFactory.getDialect(dbType);
     }
 
     public PaginationInterceptor(String customerDbType) {
-        this.customerDbType = customerDbType;
         this.iDialect = DialectFactory.getCustomerDialect(customerDbType);
     }
 
@@ -50,23 +49,15 @@ public class PaginationInterceptor implements ExtInterceptor {
 
     @Override
     public void beforeExecuteQuery(Method method, Object[] parameters, JdbcOperations jdbcOperations, SqlExecuteContext context) {
-        if (iDialect == null) {
-            try {
-                iDialect = DialectFactory.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        IPage<?> pageParam = null;
-        for (Object parameter : parameters) {
-            if (parameter instanceof IPage) {
-                pageParam = (IPage<?>) parameter;
-                break;
-            }
-        }
+        IPage<?> pageParam = this.findPageParam(parameters);
         if (pageParam == null) {
+            if (log.isDebugEnabled()) {
+                log.debug("方法：{}不是分页方法，无需分页拦截器处理", method.getName());
+            }
             return;
+        }
+        if (iDialect == null) {
+            iDialect = this.deductDialect(jdbcOperations);
         }
         Assert.isNotNull(iDialect, "没有方言处理器");
 
@@ -75,11 +66,12 @@ public class PaginationInterceptor implements ExtInterceptor {
         paginationContext.setPageParam(pageParam);
         paginationContext.setOriginalSql(context.getSql());
         paginationContext.setOriginalSqlParameters(context.getSqlParameters());
+        paginationContext.setNeedCount(IPage.class.isAssignableFrom(method.getReturnType()));
 
         // 执行sql调整
         iDialect.handle(paginationContext);
 
-        if (!IPage.class.isAssignableFrom(method.getReturnType())) {
+        if (!paginationContext.isNeedCount()) {
             // 返回结果不是分页结果，无需执行count语句
             context.setSql(paginationContext.getPageSql());
             context.setSqlParameters(paginationContext.getPageSqlParameters());
@@ -87,12 +79,10 @@ public class PaginationInterceptor implements ExtInterceptor {
         }
 
         // 查询总数
-        String countSql = paginationContext.getCountSql();
         // 分页参数如果传了totalRows，则不进行总数查询
         long total = pageParam.getTotalRows();
         if (total <= 0L) {
-            total = Optional.ofNullable(jdbcOperations.queryForObject(countSql, context.getSqlParameters(), Long.class))
-                    .orElse(0L);
+            total = this.executeCountSql(jdbcOperations, paginationContext);
         }
 
         // 分页结果
@@ -122,6 +112,42 @@ public class PaginationInterceptor implements ExtInterceptor {
 
 //        HOLDER.set(pageResult);
         context.setReturnValueSupplier(() -> pageResult);
+    }
+
+    /**
+     * 获取分页参数
+     * @param parameters
+     * @return
+     */
+    private IPage<?> findPageParam(Object[] parameters) {
+        return (IPage<?>) Arrays.stream(parameters)
+                .filter(p -> p instanceof IPage)
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * 推断方言处理器
+     * @param jdbcOperations
+     * @return
+     */
+    private IDialect deductDialect(JdbcOperations jdbcOperations) {
+        try {
+            return DialectFactory.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 执行count语句
+     * @param jdbcOperations
+     * @param context
+     * @return
+     */
+    private long executeCountSql(JdbcOperations jdbcOperations, PaginationContext context) {
+        return Optional.ofNullable(jdbcOperations.queryForObject(context.getCountSql(), context.getOriginalSqlParameters(), Long.class))
+                .orElse(0L);
     }
 
     @Override

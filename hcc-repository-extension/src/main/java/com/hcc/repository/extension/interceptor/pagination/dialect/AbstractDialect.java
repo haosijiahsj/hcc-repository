@@ -21,7 +21,9 @@ public abstract class AbstractDialect implements IDialect {
     @Override
     public void handle(PaginationContext context) {
         this.handlePageSql(context);
-        this.handleCountSql(context);
+        if (context.isNeedCount()) {
+            this.handleCountSql(context);
+        }
     }
 
     /**
