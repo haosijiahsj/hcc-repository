@@ -47,6 +47,11 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
         return selectColumns;
     }
 
+    public C tableAliasName(String tableAliasName) {
+        super.tableAliasName = tableAliasName;
+        return typeThis;
+    }
+
     @Override
     @SafeVarargs
     public final C select(R...columns) {
@@ -79,7 +84,7 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
         String sqlSelect;
         if (selectColumns.isEmpty()) {
             sqlSelect = TableInfoHelper.getColumnInfos(entityClass).stream()
-                    .map(TableColumnInfo::getColumnName)
+                    .map(c -> StrUtils.isNotEmpty(tableAliasName) ? tableAliasName + StrPool.POINT + c.getColumnName() : c.getColumnName())
                     .collect(Collectors.joining(StrPool.COMMA_SPACE));
         } else {
             sqlSelect = String.join(StrPool.COMMA_SPACE, selectColumns);
@@ -100,7 +105,8 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
     }
 
     private String tableName() {
-        return TableInfoHelper.getTableName(this.getEntityClass());
+        String tableName = TableInfoHelper.getTableName(this.getEntityClass());
+        return StrUtils.isNotEmpty(tableAliasName) ? tableName + StrPool.SPACE + tableAliasName : tableName;
     }
 
     /**

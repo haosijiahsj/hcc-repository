@@ -26,6 +26,10 @@ public class SelectTest extends BaseTest {
     public void listTest() {
         List<ProductPo> list = productService.lambdaQuery().list();
         ProductPo list1 = productService.lambdaQuery().eq(ProductPo::getId, 1).one();
+        DefaultQueryCondition<ProductPo> condition = new DefaultQueryCondition<ProductPo>()
+                .tableAliasName("p").eq("name", 1L);
+        List<ProductPo> productPos = productService.list(condition);
+        System.out.println(productPos);
     }
 
     @Test

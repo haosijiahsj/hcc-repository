@@ -43,7 +43,7 @@ public class LambdaQueryCondition<T> extends AbstractQueryCondition<T, SFunction
     }
 
     @SuppressWarnings("unchecked")
-    protected String getColumnName(SFunction<T, ?> column) {
+    protected String columnToString(SFunction<T, ?> column) {
         if (column == null) {
             throw new NullPointerException();
         }

@@ -37,10 +37,12 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     protected ExecuteSqlTypeEnum executeSqlType;
     protected Map<String, Object> columnValuePairs;
     protected SegmentContainer segmentContainer;
+    protected String tableAliasName;
 
     protected void init() {
         columnValuePairs = new LinkedHashMap<>(16);
         segmentContainer = new SegmentContainer();
+        tableAliasName = null;
         pos = new AtomicInteger(0);
     }
 
@@ -101,7 +103,21 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return segmentContainer.getSqlSegmentAfterWhere();
     }
 
+    /**
+     * 获取列名
+     * @param column
+     * @return
+     */
     protected String getColumnName(R column) {
+        return StrUtils.isNotEmpty(tableAliasName) ? tableAliasName + StrPool.POINT + this.columnToString(column) : this.columnToString(column);
+    }
+
+    /**
+     * 转换列名
+     * @param column
+     * @return
+     */
+    protected String columnToString(R column) {
         if (column instanceof String) {
             return (String) column;
         }

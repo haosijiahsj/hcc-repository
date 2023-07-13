@@ -39,7 +39,7 @@ public class LambdaUpdateCondition<T> extends AbstractUpdateCondition<T, SFuncti
 
     @Override
     @SuppressWarnings("unchecked")
-    protected String getColumnName(SFunction<T, ?> column) {
+    protected String columnToString(SFunction<T, ?> column) {
         if (column == null) {
             throw new NullPointerException();
         }
