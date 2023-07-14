@@ -6,14 +6,21 @@ import com.hcc.repository.core.constants.MethodNameEnum;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
+import com.hcc.repository.core.page.DefaultPage;
+import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.Pair;
+import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.SqlParseUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -94,7 +101,66 @@ public abstract class AbstractMethodHandler {
             result = interceptor.beforeReturn(method, args, context, result);
         }
 
+        // 假分页处理
+        IPage<?> pageParam = this.findPageParam(args);
+        if (pageParam != null && !(result instanceof IPage)) {
+            return this.fakePage(pageParam, result);
+        }
+
         return result;
+    }
+
+    /**
+     * 假分页
+     * @param pageParam
+     * @param result
+     * @return
+     */
+    private Object fakePage(IPage<?> pageParam, Object result) {
+        if (IPage.class.isAssignableFrom(method.getReturnType())) {
+            IPage<?> pageResult;
+            if (IPage.class.equals(method.getReturnType())) {
+                // 返回的是IPage接口，使用DefaultPage实例化
+                pageResult = new DefaultPage<>();
+            } else {
+                // 否则使用自定义的Page实例化
+                pageResult = (IPage<?>) ReflectUtils.newInstance(method.getReturnType());
+            }
+            List<?> records = new ArrayList<>((Collection<?>) result);
+            pageResult.setCurPage(pageParam.getCurPage());
+            pageResult.setPageSize(pageParam.getPageSize());
+            pageResult.setTotalRows(records.size());
+            if (CollUtils.isEmpty(records)) {
+                pageResult.setRecords(Collections.emptyList());
+            } else {
+                // 分割list
+                List results = new ArrayList();
+                int size = 0;
+                for (int i = 0; i < records.size(); i++) {
+                    if (i >= pageParam.offset() && size < pageParam.getPageSize()) {
+                        size++;
+                        results.add(records.get(i));
+                    }
+                }
+                pageResult.setRecords(results);
+            }
+
+            return pageResult;
+        }
+
+        return result;
+    }
+
+    /**
+     * 获取分页参数
+     * @param parameters
+     * @return
+     */
+    private IPage<?> findPageParam(Object[] parameters) {
+        return (IPage<?>) Arrays.stream(parameters)
+                .filter(p -> p instanceof IPage)
+                .findFirst()
+                .orElse(null);
     }
 
     protected void prepare() {

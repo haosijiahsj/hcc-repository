@@ -16,6 +16,13 @@ public class DefaultPage<T> implements IPage<T> {
     private long totalRows;
     private List<T> records = new ArrayList<>();
 
+    public DefaultPage() {}
+
+    public DefaultPage(long curPage, long pageSize) {
+        this.curPage = curPage;
+        this.pageSize = pageSize;
+    }
+
     @Override
     public long getCurPage() {
         return curPage;

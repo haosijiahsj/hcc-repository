@@ -50,7 +50,7 @@ public class HccRepositoryConfig {
         interceptor.addInterceptor(new DynamicTableNameInterceptor(((originalTableName, curSql) -> originalTableName)));
 //        interceptor.addInterceptor(new TenantInterceptor(() -> new LongValue("1")));
 //        interceptor.addInterceptor(new LogInterceptor());
-        interceptor.addInterceptor(new PaginationInterceptor(DbType.MYSQL));
+//        interceptor.addInterceptor(new PaginationInterceptor(DbType.MYSQL));
 
         return interceptor;
     }

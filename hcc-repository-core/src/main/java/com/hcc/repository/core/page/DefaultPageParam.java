@@ -13,6 +13,19 @@ public class DefaultPageParam implements IPage<Object> {
     private long pageSize = 20L;
     private long totalRows = 0L;
 
+    public DefaultPageParam() {}
+
+    public DefaultPageParam(long curPage, long pageSize) {
+        this.curPage = curPage;
+        this.pageSize = pageSize;
+    }
+
+    public DefaultPageParam(long curPage, long pageSize, long totalRows) {
+        this.curPage = curPage;
+        this.pageSize = pageSize;
+        this.totalRows = totalRows;
+    }
+
     @Override
     public long getCurPage() {
         return curPage;

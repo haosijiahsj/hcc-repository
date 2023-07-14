@@ -45,7 +45,7 @@ public class SelectTest extends BaseTest {
 
     @Test
     public void pageTest() {
-        IPage<ProductPo> page = productService.lambdaQuery().page(new DefaultPage<>());
+        IPage<ProductPo> page = productService.lambdaQuery().page(new DefaultPage<>(3, 20));
         System.out.println(page);
     }
 
