@@ -8,6 +8,7 @@ import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
+import com.hcc.repository.core.utils.StrUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import com.hcc.repository.extension.interceptor.pagination.dialect.DialectFactory;
 import com.hcc.repository.extension.interceptor.pagination.dialect.IDialect;
@@ -29,9 +30,8 @@ import java.util.Optional;
 @Slf4j
 public class PaginationInterceptor implements ExtInterceptor {
 
-//    private static final ThreadLocal<IPage<?>> HOLDER = new ThreadLocal<>();
-
     private IDialect iDialect;
+    private String url;
 
     public PaginationInterceptor() {}
 
@@ -109,8 +109,6 @@ public class PaginationInterceptor implements ExtInterceptor {
         // 修改当前执行的sql语句为分页sql语句
         context.setSql(paginationContext.getPageSql());
         context.setSqlParameters(paginationContext.getPageSqlParameters());
-
-//        HOLDER.set(pageResult);
         context.setReturnValueSupplier(() -> pageResult);
     }
 
@@ -133,7 +131,10 @@ public class PaginationInterceptor implements ExtInterceptor {
      */
     private IDialect deductDialect(JdbcOperations jdbcOperations) {
         try {
-            return DialectFactory.getDialect(JdbcUtils.getDbType(jdbcOperations.getDataSource().getConnection().getMetaData().getURL()));
+            if (StrUtils.isEmpty(url)) {
+                url = jdbcOperations.getDataSource().getConnection().getMetaData().getURL();
+            }
+            return DialectFactory.getDialect(JdbcUtils.getDbType(url));
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -161,11 +162,6 @@ public class PaginationInterceptor implements ExtInterceptor {
             return result;
         }
         pageResult.setRecords((List) result);
-//        try {
-//            pageResult = HOLDER.get();
-//        } finally {
-//            HOLDER.remove();
-//        }
 
         return pageResult;
     }
