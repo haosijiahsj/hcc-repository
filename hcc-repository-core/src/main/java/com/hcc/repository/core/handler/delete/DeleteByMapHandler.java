@@ -24,21 +24,23 @@ public class DeleteByMapHandler extends AbstractMethodHandler {
     @SuppressWarnings("unchecked")
     protected ICondition<?> prepareCondition() {
         DefaultUpdateCondition<?> condition = new DefaultUpdateCondition<>(entityClass);
-        if (!firstArgIsNull()) {
-            Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();
-            if (CollUtils.isNotEmpty(paramMap)) {
-                paramMap.forEach((k, v) -> {
-                    if (v instanceof Collection) {
-                        condition.in(k, (Collection<?>) v);
-                    } else if (v.getClass().isArray()) {
-                        condition.in(k, (Object[]) v);
-                    } else {
-                        condition.eq(k, v);
-                    }
-                });
-            }
-        }
         condition.setExecuteSqlType(ExecuteSqlTypeEnum.DELETE);
+        if (firstArgIsNull()) {
+            return condition;
+        }
+        Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();
+        if (CollUtils.isNotEmpty(paramMap)) {
+            paramMap.forEach((k, v) -> {
+                if (v instanceof Collection) {
+                    condition.in(k, (Collection<?>) v);
+                } else if (v.getClass().isArray()) {
+                    condition.in(k, (Object[]) v);
+                } else {
+                    condition.eq(k, v);
+                }
+            });
+        }
+
 
         return condition;
     }

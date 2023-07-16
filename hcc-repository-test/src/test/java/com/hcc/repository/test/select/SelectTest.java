@@ -101,4 +101,16 @@ public class SelectTest extends BaseTest {
         System.out.println(id);
     }
 
+    @Test
+    public void selectIdsTest() {
+        List<Long> ids = productService.lambdaQuery().like(ProductPo::getName, "h").listIds();
+        System.out.println(ids);
+    }
+
+    @Test
+    public void selectCountTest() {
+        Long count = productService.lambdaQuery().like(ProductPo::getName, "h").count();
+        System.out.println(count);
+    }
+
 }

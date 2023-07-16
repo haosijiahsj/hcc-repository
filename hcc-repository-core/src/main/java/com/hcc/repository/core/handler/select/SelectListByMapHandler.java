@@ -20,19 +20,21 @@ public class SelectListByMapHandler extends AbstractMethodHandler {
     @SuppressWarnings("unchecked")
     protected ICondition<?> prepareCondition() {
         DefaultQueryCondition<?> condition = new DefaultQueryCondition<>();
-        if (!firstArgIsNull()) {
-            Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();
-            if (CollUtils.isNotEmpty(paramMap)) {
-                paramMap.forEach((k, v) -> {
-                    if (v instanceof Collection) {
-                        condition.in(k, (Collection<?>) v);
-                    } else if (v.getClass().isArray()) {
-                        condition.in(k, (Object[]) v);
-                    } else {
-                        condition.eq(k, v);
-                    }
-                });
-            }
+        if (firstArgIsNull()) {
+            return condition;
+        }
+
+        Map<String, Object> paramMap = (Map<String, Object>) getFirstArg();
+        if (CollUtils.isNotEmpty(paramMap)) {
+            paramMap.forEach((k, v) -> {
+                if (v instanceof Collection) {
+                    condition.in(k, (Collection<?>) v);
+                } else if (v.getClass().isArray()) {
+                    condition.in(k, (Object[]) v);
+                } else {
+                    condition.eq(k, v);
+                }
+            });
         }
 
         return condition;

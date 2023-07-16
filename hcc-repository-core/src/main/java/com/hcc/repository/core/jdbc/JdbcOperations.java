@@ -242,7 +242,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> T queryForObject(String sql, Object[] args, Class<T> requiredType) {
-        return getJdbcTemplate().queryForObject(sql, args, RowMapperWrapper.create(new ObjectResultMapper<>(requiredType)));
+        return this.queryForObject(sql, args, new ObjectResultMapper<>(requiredType));
     }
 
     /**
