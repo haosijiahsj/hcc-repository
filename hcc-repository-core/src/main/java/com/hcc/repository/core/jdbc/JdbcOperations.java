@@ -2,13 +2,14 @@ package com.hcc.repository.core.jdbc;
 
 import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.exceptions.TooManyResultException;
+import com.hcc.repository.core.jdbc.batch.BatchPreparedStatementSetter;
+import com.hcc.repository.core.jdbc.batch.BatchPreparedStatementSetterWrapper;
 import com.hcc.repository.core.jdbc.batch.PreparedStatementObjectSetter;
 import com.hcc.repository.core.jdbc.mapper.MapResultMapper;
 import com.hcc.repository.core.jdbc.mapper.ObjectResultMapper;
 import com.hcc.repository.core.jdbc.mapper.RepoEntityResultMapper;
 import com.hcc.repository.core.utils.CollUtils;
 import com.hcc.repository.core.utils.Pair;
-import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -143,7 +144,7 @@ public interface JdbcOperations {
      * @return
      */
     default <T> int[] batchUpdate(String sql, List<T> batchArgs, PreparedStatementObjectSetter<T> setter) {
-        return getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
+        return getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetterWrapper<>(new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
                 T object = batchArgs.get(i);
@@ -157,7 +158,7 @@ public interface JdbcOperations {
             public int getBatchSize() {
                 return batchArgs == null ? 0 : batchArgs.size();
             }
-        });
+        }));
     }
 
     /**
