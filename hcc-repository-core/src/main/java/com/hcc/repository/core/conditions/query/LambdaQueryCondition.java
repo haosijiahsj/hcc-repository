@@ -5,6 +5,7 @@ import com.hcc.repository.core.conditions.interfaces.SFunction;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -32,6 +33,14 @@ public class LambdaQueryCondition<T> extends AbstractQueryCondition<T, SFunction
 
     public LambdaQueryCondition(Class<T> entityClass, SegmentContainer segmentContainer, Map<String, Object> columnValuePairs, AtomicInteger pos) {
         super.entityClass = entityClass;
+        super.segmentContainer = segmentContainer;
+        super.columnValuePairs = columnValuePairs;
+        super.pos = pos;
+    }
+
+    public LambdaQueryCondition(Class<T> entityClass, List<String> selectColumns, SegmentContainer segmentContainer, Map<String, Object> columnValuePairs, AtomicInteger pos) {
+        super.entityClass = entityClass;
+        super.selectColumns = selectColumns;
         super.segmentContainer = segmentContainer;
         super.columnValuePairs = columnValuePairs;
         super.pos = pos;

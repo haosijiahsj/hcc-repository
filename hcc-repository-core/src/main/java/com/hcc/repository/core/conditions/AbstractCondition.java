@@ -1,5 +1,6 @@
 package com.hcc.repository.core.conditions;
 
+import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.conditions.interfaces.ExtWhereClause;
 import com.hcc.repository.core.conditions.interfaces.GroupByClause;
 import com.hcc.repository.core.conditions.interfaces.NestedClause;
@@ -78,6 +79,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     }
 
     public C putColumnValue(String column, Object val) {
+        if (val instanceof IEnum) {
+            // 单独处理一下IEnum的枚举
+            val = ((IEnum<?>) val).getValue();
+        }
         columnValuePairs.put(column, val);
         return typeThis;
     }

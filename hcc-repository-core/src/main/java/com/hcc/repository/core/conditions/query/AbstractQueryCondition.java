@@ -23,8 +23,8 @@ import java.util.stream.Collectors;
  */
 public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T, R, C>> extends AbstractCondition<T, R, C> implements SelectClause<C, T, R> {
 
-    private List<String> selectColumns;
-    private boolean selectDistinct = false;
+    protected List<String> selectColumns;
+    protected boolean selectDistinct = false;
 
     @Override
     protected void init() {

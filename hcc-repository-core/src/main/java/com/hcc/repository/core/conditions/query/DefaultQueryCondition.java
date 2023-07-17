@@ -34,4 +34,12 @@ public class DefaultQueryCondition<T> extends AbstractQueryCondition<T, String, 
         return new DefaultQueryCondition<>(entityClass, new SegmentContainer(), columnValuePairs, pos);
     }
 
+    /**
+     * 同时支持lambda的写法
+     * @return
+     */
+    public LambdaQueryCondition<T> forLambda() {
+        return new LambdaQueryCondition<>(entityClass, selectColumns, segmentContainer, columnValuePairs, pos);
+    }
+
 }

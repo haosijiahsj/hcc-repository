@@ -6,6 +6,7 @@ import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.test.BaseTest;
 import com.hcc.repository.test.domain.ProductQueryParam;
+import com.hcc.repository.test.domain.enums.ProductStatusEnum;
 import com.hcc.repository.test.domain.po.ProductPo;
 import org.junit.Test;
 
@@ -111,6 +112,21 @@ public class SelectTest extends BaseTest {
     public void selectCountTest() {
         Long count = productService.lambdaQuery().like(ProductPo::getName, "h").count();
         System.out.println(count);
+    }
+
+    @Test
+    public void selectForLambdaTest() {
+        DefaultQueryCondition<ProductPo> defaultQueryCondition = new DefaultQueryCondition<>();
+        defaultQueryCondition
+                .selectDistinct()
+                .like("name", "h")
+                .select("id", "name")
+                .forLambda()
+                .selectDistinct(ProductPo::getProductStatus)
+                .ge(ProductPo::getPrice, 0)
+                .eq(ProductPo::getProductStatus, ProductStatusEnum.UN_SHELF);
+        List<ProductPo> productPos = productMapper.selectList(defaultQueryCondition);
+        System.out.println(productPos);
     }
 
 }
