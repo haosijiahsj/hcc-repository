@@ -50,7 +50,7 @@ public class InsertHandler extends AbstractMethodHandler {
     protected ICondition<?> buildCondition(Object entity) {
         DefaultInsertCondition<?> condition = new DefaultInsertCondition<>(entity);
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfosWithOutIdColumn(entityClass);
-        columnInfos.forEach(c -> condition.value(c.getColumnName(), this.getColumnValue(c, entity)));
+        columnInfos.forEach(c -> condition.value(c.getColumnName(), this.getColumnValue(entity, c)));
 
         TableColumnInfo idColumnInfo = TableInfoHelper.getIdColumnInfo(entityClass);
         if (idColumnInfo != null && (IdType.GENERATE.equals(idColumnInfo.getIdType()) || IdType.SPECIFY.equals(idColumnInfo.getIdType()))) {
@@ -101,21 +101,23 @@ public class InsertHandler extends AbstractMethodHandler {
 
     /**
      * 获取列值
-     * @param columnInfo
      * @param entity
+     * @param columnInfo
      * @return
      */
-    protected Object getColumnValue(TableColumnInfo columnInfo, Object entity) {
+    protected Object getColumnValue(Object entity, TableColumnInfo columnInfo) {
         Object value = ReflectUtils.getValue(entity, columnInfo.getField());
         // 转换
         Object targetValue = value;
-        if (columnInfo.needConvert()) {
-            targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
-        } else if (columnInfo.isAssignableFromIEnum()) {
-            targetValue = ((IEnum<?>) value).getValue();
+        if (value != null) {
+            if (columnInfo.needConvert()) {
+                targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
+            } else if (columnInfo.isAssignableFromIEnum()) {
+                targetValue = ((IEnum<?>) value).getValue();
+            }
         }
         // 自动填充处理
-        if (columnInfo.needAutoFillInsert() && targetValue == null) {
+        if (targetValue == null && columnInfo.needAutoFillInsert()) {
             targetValue = this.getInsertAutoFillValue(TableInfoHelper.getTableInfo(entityClass), columnInfo);
         }
 

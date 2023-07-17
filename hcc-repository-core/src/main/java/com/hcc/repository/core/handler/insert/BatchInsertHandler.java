@@ -55,7 +55,7 @@ public class BatchInsertHandler extends InsertHandler {
 
             // 处理列
             for (TableColumnInfo columnInfo : columnInfos) {
-                Object columnValue = getColumnValue(columnInfo, entity);
+                Object columnValue = getColumnValue(entity, columnInfo);
                 if (columnValue != null) {
                     paramMap.put(columnInfo.getColumnName(), columnValue);
                 }

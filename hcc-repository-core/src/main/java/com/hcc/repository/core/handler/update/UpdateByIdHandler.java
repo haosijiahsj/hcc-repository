@@ -34,7 +34,7 @@ public class UpdateByIdHandler extends UpdateEntityHandler {
 
         // set语句
         for (TableColumnInfo c : columnInfos) {
-            Object targetValue = super.processTargetValue(firstArg, c);
+            Object targetValue = super.getColumnValue(firstArg, c);
             if (targetValue == null && !nullSet) {
                 continue;
             }

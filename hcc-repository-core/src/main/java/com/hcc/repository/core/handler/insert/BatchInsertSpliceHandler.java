@@ -66,11 +66,11 @@ public class BatchInsertSpliceHandler extends InsertHandler {
         for (Object entity : entities) {
             index++;
             List<String> columnNames = new ArrayList<>();
-            for (TableColumnInfo c : columnInfos) {
-                String columnNamePl = c.getColumnName() + StrPool.UNDERLINE + index;
+            for (TableColumnInfo columnInfo : columnInfos) {
+                String columnNamePl = columnInfo.getColumnName() + StrPool.UNDERLINE + index;
 
                 columnNames.add(StrPool.getPlaceholder(columnNamePl));
-                condition.putParam(columnNamePl, super.getColumnValue(c, entity));
+                condition.putParam(columnNamePl, super.getColumnValue(entity, columnInfo));
             }
 
             // id单独处理一下

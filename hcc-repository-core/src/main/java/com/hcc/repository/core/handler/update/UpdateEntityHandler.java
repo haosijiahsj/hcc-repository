@@ -39,7 +39,7 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         List<TableColumnInfo> columnInfos = TableInfoHelper.getColumnInfos(entityClass, c -> !c.isPrimaryKey() && !c.isVersion());
         // set语句
         for (TableColumnInfo c : columnInfos) {
-            Object targetValue = processTargetValue(entity, c);
+            Object targetValue = getColumnValue(entity, c);
             if (targetValue == null && !nullSet) {
                 continue;
             }
@@ -57,17 +57,19 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
     }
 
     @SuppressWarnings("unchecked")
-    protected Object processTargetValue(Object entity, TableColumnInfo c) {
-        Object value = ReflectUtils.getValue(entity, c.getField());
+    protected Object getColumnValue(Object entity, TableColumnInfo columnInfo) {
+        Object value = ReflectUtils.getValue(entity, columnInfo.getField());
         // 转换
         Object targetValue = value;
-        if (c.needConvert() && targetValue != null) {
-            targetValue = ReflectUtils.newInstanceForCache(c.getConverter()).convertToColumn(value);
-        } else if (c.isAssignableFromIEnum() && targetValue != null) {
-            targetValue = ((IEnum<?>) value).getValue();
+        if (value != null) {
+            if (columnInfo.needConvert()) {
+                targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
+            } else if (columnInfo.isAssignableFromIEnum()) {
+                targetValue = ((IEnum<?>) value).getValue();
+            }
         }
-        if (c.needAutoFillUpdate() && targetValue == null) {
-            targetValue = this.getUpdateAutoFillValue(TableInfoHelper.getTableInfo(entityClass), c);
+        if (targetValue == null && columnInfo.needAutoFillUpdate()) {
+            targetValue = this.getUpdateAutoFillValue(TableInfoHelper.getTableInfo(entityClass), columnInfo);
         }
 
         return targetValue;
