@@ -87,6 +87,8 @@ public abstract class AbstractQueryCondition<T, R, C extends AbstractCondition<T
                     .map(c -> StrUtils.isNotEmpty(tableAliasName) ? tableAliasName + StrPool.POINT + c.getColumnName() : c.getColumnName())
                     .collect(Collectors.joining(StrPool.COMMA_SPACE));
         } else {
+            // 去重
+            selectColumns = selectColumns.stream().distinct().collect(Collectors.toList());
             sqlSelect = String.join(StrPool.COMMA_SPACE, selectColumns);
         }
 

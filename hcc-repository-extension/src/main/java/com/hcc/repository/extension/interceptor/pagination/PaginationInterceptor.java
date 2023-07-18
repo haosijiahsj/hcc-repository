@@ -39,10 +39,6 @@ public class PaginationInterceptor implements ExtInterceptor {
         this.iDialect = DialectFactory.getDialect(dbType);
     }
 
-    public PaginationInterceptor(String customerDbType) {
-        this.iDialect = DialectFactory.getCustomerDialect(customerDbType);
-    }
-
     public PaginationInterceptor(IDialect iDialect) {
         this.iDialect = iDialect;
     }
