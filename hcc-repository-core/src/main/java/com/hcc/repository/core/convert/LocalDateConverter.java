@@ -1,6 +1,6 @@
-package com.hcc.repository.core.convert.converter;
+package com.hcc.repository.core.convert;
 
-import com.hcc.repository.core.convert.ValueConverter;
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.core.exceptions.RepositoryException;
 
 import java.sql.Date;
@@ -9,17 +9,17 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 /**
- * LocalDateTimeConverter
+ * LocalDateConverter
  *
  * @author hushengjun
  * @date 2023/3/24
  */
-public class LocalDateConverter implements ValueConverter<LocalDate> {
+public class LocalDateConverter implements IConverter<LocalDate, Object> {
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
     @Override
-    public LocalDate convert(Object value, Class<?> targetClass) {
+    public LocalDate convertToAttribute(Object value) {
         if (value instanceof String) {
             return LocalDate.parse((String) value, DATE_FORMATTER);
         } else if (value instanceof Timestamp) {
@@ -28,7 +28,7 @@ public class LocalDateConverter implements ValueConverter<LocalDate> {
             return ((Date)value).toLocalDate();
         }
 
-        throw new RepositoryException(String.format("无法转换值：%s，到目标class: %s", value, targetClass.getName()));
+        throw new RepositoryException(String.format("无法转换值：%s，到LocalDate", value));
     }
 
 }

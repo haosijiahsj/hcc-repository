@@ -1,6 +1,5 @@
 package com.hcc.repository.core.jdbc;
 
-import com.hcc.repository.core.exceptions.RepositoryException;
 import com.hcc.repository.core.exceptions.TooManyResultException;
 import com.hcc.repository.core.jdbc.batch.BatchPreparedStatementSetter;
 import com.hcc.repository.core.jdbc.batch.BatchPreparedStatementSetterWrapper;
@@ -119,7 +118,7 @@ public interface JdbcOperations {
             return null;
         }
         if (results.size() > 1) {
-            throw new RepositoryException(String.format("预期一条数据，实际%s条数据", results.size()));
+            throw new TooManyResultException(1, results.size());
         }
 
         return results.get(0);
@@ -159,6 +158,17 @@ public interface JdbcOperations {
                 return batchArgs == null ? 0 : batchArgs.size();
             }
         }));
+    }
+
+    /**
+     * 批量处理
+     * @param sql
+     * @param setter
+     * @return
+     * @param <T>
+     */
+    default <T> int[] batchUpdate(String sql, BatchPreparedStatementSetter setter) {
+        return getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetterWrapper<>(setter));
     }
 
     /**

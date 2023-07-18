@@ -1,7 +1,9 @@
 package com.hcc.repository.core.utils;
 
 import com.hcc.repository.core.constants.DbType;
-import com.hcc.repository.core.convert.ConverterFactory;
+import com.hcc.repository.core.convert.LocalDateConverter;
+import com.hcc.repository.core.convert.LocalDateTimeConverter;
+import com.hcc.repository.core.convert.LocalTimeConverter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.NumberUtils;
 
@@ -128,9 +130,16 @@ public class JdbcUtils {
                 log.debug("JDBC driver has limited support for JDBC 4.1 'getObject(int, Class)' method", ex);
             }
 
-            if (LocalTime.class == requiredType || LocalDate.class == requiredType || LocalDateTime.class == requiredType) {
-                // java8时间日期支持
-                return ConverterFactory.getConverter(requiredType).convert(rs.getObject(index), requiredType);
+            Object val = rs.getObject(index);
+            // java8时间日期支持
+            if (LocalTime.class == requiredType) {
+                return new LocalTimeConverter().convertToAttribute(val);
+            }
+            else if (LocalDate.class == requiredType) {
+                return new LocalDateConverter().convertToAttribute(val);
+            }
+            else if (LocalDateTime.class == requiredType) {
+                return new LocalDateTimeConverter().convertToAttribute(val);
             }
 
             // Fall back to getObject without type specification, again
