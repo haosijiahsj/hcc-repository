@@ -1,6 +1,7 @@
 package com.hcc.repository.core.conditions;
 
 import com.hcc.repository.core.constants.ExecuteSqlTypeEnum;
+import com.hcc.repository.core.constants.StrPool;
 
 import java.util.Map;
 
@@ -54,7 +55,7 @@ public abstract class ICondition<T> {
      * @return
      */
     public String getSqlAfterWhere() {
-        return "";
+        return StrPool.EMPTY;
     }
 
 }

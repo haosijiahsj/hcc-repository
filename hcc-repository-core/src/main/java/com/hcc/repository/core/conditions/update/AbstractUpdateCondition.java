@@ -11,6 +11,7 @@ import com.hcc.repository.core.utils.StrUtils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * AbstractUpdateCondition
@@ -57,6 +58,8 @@ public abstract class AbstractUpdateCondition<T, R, C extends AbstractCondition<
     }
 
     private String getSqlSet() {
+        // 去重
+        sqlSets = sqlSets.stream().distinct().collect(Collectors.toList());
         return SqlKeywordEnum.SET + StrPool.SPACE + String.join(StrPool.COMMA_SPACE, sqlSets);
     }
 

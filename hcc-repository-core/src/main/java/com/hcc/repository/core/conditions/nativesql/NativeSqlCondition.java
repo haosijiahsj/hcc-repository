@@ -142,6 +142,7 @@ public class NativeSqlCondition<T> extends ICondition<T> {
      * 重置
      * @return
      */
+    @Override
     public void reset() {
         this.sql = null;
         this.paramMap = new HashMap<>(16);
