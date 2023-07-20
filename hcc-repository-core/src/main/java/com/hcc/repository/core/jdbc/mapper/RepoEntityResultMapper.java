@@ -1,10 +1,12 @@
 package com.hcc.repository.core.jdbc.mapper;
 
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
+import com.hcc.repository.core.utils.ConstructorUtils;
 import com.hcc.repository.core.utils.JdbcUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 
@@ -63,7 +65,7 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
 
             if (tableColumnInfo.needConvert()) {
                 // 用户自定义转换器
-                targetValue = ReflectUtils.newInstanceForCache(tableColumnInfo.getConverter())
+                targetValue = this.newInstanceConverter(tableColumnInfo.getConverter(), tableColumnInfo.getField().getType())
                         .convertToAttribute(columnValue);
             } else if (tableColumnInfo.isAssignableFromIEnum()) {
                 // 枚举处理
@@ -81,6 +83,18 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
         }
 
         return instance;
+    }
+
+    /**
+     * 实例化converter
+     * @param converterClass
+     * @param targetClass
+     * @return
+     */
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 
     /**

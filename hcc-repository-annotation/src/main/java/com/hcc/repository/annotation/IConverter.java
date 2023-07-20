@@ -1,7 +1,8 @@
 package com.hcc.repository.annotation;
 
 /**
- * IConverter
+ * IConverter<br/>
+ * 在实现此接口时可定义一个带参（字段类型class）的构造方法，此处会自动注入该字段
  *
  * @author hushengjun
  * @date 2023/3/3

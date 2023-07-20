@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.update;
 
 import com.hcc.repository.annotation.AutoFillContext;
 import com.hcc.repository.annotation.AutoFillStrategy;
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.conditions.AbstractCondition;
 import com.hcc.repository.core.conditions.ICondition;
@@ -11,9 +12,11 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.ConstructorUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * UpdateEntityHandler
@@ -56,6 +59,12 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         return condition;
     }
 
+    /**
+     * 获取列值
+     * @param entity
+     * @param columnInfo
+     * @return
+     */
     @SuppressWarnings("unchecked")
     protected Object getColumnValue(Object entity, TableColumnInfo columnInfo) {
         Object value = ReflectUtils.getValue(entity, columnInfo.getField());
@@ -63,7 +72,7 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         Object targetValue = value;
         if (value != null) {
             if (columnInfo.needConvert()) {
-                targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
+                targetValue = this.newInstanceConverter(columnInfo.getConverter(), columnInfo.getField().getType()).convertToColumn(value);
             } else if (columnInfo.isAssignableFromIEnum()) {
                 targetValue = ((IEnum<?>) value).getValue();
             }
@@ -73,6 +82,18 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         }
 
         return targetValue;
+    }
+
+    /**
+     * 实例化converter
+     * @param converterClass
+     * @param targetClass
+     * @return
+     */
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 
     /**

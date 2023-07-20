@@ -2,6 +2,7 @@ package com.hcc.repository.core.handler.insert;
 
 import com.hcc.repository.annotation.AutoFillContext;
 import com.hcc.repository.annotation.AutoFillStrategy;
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
@@ -12,11 +13,11 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
+import com.hcc.repository.core.utils.ConstructorUtils;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
 import org.springframework.util.NumberUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -111,7 +112,7 @@ public class InsertHandler extends AbstractMethodHandler {
         Object targetValue = value;
         if (value != null) {
             if (columnInfo.needConvert()) {
-                targetValue = ReflectUtils.newInstanceForCache(columnInfo.getConverter()).convertToColumn(value);
+                targetValue = this.newInstanceConverter(columnInfo.getConverter(), columnInfo.getField().getType()).convertToColumn(value);
             } else if (columnInfo.isAssignableFromIEnum()) {
                 targetValue = ((IEnum<?>) value).getValue();
             }
@@ -122,6 +123,18 @@ public class InsertHandler extends AbstractMethodHandler {
         }
 
         return targetValue;
+    }
+
+    /**
+     * 实例化converter
+     * @param converterClass
+     * @param targetClass
+     * @return
+     */
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 
     /**
@@ -160,15 +173,11 @@ public class InsertHandler extends AbstractMethodHandler {
             }
         }
 
+        // 实例化
         IdGenerator<?> idGenerator = Optional.ofNullable(ReflectUtils.matchConstruct(generatorClass, RepositoryConfiguration.class))
-                .map(c -> {
-                    try {
-                        return (IdGenerator<?>) c.newInstance(configuration);
-                    } catch (InstantiationException | IllegalAccessException | InvocationTargetException e) {
-                        throw new RuntimeException(e);
-                    }
-                })
+                .map(c -> (IdGenerator<?>) ConstructorUtils.newInstance(c))
                 .orElseGet(() -> ReflectUtils.newInstance(generatorClass));
+
         if (useSingletonIdGenerator) {
             ID_GENERATOR_CACHE.put(generatorClass, idGenerator);
         }
