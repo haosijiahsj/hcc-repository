@@ -1,6 +1,5 @@
 package com.hcc.repository.test.dao.mapper.provider;
 
-import com.hcc.repository.core.annotation.Param;
 
 /**
  * ProductSelectProvider

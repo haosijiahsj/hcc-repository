@@ -9,6 +9,7 @@ import com.hcc.repository.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +41,7 @@ public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodH
             providerClassType = queryProviderAnnotation.type();
         }
         Assert.isFalse(void.class.equals(providerClassType), "需要指定value或type");
+        Assert.isFalse(providerClassType.isInterface(), "provider class不能为interface");
 
         // Provider方法名，不指定则使用与mapper同名方法
         String providerMethodName = queryProviderAnnotation.method();
@@ -58,7 +60,13 @@ public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodH
 
     @Override
     protected ICondition<?> prepareCondition() {
-        Object providerObject = ReflectUtils.newInstance(providerClassType);
+        boolean isStaticMethod = Modifier.isStatic(providerMethod.getModifiers());
+
+        Object providerObject = null;
+        if (!isStaticMethod) {
+            // 非static方法需实例化Provider类调用
+            providerObject = ReflectUtils.newInstance(providerClassType);
+        }
 
         // 执行方法并获取到sql
         String sql = ReflectUtils.invokeMethod(providerObject, providerMethod, String.class, args);

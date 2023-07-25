@@ -110,7 +110,7 @@ public class ReflectUtils {
         if (!accessible) {
             method.setAccessible(true);
         }
-        Object returnObj = null;
+        Object returnObj;
         try {
             returnObj = method.invoke(obj, args);
         } catch (IllegalAccessException | InvocationTargetException e) {

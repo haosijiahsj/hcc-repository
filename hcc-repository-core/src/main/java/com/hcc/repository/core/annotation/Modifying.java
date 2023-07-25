@@ -7,7 +7,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 修改注解，配合Query一起使用
+ * 修改注解，配合Query或QueryProvider注解一起使用
  *
  * @author hushengjun
  * @date 2023/4/28
