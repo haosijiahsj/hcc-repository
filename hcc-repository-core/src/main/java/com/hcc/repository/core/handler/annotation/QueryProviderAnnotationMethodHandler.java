@@ -1,0 +1,80 @@
+package com.hcc.repository.core.handler.annotation;
+
+import com.hcc.repository.core.annotation.QueryProvider;
+import com.hcc.repository.core.conditions.ICondition;
+import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
+import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.ReflectUtils;
+import com.hcc.repository.core.utils.StrUtils;
+import lombok.extern.slf4j.Slf4j;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+/**
+ * 查询注解处理器
+ *
+ * @author hushengjun
+ * @date 2023/4/28
+ */
+@Slf4j
+public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodHandler {
+
+    private final QueryProvider queryProviderAnnotation;
+    private Class<?> providerClassType;
+    private Method providerMethod;
+
+    public QueryProviderAnnotationMethodHandler(QueryProvider queryProviderAnnotation) {
+        super(queryProviderAnnotation.resultMapper());
+        this.queryProviderAnnotation = queryProviderAnnotation;
+    }
+
+    @Override
+    protected void prepare() {
+        // Provider类名
+        providerClassType = queryProviderAnnotation.value();
+        if (providerClassType == null || void.class.equals(providerClassType)) {
+            providerClassType = queryProviderAnnotation.type();
+        }
+        Assert.isFalse(void.class.equals(providerClassType), "需要指定value或type");
+
+        // Provider方法名，不指定则使用与mapper同名方法
+        String providerMethodName = queryProviderAnnotation.method();
+        if (StrUtils.isEmpty(providerMethodName)) {
+            providerMethodName = method.getName();
+        }
+
+        // 查找对应的Provider方法
+        providerMethod = ReflectUtils.getDeclaredMethod(providerClassType, providerMethodName, method.getParameterTypes());
+        Assert.isNotNull(providerMethod, String.format("未在类：%s找到方法：%s(%s)", providerClassType.getName(), providerMethodName, Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", "))));
+
+        // 判断返回值必须为String
+        Class<?> returnType = providerMethod.getReturnType();
+        Assert.isTrue(String.class.equals(returnType), String.format("%s.%s方法返回值必须为String", providerClassType.getName(), providerMethodName));
+    }
+
+    @Override
+    protected ICondition<?> prepareCondition() {
+        Object providerObject = ReflectUtils.newInstance(providerClassType);
+
+        // 执行方法并获取到sql
+        String sql = ReflectUtils.invokeMethod(providerObject, providerMethod, String.class, args);
+        Map<String, Object> paramMap = super.collectParam();
+        if (log.isDebugEnabled()) {
+            log.debug("{}.{}({})执行结果为：{}", providerClassType.getName(), providerMethod.getName(),
+                    Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", ")),
+                    sql);
+        }
+
+        // 构建Condition
+        NativeSqlCondition<?> condition = new NativeSqlCondition<>();
+        condition.sql(sql);
+        condition.putParamMap(paramMap);
+
+        return condition;
+    }
+
+}

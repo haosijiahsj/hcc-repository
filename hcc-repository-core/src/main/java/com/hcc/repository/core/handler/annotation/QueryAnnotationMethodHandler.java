@@ -47,10 +47,16 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
     private static final String AND_OR_REGEX = "(?i)AND|(?i)OR";
     private static final String SET_VAL_REGEX_COMMA = ".+=.+,";
     private static final String SET_VAL_REGEX = ".+=.+";
-    protected final Query queryAnnotation;
+    protected Query queryAnnotation;
+    protected Class<? extends ResultMapper> resultMapper;
 
     public QueryAnnotationMethodHandler(Query queryAnnotation) {
         this.queryAnnotation = queryAnnotation;
+        this.resultMapper = queryAnnotation.resultMapper();
+    }
+
+    public QueryAnnotationMethodHandler(Class<? extends ResultMapper> resultMapper) {
+        this.resultMapper = resultMapper;
     }
 
     @Override
@@ -121,7 +127,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
      * 收集参数到Map中
      * @return
      */
-    private Map<String, Object> collectParam() {
+    protected Map<String, Object> collectParam() {
         if (ArrayUtils.isEmpty(args)) {
             return Collections.emptyMap();
         }
@@ -261,7 +267,7 @@ public class QueryAnnotationMethodHandler extends AbstractMethodHandler {
             ResolvableType resolvableType = ResolvableType.forMethodReturnType(method);
             genericClass = resolvableType.getGeneric(0).resolve();
         }
-        ResultMapper<?> rowMapper = this.newInstanceRowMapper(queryAnnotation.resultMapper(), genericClass);
+        ResultMapper<?> rowMapper = this.newInstanceRowMapper(resultMapper, genericClass);
 
         if (method.getReturnType().equals(genericClass)) {
             // 返回值为对象

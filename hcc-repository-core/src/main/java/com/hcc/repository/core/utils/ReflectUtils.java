@@ -90,8 +90,8 @@ public class ReflectUtils {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public static void invokeMethod(Object obj, Method method, Object...args) throws InvocationTargetException, IllegalAccessException {
-        invokeMethod(obj, method, Object.class, args);
+    public static Object invokeMethod(Object obj, Method method, Object...args) {
+        return invokeMethod(obj, method, Object.class, args);
     }
 
     /**
@@ -105,15 +105,35 @@ public class ReflectUtils {
      * @throws InvocationTargetException
      * @throws IllegalAccessException
      */
-    public static <T> T invokeMethod(Object obj, Method method, Class<T> returnClass, Object... args) throws InvocationTargetException, IllegalAccessException {
+    public static <T> T invokeMethod(Object obj, Method method, Class<T> returnClass, Object... args) {
         boolean accessible = method.isAccessible();
         if (!accessible) {
             method.setAccessible(true);
         }
-        Object returnObj = method.invoke(obj, args);
+        Object returnObj = null;
+        try {
+            returnObj = method.invoke(obj, args);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
+        }
         method.setAccessible(accessible);
 
         return returnClass.cast(returnObj);
+    }
+
+    /**
+     * 获取方法
+     * @param clazz
+     * @param name
+     * @param types
+     * @return
+     */
+    public static Method getDeclaredMethod(Class<?> clazz, String name, Class<?>[] types) {
+        try {
+            return clazz.getDeclaredMethod(name, types);
+        } catch (NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
