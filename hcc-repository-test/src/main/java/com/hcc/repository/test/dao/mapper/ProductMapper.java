@@ -8,7 +8,7 @@ import com.hcc.repository.core.annotation.QueryProvider;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.mapper.BaseMapper;
 import com.hcc.repository.core.page.IPage;
-import com.hcc.repository.test.dao.mapper.provider.ProductSelectProvider;
+import com.hcc.repository.test.dao.mapper.provider.ProductQueryProvider;
 import com.hcc.repository.test.domain.ProductQueryParam;
 import com.hcc.repository.test.domain.po.ProductPo;
 
@@ -112,6 +112,10 @@ public interface ProductMapper extends BaseMapper<ProductPo, Long> {
     @Query("select COUNT(*) from product p where p.name = #{arg0}")
     long selectByAnnotationForArgIndex(String name);
 
-    @QueryProvider(ProductSelectProvider.class)
+    @QueryProvider(ProductQueryProvider.class)
     ProductPo selectProvider1(@Param("id") Long id);
+
+    @Modifying
+    @QueryProvider(ProductQueryProvider.class)
+    int updateProvider1(@Param("id") Long id);
 }

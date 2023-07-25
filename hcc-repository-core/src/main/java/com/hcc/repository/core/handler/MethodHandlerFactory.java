@@ -1,7 +1,6 @@
 package com.hcc.repository.core.handler;
 
 import com.hcc.repository.core.annotation.Modifying;
-import com.hcc.repository.core.annotation.ModifyingProvider;
 import com.hcc.repository.core.annotation.Query;
 import com.hcc.repository.core.annotation.QueryProvider;
 import com.hcc.repository.core.constants.MethodNameEnum;
@@ -83,9 +82,9 @@ public class MethodHandlerFactory {
     private static AbstractMethodHandler getQueryProviderAnnotationMethodHandler(Method method) {
         QueryProvider queryProviderAnnotation = method.getAnnotation(QueryProvider.class);
         if (queryProviderAnnotation != null) {
-            ModifyingProvider modifyingProviderAnnotation = method.getAnnotation(ModifyingProvider.class);
-            if (modifyingProviderAnnotation != null) {
-                return new ModifyingProviderAnnotationMethodHandler(queryProviderAnnotation, modifyingProviderAnnotation);
+            Modifying modifyingAnnotation = method.getAnnotation(Modifying.class);
+            if (modifyingAnnotation != null) {
+                return new ModifyingProviderAnnotationMethodHandler(queryProviderAnnotation, modifyingAnnotation);
             }
 
             return new QueryProviderAnnotationMethodHandler(queryProviderAnnotation);

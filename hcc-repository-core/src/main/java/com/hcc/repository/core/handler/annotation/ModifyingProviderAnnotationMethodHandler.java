@@ -1,6 +1,6 @@
 package com.hcc.repository.core.handler.annotation;
 
-import com.hcc.repository.core.annotation.ModifyingProvider;
+import com.hcc.repository.core.annotation.Modifying;
 import com.hcc.repository.core.annotation.QueryProvider;
 import lombok.extern.slf4j.Slf4j;
 
@@ -13,11 +13,11 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ModifyingProviderAnnotationMethodHandler extends QueryProviderAnnotationMethodHandler {
 
-    private final ModifyingProvider modifyingProvider;
+    private final Modifying modifyingAnnotation;
 
-    public ModifyingProviderAnnotationMethodHandler(QueryProvider queryProvider, ModifyingProvider modifyingProvider) {
+    public ModifyingProviderAnnotationMethodHandler(QueryProvider queryProvider, Modifying modifyingAnnotation) {
         super(queryProvider);
-        this.modifyingProvider = modifyingProvider;
+        this.modifyingAnnotation = modifyingAnnotation;
     }
 
     @Override
