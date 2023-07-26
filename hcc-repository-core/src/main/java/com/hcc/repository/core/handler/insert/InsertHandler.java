@@ -3,11 +3,11 @@ package com.hcc.repository.core.handler.insert;
 import com.hcc.repository.annotation.AutoFillContext;
 import com.hcc.repository.annotation.AutoFillStrategy;
 import com.hcc.repository.annotation.IConverter;
-import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.insert.DefaultInsertCondition;
+import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
@@ -111,10 +111,14 @@ public class InsertHandler extends AbstractMethodHandler {
         // 转换
         Object targetValue = value;
         if (value != null) {
+            Class<? extends IConverter> converter = null;
             if (columnInfo.needConvert()) {
-                targetValue = this.newInstanceConverter(columnInfo.getConverter(), columnInfo.getField().getType()).convertToColumn(value);
+                converter = columnInfo.getConverter();
             } else if (columnInfo.isAssignableFromIEnum()) {
-                targetValue = ((IEnum<?>) value).getValue();
+                converter = IEnumConverter.class;
+            }
+            if (converter != null) {
+                targetValue = this.newInstanceConverter(converter, columnInfo.getField().getType()).convertToColumn(value);
             }
         }
         // 自动填充处理
@@ -175,7 +179,7 @@ public class InsertHandler extends AbstractMethodHandler {
 
         // 实例化
         IdGenerator<?> idGenerator = Optional.ofNullable(ReflectUtils.matchConstruct(generatorClass, RepositoryConfiguration.class))
-                .map(c -> (IdGenerator<?>) ConstructorUtils.newInstance(c))
+                .map(c -> (IdGenerator<?>) ConstructorUtils.newInstance(c, configuration))
                 .orElseGet(() -> ReflectUtils.newInstance(generatorClass));
 
         if (useSingletonIdGenerator) {

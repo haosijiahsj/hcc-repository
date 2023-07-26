@@ -3,11 +3,11 @@ package com.hcc.repository.core.handler.update;
 import com.hcc.repository.annotation.AutoFillContext;
 import com.hcc.repository.annotation.AutoFillStrategy;
 import com.hcc.repository.annotation.IConverter;
-import com.hcc.repository.annotation.IEnum;
 import com.hcc.repository.core.conditions.AbstractCondition;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.SegmentContainer;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
+import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -71,10 +71,14 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         // 转换
         Object targetValue = value;
         if (value != null) {
+            Class<? extends IConverter> converter = null;
             if (columnInfo.needConvert()) {
-                targetValue = this.newInstanceConverter(columnInfo.getConverter(), columnInfo.getField().getType()).convertToColumn(value);
+                converter = columnInfo.getConverter();
             } else if (columnInfo.isAssignableFromIEnum()) {
-                targetValue = ((IEnum<?>) value).getValue();
+                converter = IEnumConverter.class;
+            }
+            if (converter != null) {
+                targetValue = this.newInstanceConverter(converter, columnInfo.getField().getType()).convertToColumn(value);
             }
         }
         if (targetValue == null && columnInfo.needAutoFillUpdate()) {
