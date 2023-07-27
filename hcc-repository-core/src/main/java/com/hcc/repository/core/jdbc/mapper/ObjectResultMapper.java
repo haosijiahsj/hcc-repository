@@ -23,6 +23,7 @@ public class ObjectResultMapper<T> implements ResultMapper<T> {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public T resultMap(ResultSet rs, int rowNum) throws SQLException {
         ResultSetMetaData metaData = rs.getMetaData();
         if (metaData.getColumnCount() != 1) {

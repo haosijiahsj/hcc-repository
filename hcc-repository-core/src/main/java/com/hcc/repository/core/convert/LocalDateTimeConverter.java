@@ -28,4 +28,8 @@ public class LocalDateTimeConverter implements IConverter<LocalDateTime, Object>
         throw new RepositoryException(String.format("无法转换值：%s，到目标LocalDateTime", value));
     }
 
+    @Override
+    public Object convertToColumn(LocalDateTime attribute) {
+        return attribute.format(DATE_TIME_FORMATTER);
+    }
 }

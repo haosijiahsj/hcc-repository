@@ -47,9 +47,8 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
         for (int index = 1; index <= columnCount; index++) {
             String columnName = this.getColumnName(rsMetaData, index);
             // 对应实体元数据，先用列名获取，再用字段名获取
-            TableColumnInfo tableColumnInfo = Optional.ofNullable(columnNameColumnInfoMap.get(columnName))
-                    .orElse(fieldNameColumnInfoMap.get(columnName));
-            if (tableColumnInfo == null) {
+            TableColumnInfo columnInfo = columnNameColumnInfoMap.getOrDefault(columnName, fieldNameColumnInfoMap.get(columnName));
+            if (columnInfo == null) {
                 continue;
             }
             Object columnValue = JdbcUtils.getResultSetValue(rs, index);
@@ -57,28 +56,28 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
                 continue;
             }
 
-            Field field = tableColumnInfo.getField();
+            Field field = columnInfo.getField();
             Class<?> fieldTypeClass = field.getType();
             Object targetValue;
 
             Class<? extends IConverter> converter = null;
-            if (tableColumnInfo.needConvert()) {
+            if (columnInfo.needConvert()) {
                 // 用户自定义转换器
-                converter = tableColumnInfo.getConverter();
-            } else if (tableColumnInfo.isAssignableFromIEnum()) {
+                converter = columnInfo.getConverter();
+            } else if (columnInfo.isAssignableFromIEnum()) {
                 // IEnum枚举处理
                 converter = IEnumConverter.class;
-            } else if (tableColumnInfo.isEnum()) {
+            } else if (columnInfo.isEnum()) {
                 // 枚举处理
-                if (String.class.equals(tableColumnInfo.getFieldType())) {
+                if (String.class.equals(columnInfo.getFieldType())) {
                     converter = EnumNameConverter.class;
-                } else if (Integer.class.equals(tableColumnInfo.getFieldType()) || int.class.equals(tableColumnInfo.getFieldType())) {
+                } else if (Integer.class.equals(columnInfo.getFieldType()) || int.class.equals(columnInfo.getFieldType())) {
                     converter = EnumOrdinalConverter.class;
                 }
             }
 
             if (converter != null) {
-                targetValue = this.newInstanceConverter(converter, tableColumnInfo.getField().getType()).convertToAttribute(columnValue);
+                targetValue = this.newInstanceConverter(converter, columnInfo.getFieldType()).convertToAttribute(columnValue);
             } else {
                 targetValue = JdbcUtils.getResultSetValue(rs, index, fieldTypeClass);
             }

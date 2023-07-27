@@ -9,7 +9,7 @@ package com.hcc.repository.annotation;
 public interface PropSetListener {
 
     /**
-     * 设置方法
+     * 实体属性值设置后回调方法
      * @param entity
      * @param value
      * @param propName

@@ -21,21 +21,22 @@ import java.lang.annotation.Target;
 public @interface QueryProvider {
 
     /**
-     * class类型
+     * provider class类型
      * @return
      */
     Class<?> value() default void.class;
     /**
-     * class类型
+     * provider class类型 alias for value
      * @return
      */
     Class<?> type() default void.class;
 
     /**
-     * 方法名称
+     * 方法名称，默认与mapper中的标记此注解方法名称一致
      * @return
      */
     String method() default "";
+
     /**
      * 映射器
      * @return

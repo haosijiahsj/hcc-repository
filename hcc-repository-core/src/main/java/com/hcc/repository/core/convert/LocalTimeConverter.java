@@ -28,4 +28,9 @@ public class LocalTimeConverter implements IConverter<LocalTime, Object> {
         throw new RepositoryException(String.format("无法转换值：%s，到目标LocalTime", value));
     }
 
+    @Override
+    public Object convertToColumn(LocalTime attribute) {
+        return attribute.format(TIME_FORMATTER);
+    }
+
 }

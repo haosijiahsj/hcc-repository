@@ -1,5 +1,6 @@
 package com.hcc.repository.core.utils;
 
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.core.constants.DbType;
 import com.hcc.repository.core.convert.LocalDateConverter;
 import com.hcc.repository.core.convert.LocalDateTimeConverter;
@@ -131,15 +132,17 @@ public class JdbcUtils {
             }
 
             Object val = rs.getObject(index);
-            // java8时间日期支持
+            // 上述抛异常后，说明当前驱动不支持java8日期，使用自定义converter支持
+            IConverter<?, Object> converter = null;
             if (LocalTime.class == requiredType) {
-                return new LocalTimeConverter().convertToAttribute(val);
+                converter = new LocalTimeConverter();
+            } else if (LocalDate.class == requiredType) {
+                converter = new LocalDateConverter();
+            } else if (LocalDateTime.class == requiredType) {
+                converter = new LocalDateTimeConverter();
             }
-            else if (LocalDate.class == requiredType) {
-                return new LocalDateConverter().convertToAttribute(val);
-            }
-            else if (LocalDateTime.class == requiredType) {
-                return new LocalDateTimeConverter().convertToAttribute(val);
+            if (converter != null) {
+                return converter.convertToAttribute(val);
             }
 
             // Fall back to getObject without type specification, again

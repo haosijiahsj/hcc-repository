@@ -18,7 +18,7 @@ import java.lang.annotation.Target;
 public @interface Param {
 
     /**
-     * 参数名称，不设置时自动使用方法名称（在编译时设置了-parameters参数时生效）
+     * 参数名称，不设置时自动使用参数名称（在编译时设置了-parameters参数时生效）
      * @return
      */
     String value() default "";

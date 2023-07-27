@@ -31,4 +31,9 @@ public class LocalDateConverter implements IConverter<LocalDate, Object> {
         throw new RepositoryException(String.format("无法转换值：%s，到LocalDate", value));
     }
 
+    @Override
+    public Object convertToColumn(LocalDate attribute) {
+        return attribute.toString();
+    }
+
 }

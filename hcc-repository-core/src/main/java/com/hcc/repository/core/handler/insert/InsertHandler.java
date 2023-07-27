@@ -89,7 +89,7 @@ public class InsertHandler extends AbstractMethodHandler {
             // 用户指定值
             idValue = ReflectUtils.getValue(entity, idColumnInfo.getField());
         } else if (IdType.GENERATE.equals(idType)) {
-            idValue = newInstanceGenerator(idColumnInfo.getGenerator(), idColumnInfo.isUseSingletonIdGenerator()).nextId();
+            idValue = this.newInstanceGenerator(idColumnInfo.getGenerator(), idColumnInfo.isUseSingletonIdGenerator()).nextId();
         }
         if (idValue != null) {
             // 回填id到实体中
