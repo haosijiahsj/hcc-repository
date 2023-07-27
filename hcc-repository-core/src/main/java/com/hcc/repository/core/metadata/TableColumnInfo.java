@@ -56,12 +56,16 @@ public class TableColumnInfo {
         return !Constants.UnknownFillStrategy.class.equals(updateStrategy) && !AutoFillStrategy.class.equals(updateStrategy);
     }
 
+    public Class<?> getFieldType() {
+        return field.getType();
+    }
+
     public boolean isEnum() {
         return field.getType().isEnum();
     }
 
     public boolean isAssignableFromIEnum() {
-        return isEnum() && IEnum.class.isAssignableFrom(field.getType());
+        return isEnum() && IEnum.class.isAssignableFrom(getFieldType());
     }
 
 }

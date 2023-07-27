@@ -1,16 +1,22 @@
 package com.hcc.repository.core.handler;
 
+import com.hcc.repository.annotation.IConverter;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.nativesql.NativeSqlCondition;
 import com.hcc.repository.core.constants.MethodNameEnum;
+import com.hcc.repository.core.convert.EnumNameConverter;
+import com.hcc.repository.core.convert.EnumOrdinalConverter;
+import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.interceptor.SqlExecuteContext;
 import com.hcc.repository.core.jdbc.JdbcOperations;
+import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.page.DefaultPage;
 import com.hcc.repository.core.page.IPage;
 import com.hcc.repository.core.spring.config.RepositoryConfiguration;
 import com.hcc.repository.core.utils.Assert;
 import com.hcc.repository.core.utils.CollUtils;
+import com.hcc.repository.core.utils.ConstructorUtils;
 import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
@@ -180,6 +186,44 @@ public abstract class AbstractMethodHandler {
      * @return
      */
     protected abstract Object executeSql(String sql, Object[] args);
+
+    /**
+     * 获取转换器
+     * @param columnInfo
+     * @return
+     */
+    protected IConverter getConverter(TableColumnInfo columnInfo) {
+        Class<? extends IConverter> converter = null;
+        if (columnInfo.needConvert()) {
+            converter = columnInfo.getConverter();
+        } else if (columnInfo.isAssignableFromIEnum()) {
+            converter = IEnumConverter.class;
+        } else if (columnInfo.isEnum()) {
+            if (String.class.equals(columnInfo.getFieldType())) {
+                converter = EnumNameConverter.class;
+            } else if (Integer.class.equals(columnInfo.getFieldType()) || int.class.equals(columnInfo.getFieldType())) {
+                converter = EnumOrdinalConverter.class;
+            }
+        }
+
+        if (converter != null) {
+            return this.newInstanceConverter(converter, columnInfo.getFieldType());
+        }
+
+        return null;
+    }
+
+    /**
+     * 实例化converter
+     * @param converterClass
+     * @param targetClass
+     * @return
+     */
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
+    }
 
     /**
      * sql解析

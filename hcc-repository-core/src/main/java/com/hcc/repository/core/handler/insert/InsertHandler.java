@@ -7,7 +7,6 @@ import com.hcc.repository.annotation.IdGenerator;
 import com.hcc.repository.annotation.IdType;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.insert.DefaultInsertCondition;
-import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.handler.AbstractMethodHandler;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
@@ -111,14 +110,9 @@ public class InsertHandler extends AbstractMethodHandler {
         // 转换
         Object targetValue = value;
         if (value != null) {
-            Class<? extends IConverter> converter = null;
-            if (columnInfo.needConvert()) {
-                converter = columnInfo.getConverter();
-            } else if (columnInfo.isAssignableFromIEnum()) {
-                converter = IEnumConverter.class;
-            }
+            IConverter converter = super.getConverter(columnInfo);
             if (converter != null) {
-                targetValue = this.newInstanceConverter(converter, columnInfo.getField().getType()).convertToColumn(value);
+                targetValue = converter.convertToColumn(value);
             }
         }
         // 自动填充处理

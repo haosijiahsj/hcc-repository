@@ -1,6 +1,8 @@
 package com.hcc.repository.core.jdbc.mapper;
 
 import com.hcc.repository.annotation.IConverter;
+import com.hcc.repository.core.convert.EnumNameConverter;
+import com.hcc.repository.core.convert.EnumOrdinalConverter;
 import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.jdbc.ResultMapper;
 import com.hcc.repository.core.metadata.TableColumnInfo;
@@ -64,8 +66,15 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
                 // 用户自定义转换器
                 converter = tableColumnInfo.getConverter();
             } else if (tableColumnInfo.isAssignableFromIEnum()) {
-                // 枚举处理
+                // IEnum枚举处理
                 converter = IEnumConverter.class;
+            } else if (tableColumnInfo.isEnum()) {
+                // 枚举处理
+                if (String.class.equals(tableColumnInfo.getFieldType())) {
+                    converter = EnumNameConverter.class;
+                } else if (Integer.class.equals(tableColumnInfo.getFieldType()) || int.class.equals(tableColumnInfo.getFieldType())) {
+                    converter = EnumOrdinalConverter.class;
+                }
             }
 
             if (converter != null) {

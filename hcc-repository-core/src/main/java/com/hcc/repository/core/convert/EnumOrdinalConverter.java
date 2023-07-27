@@ -1,4 +1,4 @@
-package com.hcc.repository.extension.converter.enums;
+package com.hcc.repository.core.convert;
 
 /**
  * EnumOrdinalConverter

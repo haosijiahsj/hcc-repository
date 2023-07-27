@@ -55,11 +55,11 @@ public class OptimisticLockInterceptor implements Interceptor {
 
         String changeColumnName = versionColumnName + "_CHANGE";
         updateCondition.setSql(String.format("%s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(changeColumnName)));
-        updateCondition.getColumnValuePairs().put(changeColumnName, getChangeVersionVal(originalVersionVal, versionColumnInfo.getField().getType()));
+        updateCondition.putColumnValuePair(changeColumnName, getChangeVersionVal(originalVersionVal, versionColumnInfo.getField().getType()));
 
         String originalColumnName = versionColumnName + "_ORIGINAL";
         updateCondition.apply(String.format("AND %s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(originalColumnName)));
-        updateCondition.getColumnValuePairs().put(originalColumnName, originalVersionVal);
+        updateCondition.putColumnValuePair(originalColumnName, originalVersionVal);
     }
 
     /**

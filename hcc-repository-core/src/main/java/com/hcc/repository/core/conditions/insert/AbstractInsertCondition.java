@@ -63,6 +63,10 @@ public abstract class AbstractInsertCondition<T, R, C extends AbstractInsertCond
         return columnValuePairs;
     }
 
+    public void putColumnValuePair(String columnName, Object val) {
+        columnValuePairs.put(columnName, val);
+    }
+
     /**
      * 拼接insert
      * @param condition

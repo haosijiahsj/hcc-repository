@@ -12,7 +12,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -40,7 +39,7 @@ public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodH
         if (providerClassType == null || void.class.equals(providerClassType)) {
             providerClassType = queryProviderAnnotation.type();
         }
-        Assert.isFalse(void.class.equals(providerClassType), "需要指定value或type");
+        Assert.isFalse(providerClassType == null || void.class.equals(providerClassType), "需要指定value或type");
         Assert.isFalse(providerClassType.isInterface(), "provider class不能为interface");
 
         // Provider方法名，不指定则使用与mapper同名方法
@@ -51,11 +50,12 @@ public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodH
 
         // 查找对应的Provider方法
         providerMethod = ReflectUtils.getDeclaredMethod(providerClassType, providerMethodName, method.getParameterTypes());
-        Assert.isNotNull(providerMethod, String.format("未在类：%s找到方法：%s(%s)", providerClassType.getName(), providerMethodName, Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", "))));
+        Assert.isNotNull(providerMethod, "未在类：{0}找到方法：{1}({2})", providerClassType.getName(), providerMethodName,
+                Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", ")));
 
         // 判断返回值必须为String
         Class<?> returnType = providerMethod.getReturnType();
-        Assert.isTrue(String.class.equals(returnType), String.format("%s.%s方法返回值必须为String", providerClassType.getName(), providerMethodName));
+        Assert.isTrue(String.class.equals(returnType), "{0}.{1}方法返回值必须为String", providerClassType.getName(), providerMethodName);
     }
 
     @Override
@@ -70,17 +70,18 @@ public class QueryProviderAnnotationMethodHandler extends QueryAnnotationMethodH
 
         // 执行方法并获取到sql
         String sql = ReflectUtils.invokeMethod(providerObject, providerMethod, String.class, args);
-        Map<String, Object> paramMap = super.collectParam();
         if (log.isDebugEnabled()) {
             log.debug("{}.{}({})执行结果为：{}", providerClassType.getName(), providerMethod.getName(),
                     Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", ")),
                     sql);
         }
+        Assert.isTrue(StrUtils.isNotEmpty(sql), "{0}.{1}({2})生成的sql为空", providerClassType.getName(), providerMethod.getName(),
+                Arrays.stream(method.getParameterTypes()).map(Class::getName).collect(Collectors.joining(", ")));
 
         // 构建Condition
         NativeSqlCondition<?> condition = new NativeSqlCondition<>();
         condition.sql(sql);
-        condition.putParamMap(paramMap);
+        condition.putParamMap(super.collectParam());
 
         return condition;
     }

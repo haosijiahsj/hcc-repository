@@ -92,6 +92,10 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
         return columnValuePairs;
     }
 
+    public void putColumnValuePair(String column, Object val) {
+        columnValuePairs.put(column, val);
+    }
+
     public SegmentContainer getSegmentContainer() {
         return segmentContainer;
     }
@@ -103,7 +107,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     @Override
     public String getSqlAfterWhere() {
         if (segmentContainer == null) {
-            return "";
+            return StrPool.EMPTY;
         }
         return segmentContainer.getSqlSegmentAfterWhere();
     }

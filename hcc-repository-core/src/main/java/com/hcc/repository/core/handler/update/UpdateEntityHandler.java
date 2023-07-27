@@ -7,7 +7,6 @@ import com.hcc.repository.core.conditions.AbstractCondition;
 import com.hcc.repository.core.conditions.ICondition;
 import com.hcc.repository.core.conditions.SegmentContainer;
 import com.hcc.repository.core.conditions.update.DefaultUpdateCondition;
-import com.hcc.repository.core.convert.IEnumConverter;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
@@ -71,14 +70,9 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         // 转换
         Object targetValue = value;
         if (value != null) {
-            Class<? extends IConverter> converter = null;
-            if (columnInfo.needConvert()) {
-                converter = columnInfo.getConverter();
-            } else if (columnInfo.isAssignableFromIEnum()) {
-                converter = IEnumConverter.class;
-            }
+            IConverter converter = super.getConverter(columnInfo);
             if (converter != null) {
-                targetValue = this.newInstanceConverter(converter, columnInfo.getField().getType()).convertToColumn(value);
+                targetValue = converter.convertToColumn(value);
             }
         }
         if (targetValue == null && columnInfo.needAutoFillUpdate()) {

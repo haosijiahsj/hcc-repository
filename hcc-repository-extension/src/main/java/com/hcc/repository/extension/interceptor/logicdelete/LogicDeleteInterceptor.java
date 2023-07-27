@@ -107,7 +107,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
                 if (!insertCondition.getSqlColumns().contains(columnName)) {
                     insertCondition.getSqlColumns().add(columnName);
                 }
-                insertCondition.getColumnValuePairs().put(columnName, logicNotDelVal);
+                insertCondition.putColumnValuePair(columnName, logicNotDelVal);
             }
         }
 
