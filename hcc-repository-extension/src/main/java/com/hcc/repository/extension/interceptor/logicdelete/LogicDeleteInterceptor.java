@@ -13,6 +13,7 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.StrUtils;
 import com.hcc.repository.extension.interceptor.ExtInterceptor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -88,7 +89,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
         Object logicDelVal = this.getLogicDelVal(logicDelColumnInfo);
         Object logicNotDelVal = this.getLogicNotDelVal(logicDelColumnInfo);
 
-        String whereSqlSegment = String.format("AND %s = %s", columnName, logicNotDelVal instanceof String ? String.format("'%s'", logicNotDelVal) : logicNotDelVal);
+        String whereSqlSegment = StrUtils.format("AND {0} = {1}", columnName, logicNotDelVal instanceof String ? String.format("'%s'", logicNotDelVal) : logicNotDelVal);
         // 通过condition判断并加入逻辑删除条件
         MethodNameEnum methodNameEnum = MethodNameEnum.get(method.getName());
         if (methodNameEnum == null) {
@@ -119,7 +120,7 @@ public class LogicDeleteInterceptor implements ExtInterceptor {
                 if (logicDelVal instanceof String) {
                     logicDelVal = String.format("'%s'", logicDelVal);
                 }
-                abstractUpdateCondition.setSql(String.format("%s = %s", columnName, logicDelVal));
+                abstractUpdateCondition.setSql(StrUtils.format("{0} = {1}", columnName, logicDelVal));
                 abstractUpdateCondition.apply(whereSqlSegment);
             }
         }

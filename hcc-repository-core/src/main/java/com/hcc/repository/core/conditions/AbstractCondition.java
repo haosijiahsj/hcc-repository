@@ -156,7 +156,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String namedColumnName = this.getNamedColumnName(columnName);
 
             this.putColumnValue(namedColumnName, val);
-            String sqlSegment = String.format("%s %s %s", columnName, sqkKeyWord.getKeyword(), StrPool.getPlaceholder(namedColumnName));
+            String sqlSegment = StrUtils.format("{0} {1} {2}", columnName, sqkKeyWord.getKeyword(), StrPool.getPlaceholder(namedColumnName));
             segmentContainer.addAndSegment(sqlSegment);
         }
 
@@ -202,7 +202,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             this.putColumnValue(leftColumnName, leftVal)
                     .putColumnValue(rightColumnName, rightVal);
             SqlKeywordEnum sqlKeyword = isBetween ? SqlKeywordEnum.BETWEEN : SqlKeywordEnum.NOT_BETWEEN;
-            String sqlSegment = String.format("%s %s %s %s %s",
+            String sqlSegment = StrUtils.format("{0} {1} {2} {3} {4}",
                     columnName, sqlKeyword.getKeyword(), StrPool.getPlaceholder(leftColumnName),
                     SqlKeywordEnum.AND.getKeyword(), StrPool.getPlaceholder(rightColumnName));
             segmentContainer.addAndSegment(sqlSegment);
@@ -225,7 +225,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             String namedColumnName = this.getNamedColumnName(columnName);
             this.putColumnValue(namedColumnName, sqlLikeEnum.getLikeVal(val));
-            String sqlSegment = String.format("%s %s %s", columnName,
+            String sqlSegment = StrUtils.format("{0} {1} {2}", columnName,
                     isLike ? SqlKeywordEnum.LIKE.getKeyword() : SqlKeywordEnum.NOT_LIKE.getKeyword(),
                     StrPool.getPlaceholder(namedColumnName));
             segmentContainer.addAndSegment(sqlSegment);
@@ -256,7 +256,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     private C addNullCondition(boolean condition, R column, boolean isNull) {
         if (condition) {
             String columnName = this.getColumnName(column);
-            String sqlSegment = String.format("%s %s", columnName,
+            String sqlSegment = StrUtils.format("{0} {1}", columnName,
                     isNull ? SqlKeywordEnum.IS_NULL.getKeyword() : SqlKeywordEnum.IS_NOT_NULL.getKeyword());
             segmentContainer.addAndSegment(sqlSegment);
         }
@@ -278,7 +278,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
             String columnName = this.getColumnName(column);
             String namedColumnName = this.getNamedColumnName(columnName);
             this.putColumnValue(namedColumnName, coll);
-            String sqlSegment = String.format("%s %s %s", columnName,
+            String sqlSegment = StrUtils.format("{0} {1} 2", columnName,
                     isIn ? SqlKeywordEnum.IN.getKeyword() : SqlKeywordEnum.NOT_IN.getKeyword(), StrPool.L_BRACKET + StrPool.getPlaceholder(namedColumnName) + StrPool.R_BRACKET);
             segmentContainer.addAndSegment(sqlSegment);
         }
@@ -299,7 +299,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     public C inSql(boolean condition, R column, String value) {
         if (condition) {
             String columnName = this.getColumnName(column);
-            String sqlSegment = String.format("%s %s %s", columnName,
+            String sqlSegment = StrUtils.format("{0} {1} {2}", columnName,
                     SqlKeywordEnum.IN.getKeyword(), StrPool.L_BRACKET + value + StrPool.R_BRACKET);
             segmentContainer.addAndSegment(sqlSegment);
         }
@@ -310,7 +310,7 @@ public abstract class AbstractCondition<T, R, C extends AbstractCondition<T, R, 
     public C notInSql(boolean condition, R column, String value) {
         if (condition) {
             String columnName = this.getColumnName(column);
-            String sqlSegment = String.format("%s %s %s", columnName,
+            String sqlSegment = StrUtils.format("{0} {1} {2}", columnName,
                     SqlKeywordEnum.NOT_IN.getKeyword(), StrPool.L_BRACKET + value + StrPool.R_BRACKET);
             segmentContainer.addAndSegment(sqlSegment);
         }

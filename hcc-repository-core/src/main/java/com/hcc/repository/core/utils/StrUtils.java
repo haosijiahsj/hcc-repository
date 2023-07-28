@@ -2,6 +2,8 @@ package com.hcc.repository.core.utils;
 
 import com.hcc.repository.core.constants.StrPool;
 
+import java.text.MessageFormat;
+
 /**
  * 字符串工具类
  *
@@ -60,6 +62,10 @@ public class StrUtils {
 
     public static String join(CharSequence delimiter, Iterable<? extends CharSequence> elements) {
         return String.join(delimiter, elements);
+    }
+
+    public static String format(String pattern, Object...args) {
+        return MessageFormat.format(pattern, args);
     }
 
 }

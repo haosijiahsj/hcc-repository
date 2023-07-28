@@ -278,6 +278,14 @@ public interface IRepository<T, ID extends Serializable> {
     }
 
     /**
+     * 查询全部
+     * @return
+     */
+    default List<T> listAll() {
+        return getBaseMapper().selectAll();
+    }
+
+    /**
      * 通过条件查询id列表
      * @param condition
      * @return

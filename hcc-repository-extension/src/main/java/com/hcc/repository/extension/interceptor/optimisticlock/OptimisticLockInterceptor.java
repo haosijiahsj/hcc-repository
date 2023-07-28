@@ -8,6 +8,7 @@ import com.hcc.repository.core.interceptor.Interceptor;
 import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.ReflectUtils;
+import com.hcc.repository.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import java.lang.reflect.Method;
@@ -54,11 +55,11 @@ public class OptimisticLockInterceptor implements Interceptor {
         AbstractUpdateCondition<?, ?, ?> updateCondition = (AbstractUpdateCondition<?, ?, ?>) condition;
 
         String changeColumnName = versionColumnName + "_CHANGE";
-        updateCondition.setSql(String.format("%s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(changeColumnName)));
+        updateCondition.setSql(StrUtils.format("{0} = {1}", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(changeColumnName)));
         updateCondition.putColumnValuePair(changeColumnName, getChangeVersionVal(originalVersionVal, versionColumnInfo.getField().getType()));
 
         String originalColumnName = versionColumnName + "_ORIGINAL";
-        updateCondition.apply(String.format("AND %s = %s", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(originalColumnName)));
+        updateCondition.apply(StrUtils.format("AND {0} = {1}", versionColumnInfo.getColumnName(), StrPool.getPlaceholder(originalColumnName)));
         updateCondition.putColumnValuePair(originalColumnName, originalVersionVal);
     }
 

@@ -179,6 +179,14 @@ public interface BaseMapper<T, ID extends Serializable> {
     List<T> selectList(ICondition<T> condition);
 
     /**
+     * 查询所有
+     * @return
+     */
+    default List<T> selectAll() {
+        return selectList(null);
+    }
+
+    /**
      * 查询id列表
      * @param condition
      * @return
