@@ -1,14 +1,14 @@
-package com.hcc.repository.extension.converter.encrypt;
+package com.hcc.repository.extension.converter.codec;
 
 import com.hcc.repository.extension.converter.StringConverter;
 
 /**
- * 加解密converter
+ * 编解码converter
  *
  * @author hushengjun
  * @date 2023/4/25
  */
-public interface EncryptConverter extends StringConverter {
+public interface CodecConverter extends StringConverter {
 
     @Override
     default String convertToColumn(String attribute) {
@@ -16,7 +16,7 @@ public interface EncryptConverter extends StringConverter {
             return null;
         }
 
-        return encrypt(attribute);
+        return encode(attribute);
     }
 
     @Override
@@ -25,21 +25,25 @@ public interface EncryptConverter extends StringConverter {
             return null;
         }
 
-        return decrypt(column);
+        return decode(column);
     }
 
     /**
-     * 加密方法
-     * @param originalText
+     * 编码方法
+     * @param originalStr
      * @return
      */
-    String encrypt(String originalText);
+    default String encode(String originalStr) {
+        return originalStr;
+    }
 
     /**
-     * 解密方法
-     * @param ciphertext
+     * 解码方法
+     * @param encodedStr
      * @return
      */
-    String decrypt(String ciphertext);
+    default String decode(String encodedStr) {
+        return encodedStr;
+    }
 
 }
