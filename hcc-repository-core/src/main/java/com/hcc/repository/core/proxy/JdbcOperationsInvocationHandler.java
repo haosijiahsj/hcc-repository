@@ -35,16 +35,13 @@ public class JdbcOperationsInvocationHandler implements InvocationHandler {
             return method.invoke(jdbcOperations, args);
         }
 
-        if (configuration.isPrintSqlLog()) {
-            this.printPrepareSqlLog(args[0].toString(), args[1]);
-        }
         long begin = System.currentTimeMillis();
 
         // 执行sql
         Object executeResult = method.invoke(jdbcOperations, args);
 
         if (configuration.isPrintSqlLog()) {
-            this.printSqlResult(executeResult, begin);
+            this.printSqlLog(args[0].toString(), args[1], executeResult, System.currentTimeMillis() - begin);
         }
 
         return executeResult;
@@ -55,25 +52,17 @@ public class JdbcOperationsInvocationHandler implements InvocationHandler {
      * @param sql
      * @param sqlArg
      */
-    private void printPrepareSqlLog(String sql, Object sqlArg) {
-        System.out.println("========== execute sql begin ==========");
-        System.out.println("==>  Preparing:  " + sql);
+    private void printSqlLog(String sql, Object sqlArg, Object result, long totalMs) {
+        String sqlParamMsg;
         if (sqlArg instanceof Object[]) {
             String paramStr = Arrays.stream((Object[]) sqlArg)
                     .map(param -> param == null ? "null" : param + "(" + param.getClass().getSimpleName() + ")")
                     .collect(Collectors.joining(", "));
-            System.out.println("==>  Parameters: " + paramStr);
+            sqlParamMsg = "==>  Parameters: " + paramStr;
         } else {
-            System.out.println("==>  Parameters: " + sqlArg);
+            sqlParamMsg = "==>  Parameters: " + sqlArg;
         }
-    }
 
-    /**
-     * 打印结果信息
-     * @param result
-     * @param begin
-     */
-    private void printSqlResult(Object result, long begin) {
         long total = 0;
         if (result != null) {
             if (result instanceof Collection) {
@@ -82,9 +71,15 @@ public class JdbcOperationsInvocationHandler implements InvocationHandler {
                 total = 1;
             }
         }
-        System.out.println("<==       Total: " + total);
-        System.out.printf("elapsed time: %sms%n", System.currentTimeMillis() - begin);
-        System.out.println("========== execute sql end   ==========");
+
+        System.out.println(
+                "========== execute sql begin ==========\n"
+                + "==>  Preparing:  " + sql + "\n"
+                + sqlParamMsg + "\n"
+                + "<==       Total: " + total + "\n"
+                + String.format("elapsed time: %sms%n", totalMs)
+                + "========== execute sql end   =========="
+        );
     }
 
 }
