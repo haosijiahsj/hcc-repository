@@ -23,7 +23,7 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
- * TableInfoCache
+ * 实体元数据工具
  *
  * @author hushengjun
  * @date 2023/3/17
@@ -60,7 +60,7 @@ public class TableInfoHelper {
         tableInfo.setTableName(resolveTableName(clazz));
         if (tableAnnotation != null) {
             tableInfo.setColumnPrefix(tableAnnotation.columnPrefix());
-            tableInfo.setIgnorePropertyNames(Arrays.asList(tableAnnotation.ignorePropertyNames()));
+            tableInfo.setIgnorePropNames(Arrays.asList(tableAnnotation.ignorePropNames()));
             tableInfo.setPropSet(tableAnnotation.propSet());
         }
 
@@ -72,7 +72,7 @@ public class TableInfoHelper {
                 continue;
             }
             String fieldName = field.getName();
-            if (CollUtils.isNotEmpty(tableInfo.getIgnorePropertyNames()) && tableInfo.getIgnorePropertyNames().contains(fieldName)) {
+            if (CollUtils.isNotEmpty(tableInfo.getIgnorePropNames()) && tableInfo.getIgnorePropNames().contains(fieldName)) {
                 continue;
             }
 

@@ -196,7 +196,7 @@ public abstract class AbstractMethodHandler {
         Class<? extends IConverter> converter = null;
         if (columnInfo.needConvert()) {
             converter = columnInfo.getConverter();
-        } else if (columnInfo.isAssignableFromIEnum()) {
+        } else if (columnInfo.isIEnum()) {
             converter = IEnumConverter.class;
         } else if (columnInfo.isEnum()) {
             if (String.class.equals(columnInfo.getFieldType())) {

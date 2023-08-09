@@ -33,12 +33,12 @@ public @interface Table {
      * 忽略的属性名称，实体字段名称
      * @return
      */
-    String[] ignorePropertyNames() default {};
+    String[] ignorePropNames() default {};
 
     /**
      * 属性设置监听器
      * @return
      */
-    Class<? extends PropSetListener> propSet() default Constants.DefPropSetListener.class;
+    Class<? extends PropSetListener> propSet() default Constants.UnknownPropSetListener.class;
 
 }

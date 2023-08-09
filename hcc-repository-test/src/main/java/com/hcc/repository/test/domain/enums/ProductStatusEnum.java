@@ -26,4 +26,7 @@ public enum ProductStatusEnum implements IEnum<Integer> {
         return code;
     }
 
+    public String getName() {
+        return name;
+    }
 }

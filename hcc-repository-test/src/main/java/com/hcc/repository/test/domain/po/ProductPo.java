@@ -1,12 +1,13 @@
 package com.hcc.repository.test.domain.po;
 
+import com.hcc.repository.annotation.Column;
 import com.hcc.repository.annotation.Id;
 import com.hcc.repository.annotation.IdType;
-import com.hcc.repository.annotation.PropSetListener;
 import com.hcc.repository.annotation.Table;
 import com.hcc.repository.annotation.Version;
 import com.hcc.repository.extension.generator.id.SnowFlakeIdGenerator;
 import com.hcc.repository.test.domain.enums.ProductStatusEnum;
+import com.hcc.repository.test.domain.listener.ProductStatusNamePropSetListener;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
@@ -22,7 +23,7 @@ import java.math.BigDecimal;
 @EqualsAndHashCode(callSuper = true)
 @Data
 @ToString(callSuper = true)
-@Table(value = "product")
+@Table(value = "product", propSet = ProductStatusNamePropSetListener.class)
 public class ProductPo extends BasePo {
 
     @Id(idType = IdType.GENERATE, generator = SnowFlakeIdGenerator.class)
@@ -32,12 +33,7 @@ public class ProductPo extends BasePo {
     private ProductStatusEnum productStatus;
     @Version
     private Integer version;
-
-    public static class TestPropSetListener implements PropSetListener {
-        @Override
-        public Object onPropSet(Object entity, Object value, String propName, String columnName) {
-            return value;
-        }
-    }
+    @Column(ignore = true)
+    private String productStatusName;
 
 }

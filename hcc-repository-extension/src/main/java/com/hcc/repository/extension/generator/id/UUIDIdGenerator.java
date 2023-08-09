@@ -10,7 +10,7 @@ import java.util.UUID;
  * @author hushengjun
  * @date 2023/4/4
  */
-public class UuidIdGenerator implements IdGenerator<String> {
+public class UUIDIdGenerator implements IdGenerator<String> {
 
     @Override
     public String nextId() {

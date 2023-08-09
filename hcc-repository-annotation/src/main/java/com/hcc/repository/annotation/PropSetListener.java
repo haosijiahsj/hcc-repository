@@ -9,6 +9,18 @@ package com.hcc.repository.annotation;
 public interface PropSetListener {
 
     /**
+     * 满足条件的才会执行onPropSet方法
+     * @param entity
+     * @param value
+     * @param propName
+     * @param columnName
+     * @return
+     */
+    default boolean test(Object entity, Object value, String propName, String columnName) {
+        return true;
+    }
+
+    /**
      * 实体属性值设置后回调方法
      * @param entity
      * @param value

@@ -33,6 +33,11 @@ public interface Constants {
     /**
      * 默认的属性监听器
      */
-    class DefPropSetListener implements PropSetListener {}
+    class UnknownPropSetListener implements PropSetListener {
+        @Override
+        public Object onPropSet(Object entity, Object value, String propName, String columnName) {
+            throw new UnsupportedOperationException("请实现PropSetListener");
+        }
+    }
 
 }

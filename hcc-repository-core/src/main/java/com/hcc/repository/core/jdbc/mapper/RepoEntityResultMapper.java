@@ -1,6 +1,7 @@
 package com.hcc.repository.core.jdbc.mapper;
 
 import com.hcc.repository.annotation.IConverter;
+import com.hcc.repository.annotation.PropSetListener;
 import com.hcc.repository.core.convert.EnumNameConverter;
 import com.hcc.repository.core.convert.EnumOrdinalConverter;
 import com.hcc.repository.core.convert.IEnumConverter;
@@ -64,7 +65,7 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
             if (columnInfo.needConvert()) {
                 // 用户自定义转换器
                 converter = columnInfo.getConverter();
-            } else if (columnInfo.isAssignableFromIEnum()) {
+            } else if (columnInfo.isIEnum()) {
                 // IEnum枚举处理
                 converter = IEnumConverter.class;
             } else if (columnInfo.isEnum()) {
@@ -83,8 +84,12 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
             }
 
             // 执行监听器
-            targetValue = ReflectUtils.newInstanceForCache(tableInfo.getPropSet())
-                    .onPropSet(instance, targetValue, field.getName(), columnName);
+            if (tableInfo.needPropSet()) {
+                PropSetListener propSetListener = ReflectUtils.newInstanceForCache(tableInfo.getPropSet());
+                if (propSetListener.test(instance, targetValue, field.getName(), columnName)) {
+                    targetValue = propSetListener.onPropSet(instance, targetValue, field.getName(), columnName);
+                }
+            }
 
             // 反射赋值
             ReflectUtils.setValue(instance, field, targetValue);
