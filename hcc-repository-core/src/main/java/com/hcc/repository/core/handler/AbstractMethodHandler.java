@@ -207,7 +207,7 @@ public abstract class AbstractMethodHandler {
         }
 
         if (converter != null) {
-            return this.newInstanceConverter(converter, columnInfo.getFieldType());
+            return this.newInstanceConverter(converter, columnInfo);
         }
 
         return null;
@@ -216,12 +216,12 @@ public abstract class AbstractMethodHandler {
     /**
      * 实例化converter
      * @param converterClass
-     * @param targetClass
+     * @param columnInfo
      * @return
      */
-    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, TableColumnInfo columnInfo) {
         return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
-                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, columnInfo.getFieldType()))
                 .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 

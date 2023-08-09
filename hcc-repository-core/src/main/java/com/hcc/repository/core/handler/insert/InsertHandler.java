@@ -124,18 +124,6 @@ public class InsertHandler extends AbstractMethodHandler {
     }
 
     /**
-     * 实例化converter
-     * @param converterClass
-     * @param targetClass
-     * @return
-     */
-    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
-        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
-                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
-                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
-    }
-
-    /**
      * 获取填充值
      * @param tableInfo
      * @param columnInfo

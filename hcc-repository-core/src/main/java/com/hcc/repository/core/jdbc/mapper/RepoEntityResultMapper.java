@@ -78,7 +78,7 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
             }
 
             if (converter != null) {
-                targetValue = this.newInstanceConverter(converter, columnInfo.getFieldType()).convertToAttribute(columnValue);
+                targetValue = this.newInstanceConverter(converter, columnInfo).convertToAttribute(columnValue);
             } else {
                 targetValue = JdbcUtils.getResultSetValue(rs, index, fieldTypeClass);
             }
@@ -101,12 +101,12 @@ public class RepoEntityResultMapper<T> implements ResultMapper<T> {
     /**
      * 实例化converter
      * @param converterClass
-     * @param targetClass
+     * @param columnInfo
      * @return
      */
-    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
+    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, TableColumnInfo columnInfo) {
         return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
-                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
+                .map(c -> (IConverter) ConstructorUtils.newInstance(c, columnInfo.getFieldType()))
                 .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 

@@ -11,11 +11,9 @@ import com.hcc.repository.core.metadata.TableColumnInfo;
 import com.hcc.repository.core.metadata.TableInfo;
 import com.hcc.repository.core.metadata.TableInfoHelper;
 import com.hcc.repository.core.utils.Assert;
-import com.hcc.repository.core.utils.ConstructorUtils;
 import com.hcc.repository.core.utils.ReflectUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 /**
  * UpdateEntityHandler
@@ -80,18 +78,6 @@ public class UpdateEntityHandler extends AbstractUpdateHandler {
         }
 
         return targetValue;
-    }
-
-    /**
-     * 实例化converter
-     * @param converterClass
-     * @param targetClass
-     * @return
-     */
-    private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, Class<?> targetClass) {
-        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
-                .map(c -> (IConverter) ConstructorUtils.newInstance(c, targetClass))
-                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 
     /**
