@@ -1,7 +1,7 @@
 package com.hcc.repository.extension.converter.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 
 /**
  * JacksonConverter
@@ -20,21 +20,15 @@ public class JacksonConverter implements JsonConverter<Object> {
     }
 
     @Override
+    @SneakyThrows
     public String toJson(Object attribute) {
-        try {
-            return OBJECT_MAPPER.writeValueAsString(attribute);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return OBJECT_MAPPER.writeValueAsString(attribute);
     }
 
     @Override
+    @SneakyThrows
     public Object parseJson(String json) {
-        try {
-            return OBJECT_MAPPER.readValue(json, targetClass);
-        } catch (JsonProcessingException e) {
-            throw new RuntimeException(e);
-        }
+        return OBJECT_MAPPER.readValue(json, targetClass);
     }
 
 }

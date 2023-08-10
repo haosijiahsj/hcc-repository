@@ -14,7 +14,8 @@ public class SelectProviderTest extends BaseTest {
 
     @Test
     public void selectProvider1Test() {
-        ProductPo productPo = productMapper.selectProvider1(375700039445909504L);
+        ProductPo productPo = productMapper.selectProvider1(401459829337886723L);
+        System.out.println(productPo);
     }
 
 }

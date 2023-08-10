@@ -21,8 +21,11 @@ import com.hcc.repository.core.utils.JSqlParserUtils;
 import com.hcc.repository.core.utils.Pair;
 import com.hcc.repository.core.utils.ReflectUtils;
 import com.hcc.repository.core.utils.SqlParseUtils;
+import com.hcc.repository.core.utils.StrUtils;
 import lombok.extern.slf4j.Slf4j;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -220,9 +223,29 @@ public abstract class AbstractMethodHandler {
      * @return
      */
     private IConverter newInstanceConverter(Class<? extends IConverter> converterClass, TableColumnInfo columnInfo) {
-        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
-                .map(c -> (IConverter) ConstructorUtils.newInstance(c, columnInfo.getFieldType()))
-                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
+        Constructor<?>[] constructors = converterClass.getDeclaredConstructors();
+        for (Constructor<?> constructor : constructors) {
+            if (constructor.getParameterCount() > 1) {
+                continue;
+            }
+
+            if (constructor.getParameterCount() == 1) {
+                Class<?> parameterType = constructor.getParameterTypes()[0];
+                if (Class.class.equals(parameterType)) {
+                    return (IConverter) ConstructorUtils.newInstance(constructor, columnInfo.getFieldType());
+                } else if (Field.class.equals(parameterType)) {
+                    return (IConverter) ConstructorUtils.newInstance(constructor, columnInfo.getField());
+                }
+            } else if (constructor.getParameterCount() == 0) {
+                return ReflectUtils.newInstance(converterClass);
+            }
+        }
+
+        throw new IllegalArgumentException(StrUtils.format("converter: {0} 没有合适的构造器，如：public Converter() {}, public Converter(Class<?> clazz) {}, public Converter(Field field) {}", converterClass.getName()));
+
+//        return Optional.ofNullable(ReflectUtils.matchConstruct(converterClass, Class.class))
+//                .map(c -> (IConverter) ConstructorUtils.newInstance(c, columnInfo.getFieldType()))
+//                .orElseGet(() -> ReflectUtils.newInstance(converterClass));
     }
 
     /**

@@ -2,7 +2,10 @@ package com.hcc.repository.annotation;
 
 /**
  * IConverter<br/>
- * 在实现此接口时可定义一个带参（字段类型class）的构造方法，此处会自动注入该字段
+ * 提供字段class与字段的注入，实现时提供对应构造方法即可，多个会按以下顺序使用构造方法<br/>
+ * public CustomerConverter(Class<?> clazz) {}<br/>
+ * public CustomerConverter(Field field) {}<br/>
+ * public CustomerConverter() {}<br/>
  *
  * @author hushengjun
  * @date 2023/3/3

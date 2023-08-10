@@ -24,7 +24,7 @@ public @interface Column {
     String value() default "";
 
     /**
-     * 转换器
+     * 转换器<br/>
      * @return
      */
     Class<? extends IConverter> converter() default Constants.UnknownConverter.class;

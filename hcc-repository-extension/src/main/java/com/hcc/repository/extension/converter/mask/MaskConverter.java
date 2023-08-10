@@ -31,6 +31,14 @@ public interface MaskConverter extends StringConverter {
     }
 
     /**
+     * 脱敏占位符
+     * @return
+     */
+    default String maskPlaceholder() {
+        return MASK_PLACEHOLDER;
+    }
+
+    /**
      * 脱敏工具方法
      * @param original
      * @param prefixLen
@@ -59,7 +67,7 @@ public interface MaskConverter extends StringConverter {
      * @return
      */
     default String mask(String original, int prefixLen, int maskLen, int suffixLen) {
-        return mask(original, prefixLen, maskLen, suffixLen, MASK_PLACEHOLDER);
+        return mask(original, prefixLen, maskLen, suffixLen, maskPlaceholder());
     }
 
     /**
