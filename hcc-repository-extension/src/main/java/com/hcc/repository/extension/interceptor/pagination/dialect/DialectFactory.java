@@ -4,7 +4,7 @@ import com.hcc.repository.core.constants.DbType;
 import com.hcc.repository.extension.interceptor.pagination.dialect.handler.MysqlDialect;
 import com.hcc.repository.extension.interceptor.pagination.dialect.handler.Oracle12cDialect;
 import com.hcc.repository.extension.interceptor.pagination.dialect.handler.OracleDialect;
-import com.hcc.repository.extension.interceptor.pagination.dialect.handler.PostgreDialect;
+import com.hcc.repository.extension.interceptor.pagination.dialect.handler.PostgreSQLDialect;
 import com.hcc.repository.extension.interceptor.pagination.dialect.handler.SQLServerDialect;
 
 import java.util.EnumMap;
@@ -22,7 +22,7 @@ public class DialectFactory {
 
     static {
         dbTypeDialectMap.put(DbType.MYSQL, new MysqlDialect());
-        dbTypeDialectMap.put(DbType.POSTGRE_SQL, new PostgreDialect());
+        dbTypeDialectMap.put(DbType.POSTGRE_SQL, new PostgreSQLDialect());
         dbTypeDialectMap.put(DbType.ORACLE, new OracleDialect());
         dbTypeDialectMap.put(DbType.ORACLE_12C, new Oracle12cDialect());
         dbTypeDialectMap.put(DbType.SQL_SERVER, new SQLServerDialect());

@@ -66,10 +66,7 @@ public class PaginationContext {
      */
     public void addPageSqlParameter(Object...args) {
         Assert.isNotNull(args, "添加的分页参数不能为空");
-
-        for (Object arg : args) {
-            this.addPageSqlParameter(arg);
-        }
+        Arrays.stream(args).forEach(this::addPageSqlParameter);
     }
 
     /**

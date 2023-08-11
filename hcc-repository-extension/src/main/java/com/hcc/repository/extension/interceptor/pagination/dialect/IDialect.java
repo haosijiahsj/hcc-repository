@@ -11,7 +11,7 @@ import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
 public interface IDialect {
 
     /**
-     * 分页处理
+     * 分页处理，在上下文中修改原始sql、原始sql参数并设置count sql
      * @param context
      */
     void handle(PaginationContext context);

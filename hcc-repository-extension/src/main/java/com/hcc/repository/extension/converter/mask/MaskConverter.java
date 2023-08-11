@@ -13,11 +13,6 @@ public interface MaskConverter extends StringConverter {
     String MASK_PLACEHOLDER = "*";
 
     @Override
-    default String convertToColumn(String attribute) {
-        return attribute;
-    }
-
-    @Override
     default String convertToAttribute(String column) {
         if (column == null) {
             return null;

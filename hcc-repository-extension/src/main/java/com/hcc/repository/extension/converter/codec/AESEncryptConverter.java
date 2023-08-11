@@ -1,5 +1,8 @@
 package com.hcc.repository.extension.converter.codec;
 
+import com.hcc.repository.core.utils.Assert;
+import com.hcc.repository.core.utils.StrUtils;
+
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
@@ -21,10 +24,23 @@ public class AESEncryptConverter implements CodecConverter {
         return "hcc-repository29";
     }
 
+    /**
+     * 解密失败回调方法
+     * @param encryptedStr
+     * @param e
+     * @return
+     */
+    protected String onDecryptException(String encryptedStr, Exception e) {
+        throw new RuntimeException(e);
+    }
+
     private byte[] getSecretKey() {
-        byte[] bytes = secretKey().getBytes(StandardCharsets.UTF_8);
+        String secretKey = secretKey();
+        Assert.isTrue(StrUtils.isNotEmpty(secretKey), "密钥不能为空");
+
+        byte[] bytes = secretKey.getBytes(StandardCharsets.UTF_8);
         if (bytes.length * 8 != 128 && bytes.length * 8 != 192 && bytes.length * 8 != 256) {
-            throw new IllegalArgumentException(String.format("密钥：[%s]非法，只能是128、192、256位", secretKey()));
+            throw new IllegalArgumentException(StrUtils.format("密钥：[{0}]非法，只能是128、192、256位", secretKey));
         }
 
         return bytes;
@@ -62,14 +78,13 @@ public class AESEncryptConverter implements CodecConverter {
         try {
             Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
             cipher.init(Cipher.DECRYPT_MODE, keySpec);
-
             byte[] encodedBytes = Base64.getDecoder().decode(encodedStr.getBytes(StandardCharsets.UTF_8));
 
             byte[] decryptedBytes = cipher.doFinal(encodedBytes);
 
             return new String(decryptedBytes);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return onDecryptException(encodedStr, e);
         }
     }
 

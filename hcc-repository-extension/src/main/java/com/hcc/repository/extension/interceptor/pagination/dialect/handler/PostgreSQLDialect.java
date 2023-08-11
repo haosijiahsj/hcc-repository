@@ -5,12 +5,12 @@ import com.hcc.repository.extension.interceptor.pagination.PaginationContext;
 import com.hcc.repository.extension.interceptor.pagination.dialect.AbstractDialect;
 
 /**
- * Postgre分页
+ * PostgreSQL分页
  *
  * @author hushengjun
  * @date 2023/5/1
  */
-public class PostgreDialect extends AbstractDialect {
+public class PostgreSQLDialect extends AbstractDialect {
 
     @Override
     protected void handlePageSql(PaginationContext context) {
